@@ -12,7 +12,7 @@ description: Create or revise hand-drawn dynamic-comic videos by drawing charact
 1. 读取用户故事、角色、参考和已有项目。保留原文的题材、关系、事实边界与情绪；信息足以制作时自行补齐普通创作选择。用户只请求分镜、角色设计或代码修改时，到该交付物完成为止。
 2. 从故事提取 Narrative Beats，再确定镜头、时长、动作原因和声音。参考图锁定发型、服装、比例、配色等辨识锚点，不锁姿势、表情或构图。参考视频用于学习笔触、节奏和运动规律，不挪用独有剧情、人物或素材。
 3. 将角色设计转成可绘制的形状与运动参数。复杂照片或精细二次元角色可按目标画风简化，但需在预览和交付时说明简化程度；不能把风格化简笔角色说成高精度肖像复刻。
-4. 在仓库外创建独立项目。可复制 `assets/painted-frame-starter/`，按 [代码逐帧绘制](references/painted-frame.md) 完成时间轴、绘制、截帧、编码与复核。项目内保存源代码、角色参考、授权音频、关键帧和 MP4；私有内容不提交到 Skill 仓库。
+4. 在仓库外创建独立项目。可复制 `assets/painted-frame-starter/`，按 [代码逐帧绘制](references/painted-frame.md) 和 [逐帧生产合同](references/procedural-frame.md) 完成节拍时间轴、绘制、截帧、编码与复核。项目内保存源代码、角色参考、授权音频、关键帧和 MP4；私有内容不提交到 Skill 仓库。
 
 ## 绘制与动画约束
 
