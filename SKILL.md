@@ -1,15 +1,17 @@
 ---
 name: dynamic-comic-video
-description: Create and revise sequential motion-comic videos from stories, scripts, character references, or independent panels. Use for dynamic comics, motion comics, 动态漫画, or 漫剧 with consistent characters, fixed-camera local acting, timed audio/subtitles, and Remotion MP4 output. Not for generic slideshows, full frame-by-frame animation, or phoneme lip sync.
+description: Create and revise motion-comic videos from stories, scripts, character references, or panels. Use for 动态漫画 or 漫剧 with consistent characters. Supports layered fixed-camera Remotion output and a procedural frame-by-frame p5 route with moving cameras. Not for generic slideshows or phoneme lip sync.
 ---
 
 # Dynamic Comic Video — V1.0 workflow
 
-将用户内容制作成连续分镜式动态漫画：剧情决定分镜，事件触发人物表演，实际声音决定时间，硬切推进叙事。当前对外版本是 V1.0；历史文档中的 V0.4 只表示这套工作流早期的执行闭环，已经纳入 V1.0，不是另一套运行模式或产品版本。
+将用户内容制作成连续分镜式动态漫画：剧情决定分镜，事件触发人物表演，实际声音决定时间。分层 Remotion 路线以硬切推进叙事；逐帧 p5 路线允许符合故事的镜头运动，默认以直接剪接衔接镜头。当前对外版本是 V1.0；历史文档中的 V0.4 只表示这套工作流早期的执行闭环，已经纳入 V1.0，不是另一套运行模式或产品版本。
 
 ## 入口与按需加载
 
-先读取 [总控与恢复规则](references/v10-control-system.md)，判断本次是新建、继续还是局部修改。只加载当前阶段对应的文档，不一次读完全部 references。用户只请求分镜、提示词或局部修改时，到该交付物完成为止，不自动扩展为整片制作。
+若项目已有 `production/plan.json`、`scripts/production.mjs` 和可逐帧绘制的 `src/`，先走 [逐帧动画路线](references/procedural-frame.md)。用户明确要求连续运动或移动镜头时，也可以为新项目选择这条路线。此时以 p5 项目的镜头计划为制作数据，使用 `scripts/procedural.py` 检查、出逐镜图和渲染；下文固定机位、硬切、master/PNG 图层以及四份 Remotion 合同只适用于分层动态漫画路线。
+
+分层动态漫画路线先读取 [总控与恢复规则](references/v10-control-system.md)，判断本次是新建、继续还是局部修改。只加载当前阶段对应的文档，不一次读完全部 references。用户只请求分镜、提示词或局部修改时，到该交付物完成为止，不自动扩展为整片制作。
 
 | 当前任务 | 读取 | 本阶段结果 |
 | --- | --- | --- |
@@ -29,7 +31,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)，选择简化搞笑条漫画风时读 [风格预设](references/simple-comic-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [制作闭环与验收](references/v04-production.md)，规划能力扩展才读 [后续优化路线](references/v05-roadmap.md)。
 
-## 全程保持的创作约束
+## 分层动态漫画路线的创作约束
 
 - 保留原文的题材、地域、时代、关系、因果、事实边界与情绪。视觉语言由用户或 brief 决定，示例不是题材限制。关键设定无法可靠判断才问，其余合理假设写入 brief。
 - Character Reference 只锁身份、服装、比例与辨识锚点，不锁姿势、表情、景别和构图。新绘镜头按剧情设计表演，不能反复粘贴固定立绘。
@@ -39,7 +41,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 - 实际配音先于最终字幕、嘴型、动作触发与 CUT 定时。没有音频时可以草拟时间，但不能报告为已同步；无对白作品不强加配音或嘴型。
 - 默认新生图档位为 `comic-economy`，用户已有选择优先。知识卡、总结卡、CTA、特效和背景音乐只按创作需求启用。
 
-## 执行与验证
+## 分层动态漫画路线的执行与验证
 
 从本文件定位绝对技能目录，保留独立项目与 renderer 的绝对路径。文档中的 `scripts/...` 均相对技能目录，`<project>` 指用户项目；路径含空格时加引号。优先使用已安装环境的 Python，不假定当前目录就是技能根目录。
 
@@ -58,7 +60,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 ## 工具、隐私与保留
 
-使用当前环境可用且已获授权的图像/音频工具，读取相应技能说明；本项目不内置云端生成 API。能力边界是局部关键帧、对齐姿态切换与简单音量驱动嘴型，不承诺自动抠图、骨骼绑定、精确音素口型或完整逐帧动画。
+使用当前环境可用且已获授权的图像/音频工具，读取相应技能说明；本项目不内置云端生成 API。分层路线的能力边界是局部关键帧、对齐姿态切换与简单音量驱动嘴型；逐帧路线依赖外部 p5 项目逐帧绘制。两条路线都不承诺自动抠图、骨骼绑定或精确音素口型。
 
 用户原文、参考、JSON、配音、master、图层、预览和 MP4 保存在仓库之外的独立项目目录，renderer 位于项目之外。保留源素材和恢复所需中间文件；只在用户要求清理时删除已明确范围的临时文件，不因交付完成自动删除。
 

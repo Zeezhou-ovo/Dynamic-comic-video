@@ -1,0 +1,89 @@
+{
+  "version": "0.1",
+  "project_id": "yaya-star-seed",
+  "source_workflow": "Dynamic-comic-video narrative beats and shot review, adapted for procedural p5 rendering",
+  "source_files": ["src/rabbit.js", "src/scenes/rabbit_seed.js"],
+  "format": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "duration_frames": 360
+  },
+  "character": {
+    "id": "yaya",
+    "name": "芽芽",
+    "identity_anchors": [
+      "白色椭圆身体和圆头",
+      "两只长耳与粉色内耳",
+      "珊瑚色围巾",
+      "短手脚和小圆尾"
+    ]
+  },
+  "scene": {
+    "space": "同一片傍晚森林草地",
+    "lighting": "冷色月光，暖色种子与花",
+    "anchors": ["月亮位于画面右上", "草地地平线连续", "种子落点与花的生长点相邻"]
+  },
+  "beats": [
+    { "id": "discover", "change": "发光种子从天而降", "emotion": "好奇到惊讶" },
+    { "id": "care", "change": "芽芽把种子送入土中", "emotion": "决定照顾并耐心等待" },
+    { "id": "reward", "change": "幼芽开成花", "emotion": "惊喜到快乐" }
+  ],
+  "shots": [
+    {
+      "id": "A",
+      "beat_id": "discover",
+      "start_frame": 0,
+      "duration_frames": 96,
+      "event": "种子划过天空并落地",
+      "reaction": "芽芽先抬眼，再转向落点",
+      "incoming_state": "芽芽在草地上观察森林",
+      "outgoing_state": "芽芽知道种子的落点",
+      "transition_in": "none",
+      "transition_out": "cut",
+      "handoff": "种子落点引导下一镜头的前进方向",
+      "reads": [
+        { "start_frame": 0, "end_frame": 25, "meaning": "看清角色与森林" },
+        { "start_frame": 25, "end_frame": 61, "meaning": "追随坠落的光" },
+        { "start_frame": 61, "end_frame": 96, "meaning": "看见种子落点与角色反应" }
+      ]
+    },
+    {
+      "id": "B",
+      "beat_id": "care",
+      "start_frame": 96,
+      "duration_frames": 120,
+      "event": "芽芽两次跳向种子，捧起并放入土中",
+      "reaction": "接近时放慢，手臂伸向种子",
+      "incoming_state": "芽芽已决定去看种子",
+      "outgoing_state": "种子入土，芽芽停下等待",
+      "transition_in": "cut",
+      "transition_out": "cut",
+      "handoff": "土中的暖光延续到发芽镜头",
+      "reads": [
+        { "start_frame": 0, "end_frame": 38, "meaning": "兔子向种子移动" },
+        { "start_frame": 38, "end_frame": 75, "meaning": "种子升到爪边" },
+        { "start_frame": 75, "end_frame": 120, "meaning": "种子入土并留出等待" }
+      ]
+    },
+    {
+      "id": "C",
+      "beat_id": "reward",
+      "start_frame": 216,
+      "duration_frames": 144,
+      "event": "芽、叶、花瓣和花心依次生长",
+      "reaction": "芽芽先屏息，再露出笑容并轻跳",
+      "incoming_state": "芽芽等待土中的种子",
+      "outgoing_state": "花盛开，芽芽感到快乐",
+      "transition_in": "cut",
+      "transition_out": "none",
+      "handoff": "花与芽芽同框停留，作为结尾画面",
+      "reads": [
+        { "start_frame": 0, "end_frame": 36, "meaning": "芽出现" },
+        { "start_frame": 36, "end_frame": 83, "meaning": "花逐层盛开" },
+        { "start_frame": 83, "end_frame": 126, "meaning": "芽芽的惊喜与花的光" },
+        { "start_frame": 126, "end_frame": 144, "meaning": "留住结尾" }
+      ]
+    }
+  ]
+}
