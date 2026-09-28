@@ -1,6 +1,6 @@
-# 代码逐帧绘制：默认制作路径
+# 代码逐帧绘制
 
-本路径是新项目的默认制作方式：用代码绘制角色和场景的每一帧，再截帧编码。原 `sequential-comic` Remotion 管线保留供旧项目维护；本路径**不是**对 master、对齐图层或 `motion_plan` 0.3 的扩展。不要把现有 `prepare`、`preview.py`、`deliver.py` 宣称为已支持本路径；使用本路径自己的预览、截帧和交付记录。可从 `assets/painted-frame-starter/` 复制最小工程。
+本 Skill 用代码绘制角色和场景的每一帧，再截帧编码。它与 `dynamic-comic-video` 的 `sequential-comic` Remotion 管线是独立路线，不共用 master、对齐图层或 `motion_plan` 0.3。不要把另一条路线的 `prepare`、`preview.py`、`deliver.py` 宣称为已支持本路径；使用本 Skill 自己的预览、截帧和交付记录。可从 `assets/painted-frame-starter/` 复制最小工程。
 
 ## 目标与输入
 

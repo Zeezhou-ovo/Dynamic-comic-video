@@ -4,9 +4,9 @@
 
 ### 新增
 
-- 新项目采用 `planVersion: 3` 的逐镜 `animation_plan`；starter 在静帧、逐帧和编码前校验机位、主次动作、五层空间、视差、环境运动、光照、停顿与转场。镜头运动少于一半时要求静机位的叙事理由；重要事件需标明视觉强调。旧版计划维持兼容。
-- 新项目默认改用 `painted-frame`：p5.js／p5.brush 代码绘制角色、场景和动作，浏览器截帧并由 FFmpeg 编码；增加可复制的最小工程。旧 Remotion 数据合同和工具保留供已有项目维护。
-- 安装脚本现在只安装 Skill；每个新视频项目在仓库外独立安装 Node 和浏览器依赖。
+- 将两条路线分成独立 Skill：`dynamic-comic-video` 恢复 Remotion 分层动态漫画入口，`code-painted-video` 专用于代码逐帧绘制。安装脚本分别安装两者。
+- `code-painted-video` 使用 `planVersion: 3` 的逐镜 `animation_plan`；starter 在静帧、逐帧和编码前校验机位、主次动作、五层空间、视差、环境运动、光照、停顿与转场。镜头运动少于一半时要求静机位的叙事理由；重要事件需标明视觉强调。旧版计划维持兼容。
+- `code-painted-video` 使用 p5.js／p5.brush 绘制角色、场景和动作，浏览器截帧并由 FFmpeg 编码；提供可复制的最小工程。每个绘制项目在仓库外独立安装 Node 和浏览器依赖。
 
 ### 变更
 
