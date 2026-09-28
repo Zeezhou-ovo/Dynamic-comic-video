@@ -13,7 +13,7 @@ out/frames/
 out/video.mp4
 ```
 
-`plan.json` 至少包含 `fps`、`duration`、`width`、`height` 和 `shots`。每个 shot 写明 `start`、`end`、`action`、`camera` 与可选的 `beatEvents`。音乐节拍可以来自人工标记；没有可靠节拍时，必须标记为草拟时间轴。
+`plan.json` 至少包含 `fps`、`duration`、`width`、`height` 和 `shots`。每个 shot 写明 `start`、`end`、`action`、`camera` 与可选的 `beatEvents`。新项目设置 `planVersion: 2`，逐镜增加 [导演卡](shot-direction.md) 的叙事目的、视觉焦点、运动主次、空间、光、停顿和转场。`scripts/procedural.py` 对 v2 检查这些字段；旧计划仍可按原有字段读取。音乐节拍可以来自人工标记；没有可靠节拍时，必须标记为草拟时间轴。
 
 ## 绘制规则
 
@@ -22,6 +22,8 @@ out/video.mp4
 - 动作按准备、加速、峰值、回落、停顿拆成函数；镜头移动和角色位移使用连续 easing。
 - 只让笔触 boil 使用离散随机种子，例如 `floor(t * boilFps)`；不要累积上一帧状态。
 - 音乐事件只触发可见变化：步伐、转身、抬手、灯光闪动或镜头切换，不要每一拍都抖动全画面。
+- 将镜头位置、视差、角色姿势、环境和光照做成可随机访问的时间函数；所有层级在同一世界坐标中绘制，避免以独立图片平移代替演出。镜头移动时按深度调整位移，静止时保持空间稳定。
+- 对发光道具绘制附近地面、角色和环境的光照反馈；对拾取和种下等动作明确手与物体、物体与地面的接触帧。
 
 ## 推荐命令
 
