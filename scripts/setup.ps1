@@ -9,24 +9,12 @@ if (-not $InstallRoot) {
 }
 
 Write-Host "Preparing Dynamic-comic-video at $InstallRoot"
-if (-not (Get-Command python -ErrorAction SilentlyContinue)) { throw "Python 3.10+ is required." }
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw "Node.js/npm is required for MP4 rendering." }
-
 New-Item -ItemType Directory -Force $InstallRoot | Out-Null
 if ((Resolve-Path $RepoRoot).Path -ne (Resolve-Path $InstallRoot).Path) {
   Get-ChildItem -LiteralPath $RepoRoot -Force | Where-Object {
     $_.Name -notin @('.git', '.venv', 'node_modules', 'projects', 'renderer', 'manga-renderer')
   } | Copy-Item -Destination $InstallRoot -Recurse -Force
 }
-python -m venv (Join-Path $InstallRoot ".venv")
-$Py = Join-Path $InstallRoot ".venv\Scripts\python.exe"
-& $Py -m pip install -r (Join-Path $RepoRoot "requirements.txt")
-
-$Renderer = Join-Path $InstallRoot "assets\remotion"
-Push-Location $Renderer
-try { npm ci } finally { Pop-Location }
-
 Write-Host "Ready. Skill: $InstallRoot"
-Write-Host "Python: $Py"
-Write-Host "Renderer: $Renderer"
-Write-Host "Keep project stories, images, audio and MP4 files outside this shared skill folder."
+Write-Host "Copy assets\painted-frame-starter outside the Skill folder for each new video."
+Write-Host "Install Node and browser dependencies inside that video project."
