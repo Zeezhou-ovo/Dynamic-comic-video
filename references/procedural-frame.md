@@ -13,7 +13,7 @@ out/frames/
 out/video.mp4
 ```
 
-`plan.json` 至少包含 `fps`、`duration`、`width`、`height` 和 `shots`。每个 shot 写明 `start`、`end`、`action`、`camera` 与可选的 `beatEvents`。新项目设置 `planVersion: 2`，逐镜增加 [导演卡](shot-direction.md) 的叙事目的、视觉焦点、运动主次、空间、光、停顿和转场。`scripts/procedural.py` 对 v2 检查这些字段；旧计划仍可按原有字段读取。音乐节拍可以来自人工标记；没有可靠节拍时，必须标记为草拟时间轴。
+`plan.json` 至少包含 `fps`、`duration`、`width`、`height` 和 `shots`。每个 shot 写明 `start`、`end`、`action` 与可选的 `beatEvents`。新项目设置 `planVersion: 3`，逐镜增加 [导演卡](shot-direction.md) 中的 `animation_plan`。渲染前运行 `scripts/procedural.py validate <plan.json>`；starter 的 `render.mjs` 还会在静帧、全片帧和编码前检查计划。旧版计划仍可用于既有项目，不作为新项目模板。音乐节拍可以来自人工标记；没有可靠节拍时，必须标记为草拟时间轴。
 
 ## 绘制规则
 
@@ -28,10 +28,10 @@ out/video.mp4
 ## 推荐命令
 
 ```bash
-python3 scripts/procedural.py validate production/plan.json
-node assets/painted-frame-starter/render.mjs --stills=0,1,2
-node assets/painted-frame-starter/render.mjs --frames --workers=2
-node assets/painted-frame-starter/render.mjs --encode --audio=assets/song.wav --out=out/video.mp4
+python3 <skill-directory>/scripts/procedural.py validate plan.json
+node render.mjs --stills=0,1,2
+node render.mjs --frames --workers=2
+node render.mjs --encode --audio=assets/song.wav --out=out/video.mp4
 ```
 
 截帧前至少检查动作准备、接触、峰值、回稳和每个切点两侧；交付前检查实际时长、帧数、音轨和代表性中间帧。

@@ -26,11 +26,12 @@ bash scripts/setup.sh
 
 ## 开始一个视频项目
 
-把 [逐帧绘制起始工程](assets/painted-frame-starter/README.md) 复制到仓库之外的目录，先在 `scene.js` 中写清画布、时长、角色与 `drawWorld(t)`，再运行：
+把 [逐帧绘制起始工程](assets/painted-frame-starter/README.md) 复制到仓库之外的目录，先将 `plan.example.json` 复制为 `plan.json`，逐镜写好机位、主次动作、五个景深层、视差、环境、光照、停顿和转场，再按计划实现 `scene.js` 的 `drawWorld(t)`。缺失或不合规的计划会在渲染入口被拒绝。然后运行：
 
 ```sh
 npm install
 npx playwright install chromium
+cp plan.example.json plan.json
 node render.mjs --stills=0,2,4
 node render.mjs --frames
 node render.mjs --encode --audio=assets/audio.wav
