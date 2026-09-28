@@ -2,11 +2,12 @@
 
 Copy this directory **outside** the Skill repository for each new video. Replace the sample `drawWorld(t)` in `scene.js` with the project’s characters, setting, props, and time based actions. Keep the drawing reproducible from absolute time.
 
-Use `plan.example.json` as a director-card example and adapt it to the story before implementing shots. The plan documents intent and can be checked with `python3 <skill-directory>/scripts/procedural.py validate plan.example.json`; this minimal renderer does not automatically read the plan, so the scene code must implement its timing and direction.
+Copy `plan.example.json` to `plan.json` and adapt every scene before rendering. The renderer checks the plan before creating stills, frames or MP4; missing fields, insufficient camera motion without a stated reason, and moving cameras without required parallax stop the run. The plan must match `scene.js`'s `VIDEO` size, fps and duration. The renderer validates intent but cannot prove the drawn pixels follow it, so review moving previews and scene boundaries.
 
 ```sh
 npm install
 npx playwright install chromium
+cp plan.example.json plan.json
 npm run stills
 npm run frames
 npm run encode

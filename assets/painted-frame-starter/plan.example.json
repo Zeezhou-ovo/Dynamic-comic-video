@@ -1,33 +1,39 @@
 {
-  "planVersion": 2,
+  "planVersion": 3,
   "fps": 24,
-  "duration": 4,
+  "duration": 8,
   "width": 1280,
   "height": 720,
   "music": null,
   "shots": [
     {
       "start": 0,
-      "end": 4,
-      "action": "The traveler notices a light and pauses",
-      "camera": "STATIC",
+      "end": 8,
+      "action": "A small light travels across the painted landscape",
       "beatEvents": [],
-      "director": {
-        "narrativeGoal": "Show the traveler discovering the light",
-        "visualFocus": "The light near the traveler's hand",
-        "primaryMotion": "The traveler reaches toward the light and stops",
-        "secondaryMotions": ["The head tilts after the hand stops"],
-        "ambientMotions": ["Low, irregular leaf movement"],
-        "depth": "Traveler and light in midground; a branch crosses the foreground",
-        "lighting": "Light warms the hand and nearby ground",
-        "effects": null,
-        "timing": {
-          "preparation": [0, 0.7],
-          "action": [0.7, 2.2],
-          "pause": [2.2, 3.3],
-          "settle": [3.3, 4]
+      "animation_plan": {
+        "narrative_goal": "Demonstrate a seekable painted light moving through one scene",
+        "visual_focus": "The warm light",
+        "camera_shot": "wide",
+        "camera_motion": "static",
+        "static_necessity": "Hold the composition so the sample's time-based light motion is easy to inspect",
+        "primary_action": "The light arcs from left to right",
+        "secondary_motion": [],
+        "depth_layers": {
+          "foreground": null,
+          "character": "Moving light",
+          "midground": "Ground",
+          "background": "Sky",
+          "sky": null
         },
-        "transition": "Cut on the traveler's look toward the light"
+        "parallax_enabled": false,
+        "ambient_motion": [],
+        "lighting_change": "none",
+        "pause_before": 0,
+        "pause_after": 0,
+        "transition": "cut",
+        "important_moment": false,
+        "emphasis": []
       }
     }
   ]

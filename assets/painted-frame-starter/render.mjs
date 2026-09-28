@@ -4,11 +4,15 @@ import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { loadPlan } from './validate-plan.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map(part => {
   const [key, ...rest] = part.replace(/^--/, '').split('=');
   return [key, rest.length ? rest.join('=') : true];
 }));
+
+// Preflight is deliberately before launching Chrome and applies to stills, frames and encoding.
+const plan = loadPlan(String(args.plan || 'plan.json'));
 
 if (!args.frames && !args.stills && !args.encode) {
   console.log('Use --stills=0,2,4, --frames, or --encode [--audio=assets/audio.wav]');
@@ -31,7 +35,12 @@ async function openPage() {
 
 const firstPage = await openPage();
 const config = await firstPage.evaluate(() => window.videoConfig);
+if (plan.fps !== config.fps || plan.duration !== config.duration ||
+    plan.width !== config.width || plan.height !== config.height) {
+  throw new Error('Animation plan and scene VIDEO configuration disagree');
+}
 const fps = Number(args.fps || config.fps);
+if (fps !== plan.fps) throw new Error('Requested fps differs from the animation plan');
 const count = Math.ceil(config.duration * fps);
 const frameName = i => `out/frames/f${String(i).padStart(5, '0')}.png`;
 
