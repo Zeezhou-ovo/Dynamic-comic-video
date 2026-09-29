@@ -1,5 +1,7 @@
 # Dynamic-comic-video
 
+本文保留 Remotion 路线的历史说明。当前入口是根目录的 [SKILL.md](SKILL.md)；仓库现在还提供独立的 `code-painted-video` Skill。以下旧安装段落与当前双 Skill 安装方式不完全一致，以 [README.md](README.md) 为准。
+
 这是一个关于制作动态漫画视频的 Agent Skill 尝试。它用于探索如何把故事、角色、漫画分镜、局部人物动作、配音字幕和 Remotion 输出组织成连续分镜式动态漫画视频。
 
 项目目前处于持续试验和迭代阶段，欢迎项目组成员通过 GitHub 共同完善。真实故事、角色图和成片留在各自本地。
