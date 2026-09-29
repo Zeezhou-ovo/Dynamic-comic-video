@@ -4,9 +4,7 @@
 
 ### 新增
 
-- 将两条路线分成独立 Skill：`dynamic-comic-video` 恢复 Remotion 分层动态漫画入口，`code-painted-video` 专用于代码逐帧绘制。安装脚本分别安装两者。
-- `code-painted-video` 使用 `planVersion: 3` 的逐镜 `animation_plan`；starter 在静帧、逐帧和编码前校验机位、主次动作、五层空间、视差、环境运动、光照、停顿与转场。镜头运动少于一半时要求静机位的叙事理由；重要事件需标明视觉强调。旧版计划维持兼容。
-- `code-painted-video` 使用 p5.js／p5.brush 绘制角色、场景和动作，浏览器截帧并由 FFmpeg 编码；提供可复制的最小工程。每个绘制项目在仓库外独立安装 Node 和浏览器依赖。
+- 将代码逐帧绘制路线移至独立公开仓库 [code-painted-video](https://github.com/zeezhouovo-creator/code-painted-video)；本仓库只维护 Remotion 分层动态漫画 Skill，安装脚本也只安装该 Skill。
 
 ### 变更
 

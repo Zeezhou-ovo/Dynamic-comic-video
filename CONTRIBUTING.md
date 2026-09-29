@@ -1,6 +1,6 @@
 # 参与贡献
 
-感谢参与 `Dynamic-comic-video`。这个仓库维护 `dynamic-comic-video`（Remotion 分层动画）与 `code-painted-video`（代码逐帧绘制）两个独立 Skill，以及各自的合同、脚本和无用户内容的测试夹具。
+感谢参与 `Dynamic-comic-video`。这个仓库只维护 Remotion 分层动态漫画 Skill、相关合同、脚本和无用户内容的测试夹具。代码逐帧绘制路线已移至独立仓库 [code-painted-video](https://github.com/zeezhouovo-creator/code-painted-video)。
 
 ## 提交修改
 
@@ -22,4 +22,4 @@
 
 ## 规则变更
 
-涉及 Remotion 路线的分镜字段、动作约束或 Schema 时，更新根目录 `SKILL.md` 和对应资源。涉及逐帧路线时，更新 `skills/code-painted-video/SKILL.md` 和其目录内的资源。两条路线的行为变更都记录到 `CHANGELOG.md`，避免用另一条路线的合同或渲染命令解释当前项目。
+涉及分镜字段、动作约束或 Schema 的修改，应同步更新根目录 `SKILL.md`、相关 `references/`、Schema、测试和 `CHANGELOG.md`。逐帧代码绘制路线的贡献请转到独立仓库维护。
