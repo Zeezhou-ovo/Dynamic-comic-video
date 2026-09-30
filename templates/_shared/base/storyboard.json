@@ -1,0 +1,835 @@
+{
+  "version": "0.1",
+  "project_id": "phase4-generic-room",
+  "beats": [
+    {
+      "id": "b1",
+      "source_excerpt": "Lin finds a mysterious book on the reading room table. Bo leans in to look. The book opens and reveals a tiny golden light. They share a quiet smile.",
+      "change": "They spot an old book",
+      "emotion": "friendly"
+    },
+    {
+      "id": "b2",
+      "source_excerpt": "Lin finds a mysterious book on the reading room table. Bo leans in to look. The book opens and reveals a tiny golden light. They share a quiet smile.",
+      "change": "They inspect the book together",
+      "emotion": "friendly"
+    },
+    {
+      "id": "b3",
+      "source_excerpt": "Lin finds a mysterious book on the reading room table. Bo leans in to look. The book opens and reveals a tiny golden light. They share a quiet smile.",
+      "change": "They inspect the book together",
+      "emotion": "friendly"
+    },
+    {
+      "id": "b4",
+      "source_excerpt": "Lin finds a mysterious book on the reading room table. Bo leans in to look. The book opens and reveals a tiny golden light. They share a quiet smile.",
+      "change": "A warm light appears between the pages",
+      "emotion": "friendly"
+    },
+    {
+      "id": "b5",
+      "source_excerpt": "Lin finds a mysterious book on the reading room table. Bo leans in to look. The book opens and reveals a tiny golden light. They share a quiet smile.",
+      "change": "They smile at the discovery",
+      "emotion": "friendly"
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot_001",
+      "source_panel": "performance-test-1",
+      "beat_id": "b1",
+      "duration_frames": 48,
+      "purpose": "Lin speaks; Bo listens and blinks.",
+      "transition": "cut",
+      "setting": "Synthetic test stage",
+      "shot_size": "wide",
+      "angle": "eye_level",
+      "composition": "Lin speaks; Bo listens and blinks.",
+      "composition_tag": "center",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "speaks",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Bo"
+        },
+        {
+          "character_id": "bo",
+          "action": "listens",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Lin"
+        }
+      ],
+      "continuity": "Both characters remain on their assigned sides of the stage.",
+      "master": "shots/shot_001/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "Simple test stage",
+          "method": "reconstruct",
+          "reason": "Background plane."
+        },
+        {
+          "id": "lin_body",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_head",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_eyes",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_mouth",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_left_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_right_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_body",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_head",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_eyes",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_mouth",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_left_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_right_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        }
+      ],
+      "repetition_exception": "Repeated synthetic stage is intentional for runtime isolation.",
+      "dialogue": [
+        {
+          "speaker": "lin",
+          "text": "Hey, take a look!",
+          "start_frame": 2,
+          "end_frame": 46
+        }
+      ],
+      "direction": {
+        "scene_id": "stage",
+        "camera_position": "static",
+        "background_view": "stage-view-1",
+        "view_id": "stage-view-1",
+        "incoming_state": "Both characters hold their established positions.",
+        "outgoing_state": "The current interaction beat completes.",
+        "micro_actions": "Lin speaks; Bo listens and blinks.",
+        "cut_reason": "Advance to the next performance beat.",
+        "next_shot_id": "shot_002",
+        "handoff": "Continue with the speaker/listener relationship and stable screen direction.",
+        "reaction_hold_frames": 2,
+        "listening_reactions": [
+          {
+            "character_id": "bo",
+            "response": "listen and hold eye contact"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot_002",
+      "source_panel": "performance-test-2",
+      "beat_id": "b2",
+      "duration_frames": 24,
+      "purpose": "Lin points as the camera pushes in; Bo watches.",
+      "transition": "cut",
+      "setting": "Synthetic test stage",
+      "shot_size": "medium",
+      "angle": "eye_level",
+      "composition": "Lin points as the camera pushes in; Bo watches.",
+      "composition_tag": "right_third",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "Lin points as the camera pushes in; Bo watches.",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Bo"
+        },
+        {
+          "character_id": "bo",
+          "action": "listens",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Lin"
+        }
+      ],
+      "continuity": "Both characters remain on their assigned sides of the stage.",
+      "master": "shots/shot_002/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "Simple test stage",
+          "method": "reconstruct",
+          "reason": "Background plane."
+        },
+        {
+          "id": "lin_body",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_head",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_eyes",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_mouth",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_left_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_right_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_body",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_head",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_eyes",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_mouth",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_left_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_right_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        }
+      ],
+      "repetition_exception": "Repeated synthetic stage is intentional for runtime isolation.",
+      "dialogue": [],
+      "direction": {
+        "scene_id": "stage",
+        "camera_position": "push_in",
+        "background_view": "stage-view-2",
+        "view_id": "stage-view-2",
+        "incoming_state": "Both characters hold their established positions.",
+        "outgoing_state": "The current interaction beat completes.",
+        "micro_actions": "Lin points as the camera pushes in; Bo watches.",
+        "cut_reason": "Advance to the next performance beat.",
+        "next_shot_id": "shot_003",
+        "handoff": "Continue with the speaker/listener relationship and stable screen direction.",
+        "reaction_hold_frames": 0,
+        "listening_reactions": []
+      }
+    },
+    {
+      "id": "shot_003",
+      "source_panel": "performance-test-3",
+      "beat_id": "b3",
+      "duration_frames": 24,
+      "purpose": "Bo nods once in response.",
+      "transition": "cut",
+      "setting": "Synthetic test stage",
+      "shot_size": "medium",
+      "angle": "eye_level",
+      "composition": "Bo nods once in response.",
+      "composition_tag": "left_third",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "Bo nods once in response.",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Bo"
+        },
+        {
+          "character_id": "bo",
+          "action": "listens",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Lin"
+        }
+      ],
+      "continuity": "Both characters remain on their assigned sides of the stage.",
+      "master": "shots/shot_003/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "Simple test stage",
+          "method": "reconstruct",
+          "reason": "Background plane."
+        },
+        {
+          "id": "lin_body",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_head",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_eyes",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_mouth",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_left_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_right_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_body",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_head",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_eyes",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_mouth",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_left_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_right_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        }
+      ],
+      "repetition_exception": "Repeated synthetic stage is intentional for runtime isolation.",
+      "dialogue": [],
+      "direction": {
+        "scene_id": "stage",
+        "camera_position": "static",
+        "background_view": "stage-view-3",
+        "view_id": "stage-view-3",
+        "incoming_state": "Both characters hold their established positions.",
+        "outgoing_state": "The current interaction beat completes.",
+        "micro_actions": "Bo nods once in response.",
+        "cut_reason": "Advance to the next performance beat.",
+        "next_shot_id": "shot_004",
+        "handoff": "Continue with the speaker/listener relationship and stable screen direction.",
+        "reaction_hold_frames": 0,
+        "listening_reactions": []
+      }
+    },
+    {
+      "id": "shot_004",
+      "source_panel": "performance-test-4",
+      "beat_id": "b4",
+      "duration_frames": 24,
+      "purpose": "Bo speaks; Lin listens.",
+      "transition": "cut",
+      "setting": "Synthetic test stage",
+      "shot_size": "medium",
+      "angle": "eye_level",
+      "composition": "Bo speaks; Lin listens.",
+      "composition_tag": "diagonal",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "Bo speaks; Lin listens.",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Bo"
+        },
+        {
+          "character_id": "bo",
+          "action": "Bo speaks; Lin listens.",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Lin"
+        }
+      ],
+      "continuity": "Both characters remain on their assigned sides of the stage.",
+      "master": "shots/shot_004/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "Simple test stage",
+          "method": "reconstruct",
+          "reason": "Background plane."
+        },
+        {
+          "id": "lin_body",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_head",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_eyes",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_mouth",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_left_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_right_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_body",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_head",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_eyes",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_mouth",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_left_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_right_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        }
+      ],
+      "repetition_exception": "Repeated synthetic stage is intentional for runtime isolation.",
+      "dialogue": [
+        {
+          "speaker": "bo",
+          "text": "That's a great idea!",
+          "start_frame": 2,
+          "end_frame": 22
+        }
+      ],
+      "direction": {
+        "scene_id": "stage",
+        "camera_position": "static",
+        "background_view": "stage-view-4",
+        "view_id": "stage-view-4",
+        "incoming_state": "Both characters hold their established positions.",
+        "outgoing_state": "The current interaction beat completes.",
+        "micro_actions": "Bo speaks; Lin listens.",
+        "cut_reason": "Advance to the next performance beat.",
+        "next_shot_id": "shot_005",
+        "handoff": "Continue with the speaker/listener relationship and stable screen direction.",
+        "reaction_hold_frames": 2,
+        "listening_reactions": [
+          {
+            "character_id": "lin",
+            "response": "listen and hold eye contact"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot_005",
+      "source_panel": "performance-test-5",
+      "beat_id": "b5",
+      "duration_frames": 24,
+      "purpose": "Lin makes a small reaction bounce.",
+      "transition": "cut",
+      "setting": "Synthetic test stage",
+      "shot_size": "close_up",
+      "angle": "eye_level",
+      "composition": "Lin makes a small reaction bounce.",
+      "composition_tag": "symmetrical",
+      "characters": [
+        {
+          "character_id": "lin",
+          "action": "Lin makes a small reaction bounce.",
+          "pose_tag": "standing",
+          "expression": "happy",
+          "gaze": "Bo"
+        },
+        {
+          "character_id": "bo",
+          "action": "Lin makes a small reaction bounce.",
+          "pose_tag": "standing",
+          "expression": "neutral",
+          "gaze": "Lin"
+        }
+      ],
+      "continuity": "Both characters remain on their assigned sides of the stage.",
+      "master": "shots/shot_005/master.png",
+      "layers": [
+        {
+          "id": "bg",
+          "role": "background",
+          "elements": "Simple test stage",
+          "method": "reconstruct",
+          "reason": "Background plane."
+        },
+        {
+          "id": "lin_body",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_head",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_eyes",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_mouth",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_left_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "lin_right_arm",
+          "role": "character",
+          "character_id": "lin",
+          "elements": "lin right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_body",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo body",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_head",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo head",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_eyes",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo eyes",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_mouth",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo mouth",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_left_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo left_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        },
+        {
+          "id": "bo_right_arm",
+          "role": "character",
+          "character_id": "bo",
+          "elements": "bo right_arm",
+          "method": "reconstruct",
+          "reason": "Aligned local character part."
+        }
+      ],
+      "repetition_exception": "Repeated synthetic stage is intentional for runtime isolation.",
+      "dialogue": [],
+      "direction": {
+        "scene_id": "stage",
+        "camera_position": "static",
+        "background_view": "stage-view-5",
+        "view_id": "stage-view-5",
+        "incoming_state": "Both characters hold their established positions.",
+        "outgoing_state": "The current interaction beat completes.",
+        "micro_actions": "Lin makes a small reaction bounce.",
+        "cut_reason": "Advance to the next performance beat.",
+        "next_shot_id": null,
+        "handoff": "Continue with the speaker/listener relationship and stable screen direction.",
+        "reaction_hold_frames": 0,
+        "listening_reactions": []
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "stage",
+      "space": "Two characters on a flat stage with a simple horizon.",
+      "time": "day",
+      "lighting": "Soft even test lighting.",
+      "anchors": [
+        "Lin left",
+        "Bo right",
+        "shared ground line"
+      ]
+    }
+  ]
+}

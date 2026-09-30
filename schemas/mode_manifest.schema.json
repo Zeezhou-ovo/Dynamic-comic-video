@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "mode_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "shot": {
+          "type": "object",
+          "properties": {
+            "max_dialogue_beats": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8
+            },
+            "normal_intents": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "two_shot",
+                  "speaker_medium",
+                  "speaker_closeup",
+                  "establishing_wide"
+                ]
+              }
+            },
+            "emphasis_intent": {
+              "enum": [
+                "two_shot",
+                "speaker_medium",
+                "speaker_closeup",
+                "emphasis_push"
+              ]
+            }
+          },
+          "required": [
+            "max_dialogue_beats",
+            "normal_intents",
+            "emphasis_intent"
+          ],
+          "additionalProperties": false
+        },
+        "reaction": {
+          "type": "object",
+          "properties": {
+            "every_n_beats": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "strength": {
+              "enum": [
+                "subtle",
+                "medium",
+                "strong"
+              ]
+            },
+            "hold_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "closeup": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "every_n_beats",
+            "strength",
+            "hold_frames",
+            "closeup"
+          ],
+          "additionalProperties": false
+        },
+        "camera": {
+          "type": "object",
+          "properties": {
+            "intent": {
+              "enum": [
+                "static",
+                "subtle_push",
+                "stronger_push"
+              ]
+            },
+            "emphasis_intent": {
+              "enum": [
+                "static",
+                "subtle_push",
+                "stronger_push"
+              ]
+            },
+            "strength": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "motion_every_n_shots": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "intent",
+            "emphasis_intent",
+            "strength",
+            "motion_every_n_shots"
+          ],
+          "additionalProperties": false
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "line_pause_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "emphasis_pause_before": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "emphasis_pause_after": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "reading_frames_per_character": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "minimum_line_frames": {
+              "type": "integer",
+              "minimum": 12,
+              "maximum": 240
+            }
+          },
+          "required": [
+            "line_pause_frames",
+            "emphasis_pause_before",
+            "emphasis_pause_after",
+            "reading_frames_per_character",
+            "minimum_line_frames"
+          ],
+          "additionalProperties": false
+        },
+        "performance": {
+          "type": "object",
+          "properties": {
+            "explain_gesture": {
+              "type": "boolean"
+            },
+            "event_strength": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            }
+          },
+          "required": [
+            "explain_gesture",
+            "event_strength"
+          ],
+          "additionalProperties": false
+        },
+        "parallax": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "strength": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "enabled",
+            "strength"
+          ],
+          "additionalProperties": false
+        },
+        "subtitle": {
+          "type": "object",
+          "properties": {
+            "font_height_ratio": {
+              "type": "number",
+              "minimum": 0.025,
+              "maximum": 0.08
+            },
+            "emphasis_scale": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 1.4
+            },
+            "hold_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 48
+            }
+          },
+          "required": [
+            "font_height_ratio",
+            "emphasis_scale",
+            "hold_frames"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "shot",
+        "reaction",
+        "camera",
+        "timing",
+        "performance",
+        "parallax",
+        "subtitle"
+      ],
+      "additionalProperties": false
+    },
+    "requirements": {
+      "type": "object",
+      "properties": {
+        "min_characters": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "min_depth_layers": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "required_parts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          }
+        }
+      },
+      "required": [
+        "min_characters",
+        "min_depth_layers",
+        "required_parts"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "version",
+    "mode_id",
+    "description",
+    "policy",
+    "requirements"
+  ],
+  "additionalProperties": false
+}

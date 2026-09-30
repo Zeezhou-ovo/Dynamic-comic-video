@@ -1,0 +1,3350 @@
+{
+  "version": "0.4",
+  "project_id": "phase4-generic-room",
+  "asset_mode": "fixture",
+  "shots": [
+    {
+      "shot_id": "shot_001",
+      "start_frame": 0,
+      "duration_frames": 48,
+      "transition": "cut",
+      "performance": {
+        "mode": "sequential-comic",
+        "intent": "Lin speaks; Bo listens and blinks.",
+        "static_reason": "Synthetic performance fixture holds unrequested layers.",
+        "reviewed": false
+      },
+      "camera": {
+        "type": "push_in",
+        "focus_target": {
+          "id": "characters",
+          "x": 480,
+          "y": 270
+        },
+        "from": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1
+        },
+        "to": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1.04
+        },
+        "screen_target": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "easing": "easeInOut",
+        "parallax_enabled": true
+      },
+      "character_performance": [
+        {
+          "character_id": "lin",
+          "role": "speaker",
+          "root_pivot": [
+            0.3125,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 47,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "lin-talk",
+              "preset": "talk",
+              "start_frame": 0,
+              "peak_frame": 2,
+              "settle_frame": 45,
+              "end_frame": 47,
+              "easing": "easeInOut"
+            }
+          ]
+        },
+        {
+          "character_id": "bo",
+          "role": "idle",
+          "root_pivot": [
+            0.6979166666666666,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 47,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "bo-idle",
+              "preset": "idle",
+              "start_frame": 0,
+              "peak_frame": 0,
+              "settle_frame": 47,
+              "end_frame": 47,
+              "easing": "easeInOut"
+            },
+            {
+              "event_id": "bo-blink",
+              "preset": "blink",
+              "start_frame": 18,
+              "peak_frame": 20,
+              "settle_frame": 22,
+              "end_frame": 24,
+              "easing": "easeInOut"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_001/layers/bg.png",
+          "depth": "background",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          }
+        },
+        {
+          "layer_id": "lin_body",
+          "asset": "shots/shot_001/layers/lin_body_base.png",
+          "depth": "character",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.3125,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_head",
+          "asset": "shots/shot_001/layers/lin_head_base.png",
+          "depth": "character",
+          "z": 11,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.3125,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_eyes",
+          "asset": "shots/shot_001/layers/lin_eyes_base.png",
+          "depth": "character",
+          "z": 12,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_001/layers/lin_eyes_blink.png",
+            "expression:surprised": "shots/shot_001/layers/lin_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.3125,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_mouth",
+          "asset": "shots/shot_001/layers/lin_mouth_base.png",
+          "depth": "character",
+          "z": 13,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_001/layers/lin_mouth_base.png",
+            "open": "shots/shot_001/layers/lin_mouth_open.png",
+            "expression:happy": "shots/shot_001/layers/lin_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.3125,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_left_arm",
+          "asset": "shots/shot_001/layers/lin_left_arm_base.png",
+          "depth": "character",
+          "z": 14,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.3125,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_right_arm",
+          "asset": "shots/shot_001/layers/lin_right_arm_base.png",
+          "depth": "character",
+          "z": 15,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_001/layers/lin_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.3125,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_body",
+          "asset": "shots/shot_001/layers/bo_body_base.png",
+          "depth": "character",
+          "z": 16,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.6979166666666666,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_head",
+          "asset": "shots/shot_001/layers/bo_head_base.png",
+          "depth": "character",
+          "z": 17,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.6979166666666666,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_eyes",
+          "asset": "shots/shot_001/layers/bo_eyes_base.png",
+          "depth": "character",
+          "z": 18,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_001/layers/bo_eyes_blink.png",
+            "expression:surprised": "shots/shot_001/layers/bo_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.6979166666666666,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_mouth",
+          "asset": "shots/shot_001/layers/bo_mouth_base.png",
+          "depth": "character",
+          "z": 19,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_001/layers/bo_mouth_base.png",
+            "open": "shots/shot_001/layers/bo_mouth_open.png",
+            "expression:happy": "shots/shot_001/layers/bo_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.6979166666666666,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_left_arm",
+          "asset": "shots/shot_001/layers/bo_left_arm_base.png",
+          "depth": "character",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.6979166666666666,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_right_arm",
+          "asset": "shots/shot_001/layers/bo_right_arm_base.png",
+          "depth": "character",
+          "z": 21,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_001/layers/bo_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.6979166666666666,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 47,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "Synthetic Character Performance / Camera runtime fixture; not production art."
+      }
+    },
+    {
+      "shot_id": "shot_002",
+      "start_frame": 48,
+      "duration_frames": 24,
+      "transition": "cut",
+      "performance": {
+        "mode": "sequential-comic",
+        "intent": "Lin points as the camera pushes in; Bo watches.",
+        "static_reason": "Synthetic performance fixture holds unrequested layers.",
+        "reviewed": false
+      },
+      "camera": {
+        "type": "push_in",
+        "focus_target": {
+          "id": "characters",
+          "x": 480,
+          "y": 270
+        },
+        "from": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1
+        },
+        "to": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1.08
+        },
+        "screen_target": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "easing": "easeInOut",
+        "parallax_enabled": true
+      },
+      "character_performance": [
+        {
+          "character_id": "lin",
+          "role": "idle",
+          "root_pivot": [
+            0.31354166666666666,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "pose": "point",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 3,
+              "y": -2,
+              "scale": 1.015,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "lin-point",
+              "preset": "point",
+              "start_frame": 2,
+              "peak_frame": 6,
+              "settle_frame": 17,
+              "end_frame": 22,
+              "easing": "easeInOut",
+              "part": "right_arm"
+            }
+          ]
+        },
+        {
+          "character_id": "bo",
+          "role": "listener",
+          "root_pivot": [
+            0.6989583333333333,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "bo-listen-blink",
+              "preset": "blink",
+              "start_frame": 14,
+              "peak_frame": 16,
+              "settle_frame": 18,
+              "end_frame": 20,
+              "easing": "easeInOut"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_002/layers/bg.png",
+          "depth": "background",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          }
+        },
+        {
+          "layer_id": "lin_body",
+          "asset": "shots/shot_002/layers/lin_body_base.png",
+          "depth": "character",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.31354166666666666,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_head",
+          "asset": "shots/shot_002/layers/lin_head_base.png",
+          "depth": "character",
+          "z": 11,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.31354166666666666,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_eyes",
+          "asset": "shots/shot_002/layers/lin_eyes_base.png",
+          "depth": "character",
+          "z": 12,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_002/layers/lin_eyes_blink.png",
+            "expression:surprised": "shots/shot_002/layers/lin_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.31354166666666666,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_mouth",
+          "asset": "shots/shot_002/layers/lin_mouth_base.png",
+          "depth": "character",
+          "z": 13,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_002/layers/lin_mouth_base.png",
+            "open": "shots/shot_002/layers/lin_mouth_open.png",
+            "expression:happy": "shots/shot_002/layers/lin_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.31354166666666666,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_left_arm",
+          "asset": "shots/shot_002/layers/lin_left_arm_base.png",
+          "depth": "character",
+          "z": 14,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.31354166666666666,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_right_arm",
+          "asset": "shots/shot_002/layers/lin_right_arm_base.png",
+          "depth": "character",
+          "z": 15,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_002/layers/lin_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.31354166666666666,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_body",
+          "asset": "shots/shot_002/layers/bo_body_base.png",
+          "depth": "character",
+          "z": 16,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.6989583333333333,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_head",
+          "asset": "shots/shot_002/layers/bo_head_base.png",
+          "depth": "character",
+          "z": 17,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.6989583333333333,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_eyes",
+          "asset": "shots/shot_002/layers/bo_eyes_base.png",
+          "depth": "character",
+          "z": 18,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_002/layers/bo_eyes_blink.png",
+            "expression:surprised": "shots/shot_002/layers/bo_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.6989583333333333,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_mouth",
+          "asset": "shots/shot_002/layers/bo_mouth_base.png",
+          "depth": "character",
+          "z": 19,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_002/layers/bo_mouth_base.png",
+            "open": "shots/shot_002/layers/bo_mouth_open.png",
+            "expression:happy": "shots/shot_002/layers/bo_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.6989583333333333,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_left_arm",
+          "asset": "shots/shot_002/layers/bo_left_arm_base.png",
+          "depth": "character",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.6989583333333333,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_right_arm",
+          "asset": "shots/shot_002/layers/bo_right_arm_base.png",
+          "depth": "character",
+          "z": 21,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_002/layers/bo_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.6989583333333333,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "Synthetic Character Performance / Camera runtime fixture; not production art."
+      }
+    },
+    {
+      "shot_id": "shot_003",
+      "start_frame": 72,
+      "duration_frames": 24,
+      "transition": "cut",
+      "performance": {
+        "mode": "sequential-comic",
+        "intent": "Bo nods once in response.",
+        "static_reason": "Synthetic performance fixture holds unrequested layers.",
+        "reviewed": false
+      },
+      "camera": {
+        "type": "push_in",
+        "focus_target": {
+          "id": "characters",
+          "x": 480,
+          "y": 270
+        },
+        "from": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1
+        },
+        "to": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1.05
+        },
+        "screen_target": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "easing": "easeInOut",
+        "parallax_enabled": true
+      },
+      "character_performance": [
+        {
+          "character_id": "lin",
+          "role": "listener",
+          "root_pivot": [
+            0.3145833333333333,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": []
+        },
+        {
+          "character_id": "bo",
+          "role": "listener",
+          "root_pivot": [
+            0.7,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "bo-nod",
+              "preset": "nod",
+              "start_frame": 2,
+              "peak_frame": 7,
+              "settle_frame": 14,
+              "end_frame": 21,
+              "easing": "easeInOut"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_003/layers/bg.png",
+          "depth": "background",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          }
+        },
+        {
+          "layer_id": "lin_body",
+          "asset": "shots/shot_003/layers/lin_body_base.png",
+          "depth": "character",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.3145833333333333,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_head",
+          "asset": "shots/shot_003/layers/lin_head_base.png",
+          "depth": "character",
+          "z": 11,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.3145833333333333,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_eyes",
+          "asset": "shots/shot_003/layers/lin_eyes_base.png",
+          "depth": "character",
+          "z": 12,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_003/layers/lin_eyes_blink.png",
+            "expression:surprised": "shots/shot_003/layers/lin_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.3145833333333333,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_mouth",
+          "asset": "shots/shot_003/layers/lin_mouth_base.png",
+          "depth": "character",
+          "z": 13,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_003/layers/lin_mouth_base.png",
+            "open": "shots/shot_003/layers/lin_mouth_open.png",
+            "expression:happy": "shots/shot_003/layers/lin_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.3145833333333333,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_left_arm",
+          "asset": "shots/shot_003/layers/lin_left_arm_base.png",
+          "depth": "character",
+          "z": 14,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.3145833333333333,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_right_arm",
+          "asset": "shots/shot_003/layers/lin_right_arm_base.png",
+          "depth": "character",
+          "z": 15,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_003/layers/lin_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.3145833333333333,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_body",
+          "asset": "shots/shot_003/layers/bo_body_base.png",
+          "depth": "character",
+          "z": 16,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.7,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_head",
+          "asset": "shots/shot_003/layers/bo_head_base.png",
+          "depth": "character",
+          "z": 17,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.7,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_eyes",
+          "asset": "shots/shot_003/layers/bo_eyes_base.png",
+          "depth": "character",
+          "z": 18,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_003/layers/bo_eyes_blink.png",
+            "expression:surprised": "shots/shot_003/layers/bo_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.7,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_mouth",
+          "asset": "shots/shot_003/layers/bo_mouth_base.png",
+          "depth": "character",
+          "z": 19,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_003/layers/bo_mouth_base.png",
+            "open": "shots/shot_003/layers/bo_mouth_open.png",
+            "expression:happy": "shots/shot_003/layers/bo_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.7,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_left_arm",
+          "asset": "shots/shot_003/layers/bo_left_arm_base.png",
+          "depth": "character",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.7,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_right_arm",
+          "asset": "shots/shot_003/layers/bo_right_arm_base.png",
+          "depth": "character",
+          "z": 21,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_003/layers/bo_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.7,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "Synthetic Character Performance / Camera runtime fixture; not production art."
+      }
+    },
+    {
+      "shot_id": "shot_004",
+      "start_frame": 96,
+      "duration_frames": 24,
+      "transition": "cut",
+      "performance": {
+        "mode": "sequential-comic",
+        "intent": "Bo speaks; Lin listens.",
+        "static_reason": "Synthetic performance fixture holds unrequested layers.",
+        "reviewed": false
+      },
+      "camera": {
+        "type": "pull_out",
+        "focus_target": {
+          "id": "characters",
+          "x": 480,
+          "y": 270
+        },
+        "from": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1.05
+        },
+        "to": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1.02
+        },
+        "screen_target": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "easing": "easeInOut",
+        "parallax_enabled": true
+      },
+      "character_performance": [
+        {
+          "character_id": "lin",
+          "role": "listener",
+          "root_pivot": [
+            0.315625,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": []
+        },
+        {
+          "character_id": "bo",
+          "role": "speaker",
+          "root_pivot": [
+            0.7010416666666667,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "bo-talk",
+              "preset": "talk",
+              "start_frame": 0,
+              "peak_frame": 2,
+              "settle_frame": 21,
+              "end_frame": 23,
+              "easing": "easeInOut"
+            }
+          ]
+        }
+      ],
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_004/layers/bg.png",
+          "depth": "background",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          }
+        },
+        {
+          "layer_id": "lin_body",
+          "asset": "shots/shot_004/layers/lin_body_base.png",
+          "depth": "character",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.315625,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_head",
+          "asset": "shots/shot_004/layers/lin_head_base.png",
+          "depth": "character",
+          "z": 11,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.315625,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_eyes",
+          "asset": "shots/shot_004/layers/lin_eyes_base.png",
+          "depth": "character",
+          "z": 12,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_004/layers/lin_eyes_blink.png",
+            "expression:surprised": "shots/shot_004/layers/lin_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.315625,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_mouth",
+          "asset": "shots/shot_004/layers/lin_mouth_base.png",
+          "depth": "character",
+          "z": 13,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_004/layers/lin_mouth_base.png",
+            "open": "shots/shot_004/layers/lin_mouth_open.png",
+            "expression:happy": "shots/shot_004/layers/lin_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.315625,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_left_arm",
+          "asset": "shots/shot_004/layers/lin_left_arm_base.png",
+          "depth": "character",
+          "z": 14,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.315625,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_right_arm",
+          "asset": "shots/shot_004/layers/lin_right_arm_base.png",
+          "depth": "character",
+          "z": 15,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_004/layers/lin_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.315625,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_body",
+          "asset": "shots/shot_004/layers/bo_body_base.png",
+          "depth": "character",
+          "z": 16,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.7010416666666667,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_head",
+          "asset": "shots/shot_004/layers/bo_head_base.png",
+          "depth": "character",
+          "z": 17,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.7010416666666667,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_eyes",
+          "asset": "shots/shot_004/layers/bo_eyes_base.png",
+          "depth": "character",
+          "z": 18,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_004/layers/bo_eyes_blink.png",
+            "expression:surprised": "shots/shot_004/layers/bo_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.7010416666666667,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_mouth",
+          "asset": "shots/shot_004/layers/bo_mouth_base.png",
+          "depth": "character",
+          "z": 19,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_004/layers/bo_mouth_base.png",
+            "open": "shots/shot_004/layers/bo_mouth_open.png",
+            "expression:happy": "shots/shot_004/layers/bo_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.7010416666666667,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_left_arm",
+          "asset": "shots/shot_004/layers/bo_left_arm_base.png",
+          "depth": "character",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.7010416666666667,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_right_arm",
+          "asset": "shots/shot_004/layers/bo_right_arm_base.png",
+          "depth": "character",
+          "z": 21,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_004/layers/bo_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.7010416666666667,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "Synthetic Character Performance / Camera runtime fixture; not production art."
+      }
+    },
+    {
+      "shot_id": "shot_005",
+      "start_frame": 120,
+      "duration_frames": 24,
+      "transition": "cut",
+      "performance": {
+        "mode": "sequential-comic",
+        "intent": "Lin makes a small reaction bounce.",
+        "static_reason": "Synthetic performance fixture holds unrequested layers.",
+        "reviewed": false
+      },
+      "camera": {
+        "type": "pull_out",
+        "focus_target": {
+          "id": "characters",
+          "x": 480,
+          "y": 270
+        },
+        "from": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1.06
+        },
+        "to": {
+          "x": 480,
+          "y": 270,
+          "zoom": 1
+        },
+        "screen_target": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "easing": "easeInOut",
+        "parallax_enabled": true
+      },
+      "character_performance": [
+        {
+          "character_id": "lin",
+          "role": "idle",
+          "root_pivot": [
+            0.31666666666666665,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "expression": "happy",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": [
+            {
+              "event_id": "lin-bounce",
+              "preset": "small_bounce",
+              "start_frame": 2,
+              "peak_frame": 7,
+              "settle_frame": 12,
+              "end_frame": 18,
+              "easing": "easeInOut",
+              "amplitude": 11
+            }
+          ]
+        },
+        {
+          "character_id": "bo",
+          "role": "idle",
+          "root_pivot": [
+            0.7020833333333333,
+            0.5
+          ],
+          "root_easing": "easeInOut",
+          "root_keys": [
+            {
+              "frame": 0,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "frame": 23,
+              "x": 0,
+              "y": 0,
+              "scale": 1,
+              "rotation": 0,
+              "opacity": 1
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "layer_id": "bg",
+          "asset": "shots/shot_005/layers/bg.png",
+          "depth": "background",
+          "z": 0,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          }
+        },
+        {
+          "layer_id": "lin_body",
+          "asset": "shots/shot_005/layers/lin_body_base.png",
+          "depth": "character",
+          "z": 10,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.31666666666666665,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_head",
+          "asset": "shots/shot_005/layers/lin_head_base.png",
+          "depth": "character",
+          "z": 11,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.31666666666666665,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_eyes",
+          "asset": "shots/shot_005/layers/lin_eyes_base.png",
+          "depth": "character",
+          "z": 12,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_005/layers/lin_eyes_blink.png",
+            "expression:surprised": "shots/shot_005/layers/lin_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.31666666666666665,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_mouth",
+          "asset": "shots/shot_005/layers/lin_mouth_base.png",
+          "depth": "character",
+          "z": 13,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_005/layers/lin_mouth_base.png",
+            "open": "shots/shot_005/layers/lin_mouth_open.png",
+            "expression:happy": "shots/shot_005/layers/lin_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.31666666666666665,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_left_arm",
+          "asset": "shots/shot_005/layers/lin_left_arm_base.png",
+          "depth": "character",
+          "z": 14,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.31666666666666665,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "lin_right_arm",
+          "asset": "shots/shot_005/layers/lin_right_arm_base.png",
+          "depth": "character",
+          "z": 15,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_005/layers/lin_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.31666666666666665,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_body",
+          "asset": "shots/shot_005/layers/bo_body_base.png",
+          "depth": "character",
+          "z": 16,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "body",
+            "pivot": [
+              0.7020833333333333,
+              0.6111111111111112
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_head",
+          "asset": "shots/shot_005/layers/bo_head_base.png",
+          "depth": "character",
+          "z": 17,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "head",
+            "pivot": [
+              0.7020833333333333,
+              0.42962962962962964
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_eyes",
+          "asset": "shots/shot_005/layers/bo_eyes_base.png",
+          "depth": "character",
+          "z": 18,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "blink": "shots/shot_005/layers/bo_eyes_blink.png",
+            "expression:surprised": "shots/shot_005/layers/bo_eyes_surprised.png"
+          },
+          "acting": {
+            "part": "eyes",
+            "pivot": [
+              0.7020833333333333,
+              0.337037037037037
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_mouth",
+          "asset": "shots/shot_005/layers/bo_mouth_base.png",
+          "depth": "character",
+          "z": 19,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "closed": "shots/shot_005/layers/bo_mouth_base.png",
+            "open": "shots/shot_005/layers/bo_mouth_open.png",
+            "expression:happy": "shots/shot_005/layers/bo_mouth_happy.png"
+          },
+          "acting": {
+            "part": "mouth",
+            "pivot": [
+              0.7020833333333333,
+              0.40555555555555556
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_left_arm",
+          "asset": "shots/shot_005/layers/bo_left_arm_base.png",
+          "depth": "character",
+          "z": 20,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {},
+          "acting": {
+            "part": "left_arm",
+            "pivot": [
+              0.7020833333333333,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        },
+        {
+          "layer_id": "bo_right_arm",
+          "asset": "shots/shot_005/layers/bo_right_arm_base.png",
+          "depth": "character",
+          "z": 21,
+          "from": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "to": {
+            "x": 0,
+            "y": 0,
+            "scale": 1
+          },
+          "state_assets": {
+            "pose:point": "shots/shot_005/layers/bo_right_arm_point.png"
+          },
+          "acting": {
+            "part": "right_arm",
+            "pivot": [
+              0.7020833333333333,
+              0.5
+            ],
+            "easing": "easeInOut",
+            "keys": [
+              {
+                "frame": 0,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              },
+              {
+                "frame": 23,
+                "x": 0,
+                "y": 0,
+                "rotation": 0,
+                "opacity": 1,
+                "scale": 1
+              }
+            ]
+          }
+        }
+      ],
+      "review": {
+        "master_alignment": false,
+        "background_completed": false,
+        "motion_bounds_checked": false,
+        "notes": "Synthetic Character Performance / Camera runtime fixture; not production art."
+      }
+    }
+  ]
+}

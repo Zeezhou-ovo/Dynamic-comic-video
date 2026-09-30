@@ -1,0 +1,57 @@
+{
+  "version": "0.1",
+  "mode_id": "knowledge-explainer",
+  "description": "knowledge-explainer executable directing policy",
+  "policy": {
+    "shot": {
+      "max_dialogue_beats": 3,
+      "normal_intents": [
+        "two_shot",
+        "speaker_medium"
+      ],
+      "emphasis_intent": "speaker_medium"
+    },
+    "reaction": {
+      "every_n_beats": 0,
+      "strength": "subtle",
+      "hold_frames": 12,
+      "closeup": false
+    },
+    "camera": {
+      "intent": "static",
+      "emphasis_intent": "subtle_push",
+      "strength": 0.25,
+      "motion_every_n_shots": 0
+    },
+    "timing": {
+      "line_pause_frames": 5,
+      "emphasis_pause_before": 5,
+      "emphasis_pause_after": 10,
+      "reading_frames_per_character": 4,
+      "minimum_line_frames": 42
+    },
+    "performance": {
+      "explain_gesture": true,
+      "event_strength": 0.55
+    },
+    "parallax": {
+      "enabled": true,
+      "strength": 0.35
+    },
+    "subtitle": {
+      "font_height_ratio": 0.047,
+      "emphasis_scale": 1,
+      "hold_frames": 5
+    }
+  },
+  "requirements": {
+    "min_characters": 1,
+    "min_depth_layers": 2,
+    "required_parts": [
+      "body",
+      "head",
+      "eyes",
+      "mouth"
+    ]
+  }
+}

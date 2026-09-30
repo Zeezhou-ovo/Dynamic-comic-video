@@ -1,0 +1,57 @@
+{
+  "version": "0.1",
+  "mode_id": "motion-comic",
+  "description": "motion-comic executable directing policy",
+  "policy": {
+    "shot": {
+      "max_dialogue_beats": 2,
+      "normal_intents": [
+        "two_shot",
+        "speaker_closeup"
+      ],
+      "emphasis_intent": "speaker_closeup"
+    },
+    "reaction": {
+      "every_n_beats": 0,
+      "strength": "subtle",
+      "hold_frames": 12,
+      "closeup": false
+    },
+    "camera": {
+      "intent": "static",
+      "emphasis_intent": "static",
+      "strength": 0,
+      "motion_every_n_shots": 0
+    },
+    "timing": {
+      "line_pause_frames": 5,
+      "emphasis_pause_before": 5,
+      "emphasis_pause_after": 10,
+      "reading_frames_per_character": 4,
+      "minimum_line_frames": 42
+    },
+    "performance": {
+      "explain_gesture": false,
+      "event_strength": 0.35
+    },
+    "parallax": {
+      "enabled": false,
+      "strength": 0.1
+    },
+    "subtitle": {
+      "font_height_ratio": 0.047,
+      "emphasis_scale": 1,
+      "hold_frames": 5
+    }
+  },
+  "requirements": {
+    "min_characters": 1,
+    "min_depth_layers": 1,
+    "required_parts": [
+      "body",
+      "head",
+      "eyes",
+      "mouth"
+    ]
+  }
+}

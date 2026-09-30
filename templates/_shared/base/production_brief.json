@@ -1,0 +1,26 @@
+{
+  "version": "0.1",
+  "project_id": "phase4-generic-room",
+  "title": "Phase 4 · generic-room scene composition",
+  "original_content": "Lin finds a mysterious book on the reading room table. Bo leans in to look. The book opens and reveals a tiny golden light. They share a quiet smile.",
+  "content_preservation": [
+    "Show two characters speaking, reacting, and moving through simple local actions."
+  ],
+  "setting": {
+    "place": "A sunlit reading room",
+    "era": "contemporary",
+    "culture": "generic story setting"
+  },
+  "visual_language": "Soft, warm, hand-drawn 2D illustration with clear layered silhouettes.",
+  "style_preset": "paper-collage",
+  "tone": "curious, warm and lightly magical",
+  "format": {
+    "width": 960,
+    "height": 540,
+    "fps": 24,
+    "duration_frames": 144
+  },
+  "assumptions": [
+    "Synthetic artwork verifies Scene Graph and composition; it is test art, not final production art."
+  ]
+}

@@ -97,7 +97,7 @@ def _object_world(object_id, scene, width, height):
                                                                       "right": point[0] + 16, "bottom": point[1] + 16}}
 
 
-def _clamp_camera_target(target, desired_zoom, screen, scene, viewport, parallax):
+def _clamp_camera_target(target, desired_zoom, screen, scene, viewport, parallax, parallax_strengths=None):
     """Find a safe focus/zoom pair that keeps background coverage and safe bounds."""
     width, height = viewport["width"], viewport["height"]
     ref_w, ref_h = scene["reference_size"]["width"], scene["reference_size"]["height"]
@@ -106,6 +106,7 @@ def _clamp_camera_target(target, desired_zoom, screen, scene, viewport, parallax
     strengths = {layer["depth"]: {"foreground": 1.2, "character": 1.0, "midground": .55,
                                   "background": .2, "sky": .05}[layer["depth"]]
                  for layer in scene["layers"] if layer["kind"] == "render_layer"}
+    strengths.update(parallax_strengths or {})
     background_depth = "background" if "background" in strengths else ("sky" if "sky" in strengths else None)
     strength = strengths.get(background_depth, 1) if parallax and background_depth else 1
     # Preserve the focal subject and planned zoom first. If the background has no
@@ -132,7 +133,7 @@ def _clamp_camera_target(target, desired_zoom, screen, scene, viewport, parallax
 def resolve_composition(scene, character_assets, shot_intent, visible_characters,
                         focus_character=None, focus_object=None, character_bindings=None,
                         visible_objects=None, viewport=None, presets=None,
-                        parallax_enabled=None):
+                        parallax_enabled=None, parallax_strengths=None):
     """Map high-level shot intent and bound scene instances to a camera target."""
     config = presets or framing_config()
     framing = config["shot_intents"][shot_intent]
@@ -192,7 +193,8 @@ def resolve_composition(scene, character_assets, shot_intent, visible_characters
     has_depth_layers = len({layer["depth"] for layer in scene["layers"] if layer["kind"] == "render_layer"}) > 1
     safe_target, safe_screen, safe_zoom, safe_clamped = _clamp_camera_target(
         target, zoom, screen, scene, viewport,
-        parallax=has_depth_layers if parallax_enabled is None else parallax_enabled)
+        parallax=has_depth_layers if parallax_enabled is None else parallax_enabled,
+        parallax_strengths=parallax_strengths)
     target_details = {"id": target_id, "x": safe_target[0], "y": safe_target[1],
                       "subject_x": target[0], "subject_y": target[1]}
     return {

@@ -29,3 +29,7 @@ Set-Location Dynamic-comic-video
 代码逐帧绘制视频（p5.js／p5.brush、浏览器逐帧截取和 FFmpeg）由独立公开仓库 [code-painted-video](https://github.com/zeezhouovo-creator/code-painted-video) 维护，两条路线有各自的计划格式和渲染流程。
 
 分镜与动态漫画制作规则见 [SKILL.md](SKILL.md)，安装后续步骤见 [运行指南](references/runbook.md)。日常修改从 `main` 创建分支并提交 Pull Request。
+
+## Mode + Template runtime
+
+Phase 5 可以用同一份对白和同一套资产切换 `dialogue-comedy`、`knowledge-explainer`、`motion-comic`、`story-animation`。`generic-room` 和 `generic-outdoor` Template 提供场景、站位、角色和道具。创建入口是 `scripts/compose_project.py`，执行流程、参数、兼容性与限制见 [Mode + Template 使用说明](docs/phase5-mode-template.md)。

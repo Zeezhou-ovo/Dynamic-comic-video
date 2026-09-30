@@ -160,7 +160,7 @@ export function evaluateCharacterPerformance(context) {
       case 'raise_hand': {
         const arm = chooseArm(context.capabilities, event.part);
         const angle = event.preset === 'point' ? 42 : 58;
-        addPart(parts, arm, { rotation: (arm === 'left_arm' ? angle : -angle) * envelope });
+        addPart(parts, arm, { rotation: (arm === 'left_arm' ? angle : -angle) * amount * envelope });
         break;
       }
       case 'blink':

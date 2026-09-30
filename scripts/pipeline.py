@@ -151,6 +151,13 @@ def validate(project, assets=False, shot_id=None):
         data['character_assets'] = character_asset_manifest
     director_path = project/'director_plan.json'
     director_plan = read(director_path) if director_path.is_file() else None
+    profile_path = project/'production_profile.json'
+    if profile_path.is_file():
+        try:
+            from template_system import resolve_project_mode
+            director_plan = resolve_project_mode(project, data)
+        except (ValueError, OSError, KeyError) as exc:
+            errors.append('Mode/Template validation failed: '+str(exc))
     for n, d in data.items():
         schema = read(ROOT/'schemas'/(n+'.schema.json'))
         Draft202012Validator.check_schema(schema)
@@ -439,7 +446,13 @@ def main():
                 dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
                 shutil.copy2(local(project,name),dest)
         director_path = project/'director_plan.json'
-        render_source = compile_director_plan(read(director_path), data, project) if director_path.is_file() else data
+        if (project/'production_profile.json').is_file():
+            from template_system import resolve_project_mode
+            resolved_plan = resolve_project_mode(project, data)
+            save(project/'director_plan.json', resolved_plan)
+            render_source = compile_director_plan(resolved_plan, data, project)
+        else:
+            render_source = compile_director_plan(read(director_path), data, project) if director_path.is_file() else data
         render_data=render_payload(project,render_source,local,args.shot)
         for shot in render_data['shots']:
             for cue in shot['dialogue']:

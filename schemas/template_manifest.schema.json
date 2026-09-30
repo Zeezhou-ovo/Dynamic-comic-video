@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.1"
+    },
+    "template_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "base_project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "default_scene": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "scenes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "scene_manifest": {
+            "type": "string",
+            "minLength": 1
+          },
+          "character_assets": {
+            "type": "string",
+            "minLength": 1
+          },
+          "character_capabilities": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default_bindings": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            }
+          },
+          "available_props": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            },
+            "uniqueItems": true
+          },
+          "shot_suggestions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "establishing_wide",
+                "two_shot",
+                "speaker_medium",
+                "speaker_closeup",
+                "insert",
+                "emphasis_push"
+              ]
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "scene_manifest",
+          "character_assets",
+          "character_capabilities",
+          "default_bindings",
+          "available_props",
+          "shot_suggestions"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "version",
+    "template_id",
+    "description",
+    "base_project",
+    "default_scene",
+    "scenes"
+  ],
+  "additionalProperties": false
+}

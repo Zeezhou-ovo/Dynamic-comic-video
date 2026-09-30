@@ -1,0 +1,539 @@
+{
+  "version": "0.1",
+  "project_id": "phase4-generic-room",
+  "coordinate_system": "normalized-0-to-1",
+  "characters": [
+    {
+      "character_id": "lin",
+      "reference_size": {
+        "width": 260,
+        "height": 360
+      },
+      "root_anchor": [
+        0.5,
+        0.94
+      ],
+      "anchors": {
+        "root": [
+          0.5,
+          0.94
+        ],
+        "body": {
+          "position": [
+            0.5,
+            0.7
+          ],
+          "bounds": {
+            "left": 0.12,
+            "top": 0.14,
+            "right": 0.88,
+            "bottom": 1.0
+          }
+        },
+        "face": {
+          "position": [
+            0.5,
+            0.39
+          ],
+          "bounds": {
+            "left": 0.22,
+            "top": 0.18,
+            "right": 0.78,
+            "bottom": 0.56
+          }
+        },
+        "head": {
+          "position": [
+            0.5,
+            0.43
+          ],
+          "bounds": {
+            "left": 0.17,
+            "top": 0.15,
+            "right": 0.83,
+            "bottom": 0.62
+          }
+        },
+        "mouth": {
+          "position": [
+            0.5,
+            0.46
+          ],
+          "bounds": {
+            "left": 0.42,
+            "top": 0.4,
+            "right": 0.58,
+            "bottom": 0.51
+          }
+        },
+        "left_hand": {
+          "position": [
+            0.24,
+            0.8
+          ],
+          "bounds": {
+            "left": 0.18,
+            "top": 0.76,
+            "right": 0.31,
+            "bottom": 0.86
+          }
+        },
+        "right_hand": {
+          "position": [
+            0.76,
+            0.8
+          ],
+          "bounds": {
+            "left": 0.69,
+            "top": 0.76,
+            "right": 0.82,
+            "bottom": 0.86
+          }
+        },
+        "eyes": {
+          "position": [
+            0.5,
+            0.37
+          ],
+          "bounds": {
+            "left": 0.3,
+            "top": 0.31,
+            "right": 0.7,
+            "bottom": 0.41
+          }
+        }
+      },
+      "bounds": {
+        "left": 0.12,
+        "top": 0.14,
+        "right": 0.88,
+        "bottom": 1.0
+      },
+      "parts": {
+        "body": {
+          "asset": "character_art/lin/body_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.78
+          ],
+          "pivot": [
+            0.5,
+            0.78
+          ],
+          "depth": "character",
+          "z": 10,
+          "state_assets": {}
+        },
+        "left_arm": {
+          "asset": "character_art/lin/left_arm_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.31,
+            0.6
+          ],
+          "pivot": [
+            0.31,
+            0.6
+          ],
+          "depth": "character",
+          "z": 11,
+          "state_assets": {}
+        },
+        "right_arm": {
+          "asset": "character_art/lin/right_arm_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.7,
+            0.6
+          ],
+          "pivot": [
+            0.7,
+            0.6
+          ],
+          "depth": "character",
+          "z": 12,
+          "state_assets": {
+            "pose:point": "character_art/lin/right_arm_pose_point.png"
+          }
+        },
+        "head": {
+          "asset": "character_art/lin/head_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.6
+          ],
+          "pivot": [
+            0.5,
+            0.6
+          ],
+          "depth": "character",
+          "z": 13,
+          "state_assets": {}
+        },
+        "hair": {
+          "asset": "character_art/lin/hair_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.39
+          ],
+          "pivot": [
+            0.5,
+            0.39
+          ],
+          "depth": "character",
+          "z": 14,
+          "state_assets": {}
+        },
+        "eyes": {
+          "asset": "character_art/lin/eyes_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.37
+          ],
+          "pivot": [
+            0.5,
+            0.37
+          ],
+          "depth": "character",
+          "z": 15,
+          "state_assets": {
+            "blink": "character_art/lin/eyes_blink.png",
+            "expression:happy": "character_art/lin/eyes_expression_happy.png",
+            "expression:surprised": "character_art/lin/eyes_expression_surprised.png",
+            "expression:confused": "character_art/lin/eyes_expression_confused.png"
+          }
+        },
+        "mouth": {
+          "asset": "character_art/lin/mouth_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.46
+          ],
+          "pivot": [
+            0.5,
+            0.46
+          ],
+          "depth": "character",
+          "z": 16,
+          "state_assets": {
+            "open": "character_art/lin/mouth_open.png",
+            "closed": "character_art/lin/mouth_closed.png",
+            "expression:happy": "character_art/lin/mouth_expression_happy.png",
+            "expression:surprised": "character_art/lin/mouth_expression_surprised.png",
+            "expression:confused": "character_art/lin/mouth_expression_confused.png"
+          }
+        },
+        "badge": {
+          "asset": "character_art/lin/badge_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.55,
+            0.7
+          ],
+          "pivot": [
+            0.55,
+            0.7
+          ],
+          "depth": "character",
+          "z": 17,
+          "state_assets": {}
+        }
+      }
+    },
+    {
+      "character_id": "bo",
+      "reference_size": {
+        "width": 260,
+        "height": 360
+      },
+      "root_anchor": [
+        0.5,
+        0.94
+      ],
+      "anchors": {
+        "root": [
+          0.5,
+          0.94
+        ],
+        "body": {
+          "position": [
+            0.5,
+            0.7
+          ],
+          "bounds": {
+            "left": 0.12,
+            "top": 0.14,
+            "right": 0.88,
+            "bottom": 1.0
+          }
+        },
+        "face": {
+          "position": [
+            0.5,
+            0.39
+          ],
+          "bounds": {
+            "left": 0.22,
+            "top": 0.18,
+            "right": 0.78,
+            "bottom": 0.56
+          }
+        },
+        "head": {
+          "position": [
+            0.5,
+            0.43
+          ],
+          "bounds": {
+            "left": 0.17,
+            "top": 0.15,
+            "right": 0.83,
+            "bottom": 0.62
+          }
+        },
+        "mouth": {
+          "position": [
+            0.5,
+            0.46
+          ],
+          "bounds": {
+            "left": 0.42,
+            "top": 0.4,
+            "right": 0.58,
+            "bottom": 0.51
+          }
+        },
+        "left_hand": {
+          "position": [
+            0.24,
+            0.8
+          ],
+          "bounds": {
+            "left": 0.18,
+            "top": 0.76,
+            "right": 0.31,
+            "bottom": 0.86
+          }
+        },
+        "right_hand": {
+          "position": [
+            0.76,
+            0.8
+          ],
+          "bounds": {
+            "left": 0.69,
+            "top": 0.76,
+            "right": 0.82,
+            "bottom": 0.86
+          }
+        },
+        "eyes": {
+          "position": [
+            0.5,
+            0.37
+          ],
+          "bounds": {
+            "left": 0.3,
+            "top": 0.31,
+            "right": 0.7,
+            "bottom": 0.41
+          }
+        }
+      },
+      "bounds": {
+        "left": 0.12,
+        "top": 0.14,
+        "right": 0.88,
+        "bottom": 1.0
+      },
+      "parts": {
+        "body": {
+          "asset": "character_art/bo/body_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.78
+          ],
+          "pivot": [
+            0.5,
+            0.78
+          ],
+          "depth": "character",
+          "z": 10,
+          "state_assets": {}
+        },
+        "left_arm": {
+          "asset": "character_art/bo/left_arm_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.31,
+            0.6
+          ],
+          "pivot": [
+            0.31,
+            0.6
+          ],
+          "depth": "character",
+          "z": 11,
+          "state_assets": {}
+        },
+        "right_arm": {
+          "asset": "character_art/bo/right_arm_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.7,
+            0.6
+          ],
+          "pivot": [
+            0.7,
+            0.6
+          ],
+          "depth": "character",
+          "z": 12,
+          "state_assets": {
+            "pose:point": "character_art/bo/right_arm_pose_point.png"
+          }
+        },
+        "head": {
+          "asset": "character_art/bo/head_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.6
+          ],
+          "pivot": [
+            0.5,
+            0.6
+          ],
+          "depth": "character",
+          "z": 13,
+          "state_assets": {}
+        },
+        "hair": {
+          "asset": "character_art/bo/hair_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.39
+          ],
+          "pivot": [
+            0.5,
+            0.39
+          ],
+          "depth": "character",
+          "z": 14,
+          "state_assets": {}
+        },
+        "eyes": {
+          "asset": "character_art/bo/eyes_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.37
+          ],
+          "pivot": [
+            0.5,
+            0.37
+          ],
+          "depth": "character",
+          "z": 15,
+          "state_assets": {
+            "blink": "character_art/bo/eyes_blink.png",
+            "expression:happy": "character_art/bo/eyes_expression_happy.png",
+            "expression:surprised": "character_art/bo/eyes_expression_surprised.png",
+            "expression:confused": "character_art/bo/eyes_expression_confused.png"
+          }
+        },
+        "mouth": {
+          "asset": "character_art/bo/mouth_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.5,
+            0.46
+          ],
+          "pivot": [
+            0.5,
+            0.46
+          ],
+          "depth": "character",
+          "z": 16,
+          "state_assets": {
+            "open": "character_art/bo/mouth_open.png",
+            "closed": "character_art/bo/mouth_closed.png",
+            "expression:happy": "character_art/bo/mouth_expression_happy.png",
+            "expression:surprised": "character_art/bo/mouth_expression_surprised.png",
+            "expression:confused": "character_art/bo/mouth_expression_confused.png"
+          }
+        },
+        "badge": {
+          "asset": "character_art/bo/badge_base.png",
+          "pixel_size": {
+            "width": 260,
+            "height": 360
+          },
+          "anchor": [
+            0.55,
+            0.7
+          ],
+          "pivot": [
+            0.55,
+            0.7
+          ],
+          "depth": "character",
+          "z": 17,
+          "state_assets": {}
+        }
+      }
+    }
+  ]
+}

@@ -118,6 +118,8 @@ def render_payload(project,data,resolve,shot_id=None):
     fmt=dict(data['production_brief']['format'])
     if shot_id: fmt['duration_frames']=shots[0]['duration_frames']
     payload = {'format':fmt,'character_capabilities':capabilities,**data['motion_plan'],'shots':shots}
+    if data.get('presentation'):
+        payload['presentation'] = data['presentation']
     if data.get('scene_manifest'):
         payload['scene_manifest'] = data['scene_manifest']
         payload['character_assets'] = data['character_assets']

@@ -4,62 +4,518 @@
   "title": "director_plan",
   "type": "object",
   "properties": {
-    "version": {"const": "0.1"},
-    "project_id": {"type": "string", "minLength": 1},
-    "timing_source": {"const": "director_plan"},
+    "version": {
+      "const": "0.1"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timing_source": {
+      "const": "director_plan"
+    },
     "shots": {
-      "type": "array", "minItems": 1,
+      "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "properties": {
-          "instance_id": {"type": "string", "minLength": 1},
-          "source_shot_id": {"type": "string", "minLength": 1},
-          "shot_intent": {"enum": ["establishing_wide", "group_shot", "two_shot", "speaker_medium", "speaker_closeup", "listener_reaction", "insert", "emphasis_push"]},
-          "camera_intent": {"enum": ["static", "subtle_push", "stronger_push", "follow"]},
-          "focus_character": {"type": ["string", "null"]},
-          "focus_object": {"type": ["string", "null"]},
-          "visible_characters": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-          "visible_objects": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-          "character_bindings": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
-          "emphasis": {"enum": ["normal", "important", "reveal", "punchline", "awkward", "surprise"]},
+          "instance_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_shot_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "shot_intent": {
+            "enum": [
+              "establishing_wide",
+              "group_shot",
+              "two_shot",
+              "speaker_medium",
+              "speaker_closeup",
+              "listener_reaction",
+              "insert",
+              "emphasis_push"
+            ]
+          },
+          "camera_intent": {
+            "enum": [
+              "static",
+              "subtle_push",
+              "stronger_push",
+              "follow"
+            ]
+          },
+          "focus_character": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "focus_object": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "visible_characters": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "visible_objects": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "character_bindings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "emphasis": {
+            "enum": [
+              "normal",
+              "important",
+              "reveal",
+              "punchline",
+              "awkward",
+              "surprise"
+            ]
+          },
           "beats": {
-            "type": "array", "minItems": 1,
+            "type": "array",
+            "minItems": 1,
             "items": {
               "type": "object",
               "properties": {
-                "beat_id": {"type": "string", "minLength": 1},
-                "kind": {"enum": ["dialogue", "reaction", "pause"]},
-                "speaker": {"type": "string", "minLength": 1},
-                "text": {"type": "string", "minLength": 1},
-                "intent": {"enum": ["neutral", "ask", "explain", "confirm", "joke", "react"]},
-                "emotion": {"type": "string", "minLength": 1},
-                "emphasis": {"enum": ["normal", "important", "reveal", "punchline", "awkward", "surprise"]},
-                "listeners": {"type": "array", "items": {"type": "string", "minLength": 1}},
-                "reaction_target": {"type": ["string", "null"]},
-                "reaction": {"enum": ["neutral", "interested", "confused", "surprised", "speechless", "awkward", "annoyed", "amused", "laugh"]},
-                "reaction_strength": {"enum": ["subtle", "medium", "strong"]},
-                "performance_intent": {"type": "string", "minLength": 1},
-                "duration_frames": {"type": "integer", "minimum": 1},
-                "pause_before": {"type": "integer", "minimum": 0},
-                "pause_after": {"type": "integer", "minimum": 0},
-                "reaction_hold": {"type": "integer", "minimum": 0},
-                "shot_intent": {"enum": ["establishing_wide", "group_shot", "two_shot", "speaker_medium", "speaker_closeup", "listener_reaction", "insert", "emphasis_push"]}
+                "beat_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "enum": [
+                    "dialogue",
+                    "reaction",
+                    "pause"
+                  ]
+                },
+                "speaker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "intent": {
+                  "enum": [
+                    "neutral",
+                    "ask",
+                    "explain",
+                    "confirm",
+                    "joke",
+                    "react"
+                  ]
+                },
+                "emotion": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "emphasis": {
+                  "enum": [
+                    "normal",
+                    "important",
+                    "reveal",
+                    "punchline",
+                    "awkward",
+                    "surprise"
+                  ]
+                },
+                "listeners": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "reaction_target": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reaction": {
+                  "enum": [
+                    "neutral",
+                    "interested",
+                    "confused",
+                    "surprised",
+                    "speechless",
+                    "awkward",
+                    "annoyed",
+                    "amused",
+                    "laugh"
+                  ]
+                },
+                "reaction_strength": {
+                  "enum": [
+                    "subtle",
+                    "medium",
+                    "strong"
+                  ]
+                },
+                "performance_intent": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "duration_frames": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "pause_before": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "pause_after": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "reaction_hold": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "shot_intent": {
+                  "enum": [
+                    "establishing_wide",
+                    "group_shot",
+                    "two_shot",
+                    "speaker_medium",
+                    "speaker_closeup",
+                    "listener_reaction",
+                    "insert",
+                    "emphasis_push"
+                  ]
+                }
               },
-              "required": ["beat_id", "kind", "pause_before", "pause_after"],
+              "required": [
+                "beat_id",
+                "kind",
+                "pause_before",
+                "pause_after"
+              ],
               "allOf": [
-                {"if": {"properties": {"kind": {"const": "dialogue"}}, "required": ["kind"]}, "then": {"required": ["speaker", "text", "intent", "emotion", "emphasis", "listeners", "performance_intent", "duration_frames"]}},
-                {"if": {"properties": {"kind": {"const": "reaction"}}, "required": ["kind"]}, "then": {"required": ["reaction_target", "reaction", "reaction_hold"]}},
-                {"if": {"properties": {"kind": {"const": "pause"}}, "required": ["kind"]}, "then": {"required": ["duration_frames"]}}
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "dialogue"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "speaker",
+                      "text",
+                      "intent",
+                      "emotion",
+                      "emphasis",
+                      "listeners",
+                      "performance_intent",
+                      "duration_frames"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "reaction"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "reaction_target",
+                      "reaction",
+                      "reaction_hold"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "pause"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "duration_frames"
+                    ]
+                  }
+                }
               ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["instance_id", "source_shot_id", "shot_intent", "camera_intent", "emphasis", "beats"],
+        "required": [
+          "instance_id",
+          "source_shot_id",
+          "shot_intent",
+          "camera_intent",
+          "emphasis",
+          "beats"
+        ],
         "additionalProperties": false
       }
+    },
+    "runtime_policy": {
+      "type": "object",
+      "properties": {
+        "shot": {
+          "type": "object",
+          "properties": {
+            "max_dialogue_beats": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8
+            },
+            "normal_intents": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "two_shot",
+                  "speaker_medium",
+                  "speaker_closeup",
+                  "establishing_wide"
+                ]
+              }
+            },
+            "emphasis_intent": {
+              "enum": [
+                "two_shot",
+                "speaker_medium",
+                "speaker_closeup",
+                "emphasis_push"
+              ]
+            }
+          },
+          "required": [
+            "max_dialogue_beats",
+            "normal_intents",
+            "emphasis_intent"
+          ],
+          "additionalProperties": false
+        },
+        "reaction": {
+          "type": "object",
+          "properties": {
+            "every_n_beats": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "strength": {
+              "enum": [
+                "subtle",
+                "medium",
+                "strong"
+              ]
+            },
+            "hold_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "closeup": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "every_n_beats",
+            "strength",
+            "hold_frames",
+            "closeup"
+          ],
+          "additionalProperties": false
+        },
+        "camera": {
+          "type": "object",
+          "properties": {
+            "intent": {
+              "enum": [
+                "static",
+                "subtle_push",
+                "stronger_push"
+              ]
+            },
+            "emphasis_intent": {
+              "enum": [
+                "static",
+                "subtle_push",
+                "stronger_push"
+              ]
+            },
+            "strength": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "motion_every_n_shots": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "intent",
+            "emphasis_intent",
+            "strength",
+            "motion_every_n_shots"
+          ],
+          "additionalProperties": false
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "line_pause_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "emphasis_pause_before": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "emphasis_pause_after": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "reading_frames_per_character": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "minimum_line_frames": {
+              "type": "integer",
+              "minimum": 12,
+              "maximum": 240
+            }
+          },
+          "required": [
+            "line_pause_frames",
+            "emphasis_pause_before",
+            "emphasis_pause_after",
+            "reading_frames_per_character",
+            "minimum_line_frames"
+          ],
+          "additionalProperties": false
+        },
+        "performance": {
+          "type": "object",
+          "properties": {
+            "explain_gesture": {
+              "type": "boolean"
+            },
+            "event_strength": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            }
+          },
+          "required": [
+            "explain_gesture",
+            "event_strength"
+          ],
+          "additionalProperties": false
+        },
+        "parallax": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "strength": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "enabled",
+            "strength"
+          ],
+          "additionalProperties": false
+        },
+        "subtitle": {
+          "type": "object",
+          "properties": {
+            "font_height_ratio": {
+              "type": "number",
+              "minimum": 0.025,
+              "maximum": 0.08
+            },
+            "emphasis_scale": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 1.4
+            },
+            "hold_frames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 48
+            }
+          },
+          "required": [
+            "font_height_ratio",
+            "emphasis_scale",
+            "hold_frames"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "shot",
+        "reaction",
+        "camera",
+        "timing",
+        "performance",
+        "parallax",
+        "subtitle"
+      ],
+      "additionalProperties": false
     }
   },
-  "required": ["version", "project_id", "timing_source", "shots"],
+  "required": [
+    "version",
+    "project_id",
+    "timing_source",
+    "shots"
+  ],
   "additionalProperties": false
 }

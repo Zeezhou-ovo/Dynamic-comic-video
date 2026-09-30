@@ -11,6 +11,7 @@ import {
   useCurrentFrame,
 } from 'remotion';
 import input from './render-data.json';
+import { selectSubtitleCue } from './runtime/subtitle-controller.mjs';
 import { createShotContext } from './runtime/shot-context.mjs';
 import { evaluateCamera } from './runtime/camera-controller.mjs';
 import { evaluateLayerTransform } from './runtime/parallax-controller.mjs';
@@ -98,6 +99,7 @@ type RenderData = {
   shots: ShotPlan[];
   scene_manifest?: any;
   character_assets?: any;
+  presentation?: { subtitle?: { font_height_ratio: number; emphasis_scale: number; hold_frames: number } };
 };
 const data = input as RenderData;
 const sceneAssetLoader = data.scene_manifest && data.character_assets
@@ -133,7 +135,7 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
     visibleObjects: shot.visible_objects ?? [],
     viewport: data.format,
   });
-  const caption = shot.dialogue?.find(cue => frame >= cue.start_frame && frame < cue.end_frame);
+  const caption = selectSubtitleCue(shot.dialogue, frame, data.presentation?.subtitle?.hold_frames ?? 0);
 
   return (
     <AbsoluteFill style={{ overflow: 'hidden' }}>
@@ -183,7 +185,7 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
       {caption && (
         <div style={{
           position: 'absolute', zIndex: 1000, bottom: '7%', left: '6%', right: '6%', textAlign: 'center',
-          color: 'white', fontSize: Math.round(data.format.height * (caption.emphasis === 'punchline' || caption.emphasis === 'surprise' ? 0.052 : 0.045)),
+          color: 'white', fontSize: Math.round(data.format.height * (data.presentation?.subtitle?.font_height_ratio ?? 0.045) * ((caption.emphasis === 'punchline' || caption.emphasis === 'surprise') ? (data.presentation?.subtitle?.emphasis_scale ?? (0.052 / 0.045)) : 1)),
           fontFamily: 'Arial, "Microsoft YaHei", sans-serif', fontWeight: 700,
           whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
           textShadow: '-2px -2px 0 #172332, 2px -2px 0 #172332, -2px 2px 0 #172332, 2px 2px 0 #172332',
@@ -198,7 +200,7 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
   const context = createShotContext(data.version === '0.4' ? shot : { ...shot, camera: undefined }, frame, data.format);
   const camera = evaluateCamera(frame, context);
   const characterStates = evaluateShotCharacters(shot, frame);
-  const caption = shot.dialogue?.find(cue => frame >= cue.start_frame && frame < cue.end_frame);
+  const caption = selectSubtitleCue(shot.dialogue, frame, data.presentation?.subtitle?.hold_frames ?? 0);
 
   return (
     <AbsoluteFill style={{ overflow: 'hidden' }}>
@@ -266,7 +268,7 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
       {caption && (
         <div style={{
           position: 'absolute', bottom: '10%', left: '6%', right: '6%', textAlign: 'center',
-          color: 'white', fontSize: Math.round(data.format.height * (caption.emphasis === 'punchline' || caption.emphasis === 'surprise' ? 0.052 : 0.045)),
+          color: 'white', fontSize: Math.round(data.format.height * (data.presentation?.subtitle?.font_height_ratio ?? 0.045) * ((caption.emphasis === 'punchline' || caption.emphasis === 'surprise') ? (data.presentation?.subtitle?.emphasis_scale ?? (0.052 / 0.045)) : 1)),
           fontFamily: 'Arial, "Microsoft YaHei", sans-serif', fontWeight: 700,
           whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
           textShadow: '-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black',

@@ -1,0 +1,32 @@
+{
+  "version": "0.1",
+  "template_id": "generic-room",
+  "description": "Reusable generic-room test-art set",
+  "base_project": "templates/_shared/base",
+  "default_scene": "generic-room",
+  "scenes": {
+    "generic-room": {
+      "scene_manifest": "templates/generic-room/scene_manifest.json",
+      "character_assets": "templates/_shared/base/character_assets.json",
+      "character_capabilities": "templates/_shared/base/characters.json",
+      "default_bindings": {
+        "lin": "slot_left",
+        "bo": "slot_right"
+      },
+      "available_props": [
+        "book"
+      ],
+      "shot_suggestions": [
+        "establishing_wide",
+        "two_shot",
+        "speaker_medium",
+        "speaker_closeup",
+        "insert"
+      ]
+    }
+  },
+  "metadata": {
+    "art_quality": "test",
+    "coordinate_system": "normalized-0-to-1"
+  }
+}

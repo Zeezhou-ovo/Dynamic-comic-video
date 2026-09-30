@@ -1,0 +1,57 @@
+{
+  "version": "0.1",
+  "mode_id": "story-animation",
+  "description": "story-animation executable directing policy",
+  "policy": {
+    "shot": {
+      "max_dialogue_beats": 2,
+      "normal_intents": [
+        "establishing_wide",
+        "speaker_medium"
+      ],
+      "emphasis_intent": "emphasis_push"
+    },
+    "reaction": {
+      "every_n_beats": 0,
+      "strength": "subtle",
+      "hold_frames": 12,
+      "closeup": false
+    },
+    "camera": {
+      "intent": "subtle_push",
+      "emphasis_intent": "stronger_push",
+      "strength": 0.8,
+      "motion_every_n_shots": 1
+    },
+    "timing": {
+      "line_pause_frames": 5,
+      "emphasis_pause_before": 10,
+      "emphasis_pause_after": 16,
+      "reading_frames_per_character": 4,
+      "minimum_line_frames": 42
+    },
+    "performance": {
+      "explain_gesture": true,
+      "event_strength": 0.85
+    },
+    "parallax": {
+      "enabled": true,
+      "strength": 1
+    },
+    "subtitle": {
+      "font_height_ratio": 0.047,
+      "emphasis_scale": 1,
+      "hold_frames": 5
+    }
+  },
+  "requirements": {
+    "min_characters": 1,
+    "min_depth_layers": 2,
+    "required_parts": [
+      "body",
+      "head",
+      "eyes",
+      "mouth"
+    ]
+  }
+}

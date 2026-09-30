@@ -34,3 +34,6 @@ assets/private/
 .DS_Store
 .idea/
 .vscode/
+
+# Reusable template test art is versioned with manifests.
+!templates/**/*.png

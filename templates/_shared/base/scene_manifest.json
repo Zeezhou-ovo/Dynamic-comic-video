@@ -1,0 +1,147 @@
+{
+  "version": "0.1",
+  "project_id": "phase4-generic-room",
+  "scene_id": "generic-room",
+  "coordinate_system": "normalized-0-to-1",
+  "reference_size": {
+    "width": 960,
+    "height": 540
+  },
+  "layers": [
+    {
+      "id": "scene_root",
+      "parent_id": null,
+      "kind": "group",
+      "depth": "background",
+      "z": 0,
+      "visible": true
+    },
+    {
+      "id": "background",
+      "parent_id": "scene_root",
+      "kind": "render_layer",
+      "depth": "background",
+      "asset": "scene/background.png",
+      "fit": "canvas",
+      "z": 1,
+      "visible": true
+    },
+    {
+      "id": "midground",
+      "parent_id": "scene_root",
+      "kind": "render_layer",
+      "depth": "midground",
+      "asset": "scene/midground.png",
+      "fit": "canvas",
+      "z": 10,
+      "visible": true
+    },
+    {
+      "id": "character_field",
+      "parent_id": "scene_root",
+      "kind": "group",
+      "depth": "character",
+      "z": 20,
+      "visible": true
+    },
+    {
+      "id": "foreground",
+      "parent_id": "scene_root",
+      "kind": "render_layer",
+      "depth": "foreground",
+      "asset": "scene/foreground.png",
+      "fit": "canvas",
+      "z": 40,
+      "visible": true
+    }
+  ],
+  "objects": [
+    {
+      "id": "book",
+      "parent_id": "scene_root",
+      "asset": "scene/book.png",
+      "depth": "foreground",
+      "anchor_id": "book",
+      "position": [
+        0.5,
+        0.731
+      ],
+      "size": [
+        0.2,
+        0.2
+      ],
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "z": 33,
+      "visible": true
+    }
+  ],
+  "character_slots": {
+    "slot_left": {
+      "parent_id": "character_field",
+      "position": [
+        0.31,
+        0.83
+      ],
+      "scale": 0.76,
+      "facing": 1,
+      "z": 21,
+      "depth": "character"
+    },
+    "slot_right": {
+      "parent_id": "character_field",
+      "position": [
+        0.69,
+        0.83
+      ],
+      "scale": 0.76,
+      "facing": -1,
+      "z": 22,
+      "depth": "character"
+    }
+  },
+  "character_instances": [
+    {
+      "character_id": "lin",
+      "slot_id": "slot_left",
+      "visible": true
+    },
+    {
+      "character_id": "bo",
+      "slot_id": "slot_right",
+      "visible": true
+    }
+  ],
+  "composition_anchors": {
+    "center": [
+      0.5,
+      0.5
+    ],
+    "book": {
+      "position": [
+        0.5,
+        0.731
+      ],
+      "bounds": {
+        "left": 0.4,
+        "top": 0.631,
+        "right": 0.6,
+        "bottom": 0.831
+      }
+    }
+  },
+  "camera_safe_bounds": {
+    "left": 0.08,
+    "top": 0.08,
+    "right": 0.92,
+    "bottom": 0.92
+  },
+  "background_coverage_bounds": {
+    "left": 0,
+    "top": 0,
+    "right": 1,
+    "bottom": 1
+  }
+}

@@ -134,6 +134,15 @@ def _resolved_camera_plan(intent, composition, duration, source_motion):
 def compile_director_plan(plan, data, project=None, scene_manifest=None, character_asset_manifest=None):
     """Return a render-ready data copy whose absolute frame timeline is director-owned."""
     parse_dialogue_beats(plan)
+    policy = plan.get('runtime_policy')
+    if policy is not None:
+        from manifest_validation import validate_schema
+        validate_schema('director_plan', plan)
+    parallax_strengths = None
+    if policy:
+        intensity = policy['parallax']['strength']
+        defaults = {'foreground': 1.2, 'character': 1, 'midground': .55, 'background': .2, 'sky': .05}
+        parallax_strengths = {depth: 1 + (value - 1) * intensity for depth, value in defaults.items()}
     if plan.get('project_id') != data['storyboard'].get('project_id'):
         raise ValueError('director_plan project_id mismatch')
     board = data['storyboard']
@@ -197,6 +206,16 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
         if entry['emphasis'] == 'punchline' and entry['camera_intent'] == 'static':
             resolved = resolve_shot_intent(entry['shot_intent'], 'subtle_push', entry['emphasis'])
 
+        if policy:
+            # Mode resolver owns camera selection; don't promote static holds
+            # using legacy reaction/emphasis defaults.
+            resolved = {**resolved, 'camera_intent': entry['camera_intent'],
+                        **rules()['camera_intents'][entry['camera_intent']]}
+        if policy and (policy['camera']['strength'] == 0 or
+                       (entry['camera_intent'] == 'static' and policy['camera']['emphasis_intent'] == 'static')):
+            # A static policy overrides legacy emphasis/reaction camera promotion.
+            resolved = {**resolved, 'camera_intent': 'static', 'type': 'static', 'zoom_delta': 0}
+
         composition = None
         if phase4:
             depth_count = len({layer['depth'] for layer in scene_manifest['layers'] if layer['kind'] == 'render_layer'})
@@ -206,12 +225,13 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                 character_bindings=entry.get('character_bindings'),
                 visible_objects=entry.get('visible_objects'), viewport=canvas,
                 parallax_enabled=(resolved['camera_intent'] != 'static' and depth_count > 1),
+                parallax_strengths=parallax_strengths,
             )
 
         local_cursor = 0
         cues = []
         reaction_specs = []
-        emphasis_pause = rules()['emphasis'][entry['emphasis']]['default_pause_frames']
+        emphasis_pause = (0 if policy else rules()['emphasis'][entry['emphasis']]['default_pause_frames'])
         for beat in beats:
             local_cursor += beat.get('pause_before', 0)
             pause_after = max(beat.get('pause_after', 0), emphasis_pause)
@@ -286,6 +306,10 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                              .68 if focus_character is not None and len(visible) > 1 else .5) * canvas['width'], .46 * canvas['height'])
             camera_plan = _camera_plan(resolved['camera_intent'], legacy_focus, duration_frames,
                                        resolved['framing'], source_motion, canvas)
+        if policy and camera_plan['type'] != 'static':
+            camera_plan['to']['zoom'] = camera_plan['from']['zoom'] + (camera_plan['to']['zoom'] - camera_plan['from']['zoom']) * policy['camera']['strength']
+            camera_plan['parallax_enabled'] = camera_plan['parallax_enabled'] and policy['parallax']['enabled']
+            camera_plan['parallax_strengths'] = parallax_strengths
         motion_copy.update({'shot_id': entry['instance_id'], 'start_frame': absolute_cursor,
                             'duration_frames': duration_frames,
                             'camera': camera_plan,
@@ -324,6 +348,9 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                             f'{cue["beat_id"]}_{gesture}', gesture,
                             cue['start_frame'], duration_frames,
                             rules()['event_part'].get(gesture)))
+            if policy:
+                for event in performer['events']:
+                    event['amplitude'] = event.get('amplitude', 1) * policy['performance']['event_strength']
             motion_copy['character_performance'].append(performer)
         timeline_board.append(board_copy)
         timeline_motion.append(motion_copy)
@@ -335,6 +362,8 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
     result['motion_plan']['shots'] = timeline_motion
     result['production_brief']['format']['duration_frames'] = absolute_cursor
     result['director_plan'] = deepcopy(plan)
+    if policy:
+        result['presentation'] = {'subtitle': deepcopy(policy['subtitle'])}
     return result
 
 

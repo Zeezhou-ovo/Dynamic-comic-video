@@ -1,0 +1,76 @@
+{
+  "version": "0.1",
+  "project_id": "phase4-generic-room",
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林岚",
+      "story_role": "Character Performance runtime fixture",
+      "identity": {
+        "face": "simple oval synthetic face",
+        "hair": "short graphic fringe",
+        "clothing": "flat-color shirt",
+        "proportions": "small geometric character",
+        "distinctive_features": "#568883 body and #edac58 accent"
+      },
+      "capabilities": {
+        "parts": [
+          "body",
+          "head",
+          "eyes",
+          "mouth",
+          "left_arm",
+          "right_arm"
+        ],
+        "poses": [
+          "point"
+        ],
+        "expressions": [
+          "happy",
+          "surprised"
+        ]
+      },
+      "reference": {
+        "image": "characters/lin/reference.png",
+        "status": "planned",
+        "locks": "identity_only",
+        "prompt": "Synthetic test character; not production art."
+      }
+    },
+    {
+      "id": "bo",
+      "name": "小博",
+      "story_role": "Character Performance runtime fixture",
+      "identity": {
+        "face": "simple oval synthetic face",
+        "hair": "short graphic fringe",
+        "clothing": "flat-color shirt",
+        "proportions": "small geometric character",
+        "distinctive_features": "#6388ab body and #dc8f68 accent"
+      },
+      "capabilities": {
+        "parts": [
+          "body",
+          "head",
+          "eyes",
+          "mouth",
+          "left_arm",
+          "right_arm"
+        ],
+        "poses": [
+          "point"
+        ],
+        "expressions": [
+          "happy",
+          "surprised"
+        ]
+      },
+      "reference": {
+        "image": "characters/bo/reference.png",
+        "status": "planned",
+        "locks": "identity_only",
+        "prompt": "Synthetic test character; not production art."
+      }
+    }
+  ]
+}
