@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dynamic-comic-video:scene_manifest:0.1",
+  "title": "scene_manifest",
+  "type": "object",
+  "properties": {
+    "version": {"const": "0.1"},
+    "project_id": {"type": "string", "minLength": 1},
+    "scene_id": {"type": "string", "minLength": 1},
+    "coordinate_system": {"const": "normalized-0-to-1"},
+    "reference_size": {"$ref": "#/$defs/size"},
+    "layers": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "parent_id": {"type": ["string", "null"]},
+          "kind": {"enum": ["render_layer", "group"]},
+          "depth": {"enum": ["foreground", "character", "midground", "background", "sky"]},
+          "asset": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+\\.(png|webp)$"},
+          "z": {"type": "integer"},
+          "visible": {"type": "boolean"},
+          "fit": {"enum": ["canvas", "cover"]}
+        },
+        "required": ["id", "parent_id", "kind", "depth", "z", "visible"],
+        "allOf": [{"if": {"properties": {"kind": {"const": "render_layer"}}, "required": ["kind"]}, "then": {"required": ["asset", "fit"]}}],
+        "additionalProperties": false
+      }
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "parent_id": {"type": "string", "minLength": 1},
+          "asset": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+\\.(png|webp)$"},
+          "depth": {"enum": ["foreground", "character", "midground", "background", "sky"]},
+          "anchor_id": {"type": "string", "minLength": 1},
+          "position": {"$ref": "#/$defs/point"},
+          "size": {"$ref": "#/$defs/point"},
+          "pivot": {"$ref": "#/$defs/point"},
+          "z": {"type": "integer"},
+          "visible": {"type": "boolean"}
+        },
+        "required": ["id", "parent_id", "asset", "depth", "position", "size", "pivot", "z", "visible"],
+        "additionalProperties": false
+      }
+    },
+    "character_slots": {
+      "type": "object", "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "parent_id": {"type": "string", "minLength": 1},
+          "position": {"$ref": "#/$defs/point"},
+          "scale": {"type": "number", "exclusiveMinimum": 0, "maximum": 4},
+          "facing": {"enum": [-1, 1]},
+          "z": {"type": "integer"},
+          "depth": {"enum": ["character", "foreground"]}
+        },
+        "required": ["parent_id", "position", "scale", "facing", "z", "depth"],
+        "additionalProperties": false
+      }
+    },
+    "character_instances": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "character_id": {"type": "string", "minLength": 1},
+          "slot_id": {"type": "string", "minLength": 1},
+          "visible": {"type": "boolean"}
+        },
+        "required": ["character_id", "slot_id", "visible"],
+        "additionalProperties": false
+      }
+    },
+    "composition_anchors": {
+      "type": "object", "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/anchor"}
+    },
+    "camera_safe_bounds": {"$ref": "#/$defs/rect"},
+    "background_coverage_bounds": {"$ref": "#/$defs/rect"}
+  },
+  "required": ["version", "project_id", "scene_id", "coordinate_system", "reference_size", "layers", "objects", "character_slots", "character_instances", "composition_anchors", "camera_safe_bounds", "background_coverage_bounds"],
+  "additionalProperties": false,
+  "$defs": {
+    "size": {"type": "object", "properties": {"width": {"type": "integer", "minimum": 2}, "height": {"type": "integer", "minimum": 2}}, "required": ["width", "height"], "additionalProperties": false},
+    "point": {"type": "array", "prefixItems": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "number", "minimum": 0, "maximum": 1}], "items": false, "minItems": 2, "maxItems": 2},
+    "rect": {"type": "object", "properties": {"left": {"type": "number", "minimum": 0, "maximum": 1}, "top": {"type": "number", "minimum": 0, "maximum": 1}, "right": {"type": "number", "minimum": 0, "maximum": 1}, "bottom": {"type": "number", "minimum": 0, "maximum": 1}}, "required": ["left", "top", "right", "bottom"], "additionalProperties": false},
+    "anchor": {"oneOf": [{"$ref": "#/$defs/point"}, {"type": "object", "properties": {"position": {"$ref": "#/$defs/point"}, "bounds": {"$ref": "#/$defs/rect"}}, "required": ["position"], "additionalProperties": false}]}
+  }
+}

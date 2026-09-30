@@ -107,7 +107,31 @@ def _camera_plan(intent, focus, duration, framing, source_motion, canvas):
     return result
 
 
-def compile_director_plan(plan, data, project=None):
+def _resolved_camera_plan(intent, composition, duration, source_motion):
+    """Turn a semantic composition target into the Phase 1 camera contract."""
+    config = rules()['camera_intents'][intent]
+    camera_type = config['type']
+    target = composition['target']
+    focus = {'id': target.get('id'), 'x': target['x'], 'y': target['y']}
+    base = {'x': target['x'], 'y': target['y'], 'zoom': composition['zoom']}
+    screen = composition['screen_target']
+    depths = {layer['depth'] for layer in source_motion.get('scene_depth_layers', [])}
+    # scene_depth_layers is supplied by the caller to avoid teaching Camera about Scene.
+    moving = camera_type != 'static'
+    parallax = moving and len(depths) > 1
+    if not moving:
+        return {'type': 'static', 'focus_target': focus, 'from': base, 'to': dict(base),
+                'parallax_enabled': False, 'screen_target': screen, 'easing': 'easeInOut'}
+    end = {**base, 'zoom': base['zoom'] + config['zoom_delta']}
+    result = {'type': camera_type, 'focus_target': focus, 'from': base, 'to': end,
+              'parallax_enabled': parallax, 'screen_target': screen, 'easing': 'easeInOut'}
+    if camera_type == 'follow':
+        result['follow_path'] = [{'frame': 0, 'x': base['x'], 'y': base['y']},
+                                 {'frame': max(1, duration - 1), 'x': end['x'], 'y': end['y']}]
+    return result
+
+
+def compile_director_plan(plan, data, project=None, scene_manifest=None, character_asset_manifest=None):
     """Return a render-ready data copy whose absolute frame timeline is director-owned."""
     parse_dialogue_beats(plan)
     if plan.get('project_id') != data['storyboard'].get('project_id'):
@@ -117,6 +141,21 @@ def compile_director_plan(plan, data, project=None):
     board_by_id = {shot['id']: shot for shot in board['shots']}
     motion_by_id = {shot['shot_id']: shot for shot in motion['shots']}
     chars = data['characters']['characters']
+    if project is not None:
+        project_path = Path(project)
+        scene_path = project_path / 'scene_manifest.json'
+        character_assets_path = project_path / 'character_assets.json'
+        if scene_manifest is None and scene_path.is_file():
+            scene_manifest = json.loads(scene_path.read_text(encoding='utf-8'))
+        if character_asset_manifest is None and character_assets_path.is_file():
+            character_asset_manifest = json.loads(character_assets_path.read_text(encoding='utf-8'))
+    phase4 = scene_manifest is not None or character_asset_manifest is not None
+    if phase4 and (scene_manifest is None or character_asset_manifest is None):
+        raise ValueError('Scene Manifest and Character Asset Manifest must be provided together')
+    if phase4:
+        from composition_resolver import resolve_composition
+        if scene_manifest['project_id'] != plan['project_id'] or character_asset_manifest['project_id'] != plan['project_id']:
+            raise ValueError('Scene/Character Asset Manifest project_id mismatch')
     character_ids = {char['id'] for char in chars}
     timeline_board, timeline_motion = [], []
     absolute_cursor = 0
@@ -126,8 +165,13 @@ def compile_director_plan(plan, data, project=None):
             raise ValueError('director_plan references unknown source shot '+source_id)
         source_board = board_by_id[source_id]
         source_motion = motion_by_id[source_id]
-        visible = [char['character_id'] for char in source_board['characters']]
         beats = entry['beats']
+        default_visible = [item['character_id'] for item in source_board['characters']]
+        if phase4:
+            default_visible = [item['character_id'] for item in scene_manifest['character_instances'] if item['visible']]
+        visible = list(entry.get('visible_characters', default_visible))
+        if len(visible) != len(set(visible)):
+            raise ValueError('visible_characters contains duplicates '+entry['instance_id'])
         speakers = {beat.get('speaker') for beat in beats if beat['kind'] == 'dialogue'}
         listeners = {item for beat in beats if beat['kind'] == 'dialogue' for item in beat.get('listeners', [])}
         listeners.update(beat['reaction_target'] for beat in beats if beat['kind'] == 'reaction')
@@ -135,18 +179,16 @@ def compile_director_plan(plan, data, project=None):
             raise ValueError('director_plan uses unknown speaker/listener '+entry['instance_id'])
         if not speakers | listeners <= set(visible):
             raise ValueError('speaker/listener is not visible in source shot '+source_id)
-        focus_character = entry.get('focus_character') or next(iter(speakers or visible), visible[0])
-        if focus_character not in visible:
+        first_speaker = next((beat['speaker'] for beat in beats if beat['kind'] == 'dialogue'), None)
+        first_reaction = next((beat['reaction_target'] for beat in beats if beat['kind'] == 'reaction'), None)
+        focus_character = entry.get('focus_character') or first_speaker or first_reaction or (visible[0] if visible else None)
+        if focus_character is not None and focus_character not in visible:
             raise ValueError('focus_character is not visible in source shot '+source_id)
-        # Existing storyboard order is the authored stage layout. The resolver
-        # derives a normalized focus anchor instead of accepting camera numbers.
         canvas = data['production_brief']['format']
-        focus = ((.32 if visible.index(focus_character) == 0 and len(visible) > 1 else
-                  .68 if len(visible) > 1 else .5) * canvas['width'], .46 * canvas['height'])
-        beat_shot_intents = {beat['shot_intent'] for beat in beats if beat.get('shot_intent')}
-        if len(beat_shot_intents) > 1:
+        beat_shot_intents = [beat['shot_intent'] for beat in beats if beat.get('shot_intent')]
+        if len(set(beat_shot_intents)) > 1:
             raise ValueError('one shot instance cannot resolve multiple shot_intent values '+entry['instance_id'])
-        shot_intent = next(iter(beat_shot_intents), entry['shot_intent'])
+        shot_intent = beat_shot_intents[0] if beat_shot_intents else entry['shot_intent']
         requested_camera = entry['camera_intent']
         reaction_beat = next((beat for beat in beats if beat['kind'] == 'reaction'), None)
         if reaction_beat and requested_camera == 'static':
@@ -154,6 +196,17 @@ def compile_director_plan(plan, data, project=None):
         resolved = resolve_shot_intent(shot_intent, requested_camera, entry['emphasis'])
         if entry['emphasis'] == 'punchline' and entry['camera_intent'] == 'static':
             resolved = resolve_shot_intent(entry['shot_intent'], 'subtle_push', entry['emphasis'])
+
+        composition = None
+        if phase4:
+            depth_count = len({layer['depth'] for layer in scene_manifest['layers'] if layer['kind'] == 'render_layer'})
+            composition = resolve_composition(
+                scene_manifest, character_asset_manifest, shot_intent, visible,
+                focus_character=focus_character, focus_object=entry.get('focus_object'),
+                character_bindings=entry.get('character_bindings'),
+                visible_objects=entry.get('visible_objects'), viewport=canvas,
+                parallax_enabled=(resolved['camera_intent'] != 'static' and depth_count > 1),
+            )
 
         local_cursor = 0
         cues = []
@@ -200,6 +253,9 @@ def compile_director_plan(plan, data, project=None):
         board_copy = deepcopy(source_board)
         board_copy.update({'id': entry['instance_id'], 'duration_frames': duration_frames,
                            'dialogue': cues, 'shot_size': resolved['framing']})
+        if phase4:
+            board_copy['characters'] = [character for character in source_board['characters']
+                                        if character['character_id'] in set(visible)]
         if board_copy.get('direction'):
             direction = board_copy['direction']
             next_instance = (plan['shots'][plan['shots'].index(entry) + 1]['instance_id']
@@ -216,10 +272,23 @@ def compile_director_plan(plan, data, project=None):
                 ],
             })
         motion_copy = deepcopy(source_motion)
+        if composition:
+            source_motion = {**source_motion, 'scene_depth_layers': [layer for layer in scene_manifest['layers'] if layer['kind'] == 'render_layer']}
+            camera_plan = _resolved_camera_plan(resolved['camera_intent'], composition, duration_frames, source_motion)
+            composition['camera_safe_clamped'] = composition['safe_clamped']
+            if composition['warnings']:
+                composition['camera_safe_warning'] = composition['warnings'][0]
+            motion_copy.update({'scene_instances': composition['scene_instances'],
+                                'visible_objects': composition['visible_objects'],
+                                'composition': composition})
+        else:
+            legacy_focus = ((.32 if focus_character is not None and visible.index(focus_character) == 0 and len(visible) > 1 else
+                             .68 if focus_character is not None and len(visible) > 1 else .5) * canvas['width'], .46 * canvas['height'])
+            camera_plan = _camera_plan(resolved['camera_intent'], legacy_focus, duration_frames,
+                                       resolved['framing'], source_motion, canvas)
         motion_copy.update({'shot_id': entry['instance_id'], 'start_frame': absolute_cursor,
                             'duration_frames': duration_frames,
-                            'camera': _camera_plan(resolved['camera_intent'], focus, duration_frames,
-                                                   resolved['framing'], source_motion, canvas),
+                            'camera': camera_plan,
                             'shot_intent': shot_intent, 'camera_intent': resolved['camera_intent'],
                             'framing': resolved['framing'], 'emphasis': entry['emphasis']})
         motion_copy['character_performance'] = []
@@ -269,11 +338,12 @@ def compile_director_plan(plan, data, project=None):
     return result
 
 
-def validate_director_plan(plan, data):
+def validate_director_plan(plan, data, scene_manifest=None, character_asset_manifest=None):
     """Report compile-time semantic incompatibilities with stable, actionable errors."""
     errors = []
     try:
-        compiled = compile_director_plan(plan, data)
+        compiled = compile_director_plan(plan, data, scene_manifest=scene_manifest,
+                                         character_asset_manifest=character_asset_manifest)
     except (ValueError, KeyError, StopIteration) as exc:
         return [str(exc)]
     ids = {item['id'] for item in data['characters']['characters']}

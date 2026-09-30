@@ -117,7 +117,11 @@ def render_payload(project,data,resolve,shot_id=None):
         shots.append(runtime_shot)
     fmt=dict(data['production_brief']['format'])
     if shot_id: fmt['duration_frames']=shots[0]['duration_frames']
-    return {'format':fmt,'character_capabilities':capabilities,**data['motion_plan'],'shots':shots}
+    payload = {'format':fmt,'character_capabilities':capabilities,**data['motion_plan'],'shots':shots}
+    if data.get('scene_manifest'):
+        payload['scene_manifest'] = data['scene_manifest']
+        payload['character_assets'] = data['character_assets']
+    return payload
 
 def check_direction(data):
     if data['motion_plan']['version'] not in ('0.3','0.4'): return [],[]

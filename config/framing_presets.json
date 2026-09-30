@@ -1,0 +1,22 @@
+{
+  "version": "0.1",
+  "framing": {
+    "wide": {"target": "scene_bounds", "screen_position": [0.5, 0.5], "subject_coverage": [0.92, 0.92], "headroom": 0.04, "safe_margin": 0.04},
+    "medium": {"target": "body_anchor", "screen_position": [0.5, 0.56], "subject_coverage": [0.55, 0.76], "headroom": 0.08, "safe_margin": 0.1},
+    "medium_close": {"target": "head_anchor", "screen_position": [0.5, 0.48], "subject_coverage": [0.6, 0.62], "headroom": 0.07, "safe_margin": 0.1},
+    "close_up": {"target": "face_anchor", "screen_position": [0.5, 0.43], "subject_coverage": [0.42, 0.42], "headroom": 0.1, "safe_margin": 0.12},
+    "two_shot": {"target": "characters_bounds", "screen_position": [0.5, 0.54], "subject_coverage": [0.84, 0.78], "headroom": 0.06, "safe_margin": 0.08},
+    "group": {"target": "characters_bounds", "screen_position": [0.5, 0.52], "subject_coverage": [0.84, 0.74], "headroom": 0.08, "safe_margin": 0.08},
+    "insert": {"target": "object_anchor", "screen_position": [0.5, 0.5], "subject_coverage": [0.54, 0.54], "headroom": 0.03, "safe_margin": 0.12}
+  },
+  "shot_intents": {
+    "establishing_wide": "wide",
+    "group_shot": "group",
+    "two_shot": "two_shot",
+    "speaker_medium": "medium",
+    "speaker_closeup": "close_up",
+    "listener_reaction": "close_up",
+    "insert": "insert",
+    "emphasis_push": "medium_close"
+  }
+}

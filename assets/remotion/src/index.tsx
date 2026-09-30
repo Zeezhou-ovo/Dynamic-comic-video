@@ -14,6 +14,8 @@ import input from './render-data.json';
 import { createShotContext } from './runtime/shot-context.mjs';
 import { evaluateCamera } from './runtime/camera-controller.mjs';
 import { evaluateLayerTransform } from './runtime/parallax-controller.mjs';
+import { createAssetLoader } from './runtime/asset-loader.mjs';
+import { buildSceneGraph } from './runtime/scene-graph.mjs';
 import {
   createCharacterPerformanceContext,
   evaluateCharacterPerformance,
@@ -72,6 +74,9 @@ type ShotPlan = {
   camera_intent?: string;
   framing?: 'wide' | 'medium' | 'close_up';
   camera?: CameraPlan;
+  scene_instances?: { character_id: string; slot_id: string; visible: boolean }[];
+  visible_objects?: string[];
+  composition?: Record<string, any>;
   character_performance?: {
     character_id: string;
     role: 'idle' | 'speaker' | 'listener';
@@ -91,14 +96,16 @@ type RenderData = {
   format: { width: number; height: number; fps: number; duration_frames: number };
   asset_mode: string;
   shots: ShotPlan[];
+  scene_manifest?: any;
+  character_assets?: any;
 };
 const data = input as RenderData;
+const sceneAssetLoader = data.scene_manifest && data.character_assets
+  ? createAssetLoader(data.scene_manifest, data.character_assets)
+  : null;
 
-const Shot = ({ shot }: { shot: ShotPlan }) => {
-  const frame = useCurrentFrame();
-  const context = createShotContext(data.version === '0.4' ? shot : { ...shot, camera: undefined }, frame, data.format);
-  const camera = evaluateCamera(frame, context);
-  const characterStates = new Map((shot.character_performance ?? []).map(performance => {
+function evaluateShotCharacters(shot: ShotPlan, frame: number) {
+  return new Map((shot.character_performance ?? []).map(performance => {
     const characterContext = createCharacterPerformanceContext({
       characterId: performance.character_id,
       performance,
@@ -112,6 +119,85 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
     });
     return [performance.character_id, evaluateCharacterPerformance(characterContext)];
   }));
+}
+
+const SceneShot = ({ shot }: { shot: ShotPlan }) => {
+  const frame = useCurrentFrame();
+  const context = createShotContext(shot, frame, data.format);
+  const camera = evaluateCamera(frame, context);
+  const characterStates = evaluateShotCharacters(shot, frame);
+  const sceneGraph = buildSceneGraph({
+    sceneManifest: data.scene_manifest,
+    characterAssetManifest: data.character_assets,
+    sceneInstances: shot.scene_instances ?? [],
+    visibleObjects: shot.visible_objects ?? [],
+    viewport: data.format,
+  });
+  const caption = shot.dialogue?.find(cue => frame >= cue.start_frame && frame < cue.end_frame);
+
+  return (
+    <AbsoluteFill style={{ overflow: 'hidden' }}>
+      {sceneGraph.nodes.map(node => {
+        const depth = node.depth as Depth;
+        const depthTransform = evaluateLayerTransform(camera, depth, data.format);
+        if (node.nodeType === 'character') {
+          const state = characterStates.get(node.id);
+          const root = state?.root ?? { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 };
+          return (
+            <AbsoluteFill key={node.id} style={{ transformOrigin: '0 0', transform: depthTransform.transform }}>
+              <div style={{
+                position: 'absolute', left: node.x + root.x, top: node.y + root.y,
+                width: node.referenceSize.width, height: node.referenceSize.height,
+                transformOrigin: `${node.rootAnchor[0] * 100}% ${node.rootAnchor[1] * 100}%`,
+                transform: `scale(${node.scaleX * root.scale}, ${node.scaleY * root.scale}) rotate(${root.rotation}deg)`,
+                opacity: root.opacity,
+              }}>
+                {node.parts.map(part => {
+                  const acting = { part: part.partId, pivot: part.pivot, keys: [] };
+                  const local = evaluateCharacterPart(frame, acting, state);
+                  const asset = resolveCharacterLayerAsset({
+                    asset: part.asset, state_assets: part.state_assets, acting,
+                  }, state, frame);
+                  return (
+                    <Img key={part.id} src={staticFile(sceneAssetLoader!.resolve(asset))} style={{
+                      position: 'absolute', left: part.x + local.x, top: part.y + local.y,
+                      width: part.width, height: part.height, opacity: local.opacity,
+                      transformOrigin: `${part.pivot[0] * 100}% ${part.pivot[1] * 100}%`,
+                      transform: `rotate(${local.rotation}deg) scale(${local.scale})`,
+                    }} />
+                  );
+                })}
+              </div>
+            </AbsoluteFill>
+          );
+        }
+        return (
+          <AbsoluteFill key={node.id} style={{ transformOrigin: '0 0', transform: depthTransform.transform }}>
+            <Img src={staticFile(sceneAssetLoader!.resolve(node.asset))} style={{
+              position: 'absolute', left: node.x, top: node.y, width: node.width, height: node.height,
+              objectFit: node.fit === 'cover' ? 'cover' : node.fit === 'contain' ? 'contain' : 'fill',
+            }} />
+          </AbsoluteFill>
+        );
+      })}
+      {caption && (
+        <div style={{
+          position: 'absolute', zIndex: 1000, bottom: '7%', left: '6%', right: '6%', textAlign: 'center',
+          color: 'white', fontSize: Math.round(data.format.height * (caption.emphasis === 'punchline' || caption.emphasis === 'surprise' ? 0.052 : 0.045)),
+          fontFamily: 'Arial, "Microsoft YaHei", sans-serif', fontWeight: 700,
+          whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
+          textShadow: '-2px -2px 0 #172332, 2px -2px 0 #172332, -2px 2px 0 #172332, 2px 2px 0 #172332',
+        }}>{caption.text}</div>
+      )}
+    </AbsoluteFill>
+  );
+};
+
+const Shot = ({ shot }: { shot: ShotPlan }) => {
+  const frame = useCurrentFrame();
+  const context = createShotContext(data.version === '0.4' ? shot : { ...shot, camera: undefined }, frame, data.format);
+  const camera = evaluateCamera(frame, context);
+  const characterStates = evaluateShotCharacters(shot, frame);
   const caption = shot.dialogue?.find(cue => frame >= cue.start_frame && frame < cue.end_frame);
 
   return (
@@ -199,7 +285,7 @@ const Video = () => (
   <AbsoluteFill style={{ background: '#172332' }}>
     {data.shots.map(shot => (
       <Sequence key={shot.shot_id} from={shot.start_frame} durationInFrames={shot.duration_frames}>
-        <Shot shot={shot} />
+        {data.scene_manifest ? <SceneShot shot={shot} /> : <Shot shot={shot} />}
         {shot.dialogue?.filter(cue => cue.audio).map((cue, index) => (
           <Sequence key={index} from={cue.start_frame} durationInFrames={cue.end_frame - cue.start_frame}>
             <Audio src={staticFile(cue.audio!)} />

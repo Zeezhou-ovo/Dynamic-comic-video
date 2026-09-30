@@ -17,6 +17,10 @@
           "shot_intent": {"enum": ["establishing_wide", "group_shot", "two_shot", "speaker_medium", "speaker_closeup", "listener_reaction", "insert", "emphasis_push"]},
           "camera_intent": {"enum": ["static", "subtle_push", "stronger_push", "follow"]},
           "focus_character": {"type": ["string", "null"]},
+          "focus_object": {"type": ["string", "null"]},
+          "visible_characters": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "visible_objects": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "character_bindings": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
           "emphasis": {"enum": ["normal", "important", "reveal", "punchline", "awkward", "surprise"]},
           "beats": {
             "type": "array", "minItems": 1,

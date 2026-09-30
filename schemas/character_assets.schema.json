@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dynamic-comic-video:character_assets:0.1",
+  "title": "character_assets",
+  "type": "object",
+  "properties": {
+    "version": {"const": "0.1"},
+    "project_id": {"type": "string", "minLength": 1},
+    "coordinate_system": {"const": "normalized-0-to-1"},
+    "characters": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "character_id": {"type": "string", "minLength": 1},
+          "reference_size": {"$ref": "#/$defs/size"},
+          "root_anchor": {"$ref": "#/$defs/point"},
+          "anchors": {
+            "type": "object", "minProperties": 3,
+            "properties": {
+              "root": {"$ref": "#/$defs/point"},
+              "body": {"$ref": "#/$defs/character_anchor"},
+              "face": {"$ref": "#/$defs/character_anchor"},
+              "head": {"$ref": "#/$defs/character_anchor"},
+              "mouth": {"$ref": "#/$defs/character_anchor"},
+              "left_hand": {"$ref": "#/$defs/character_anchor"},
+              "right_hand": {"$ref": "#/$defs/character_anchor"},
+              "eyes": {"$ref": "#/$defs/character_anchor"}
+            },
+            "required": ["root", "body", "face"],
+            "additionalProperties": {"$ref": "#/$defs/character_anchor"}
+          },
+          "bounds": {"$ref": "#/$defs/rect"},
+          "parts": {
+            "type": "object", "minProperties": 1,
+            "additionalProperties": {"$ref": "#/$defs/part"}
+          }
+        },
+        "required": ["character_id", "reference_size", "root_anchor", "anchors", "bounds", "parts"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "project_id", "coordinate_system", "characters"],
+  "additionalProperties": false,
+  "$defs": {
+    "size": {"type": "object", "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}}, "required": ["width", "height"], "additionalProperties": false},
+    "point": {"type": "array", "prefixItems": [{"type": "number", "minimum": 0, "maximum": 1}, {"type": "number", "minimum": 0, "maximum": 1}], "items": false, "minItems": 2, "maxItems": 2},
+    "rect": {"type": "object", "properties": {"left": {"type": "number", "minimum": 0, "maximum": 1}, "top": {"type": "number", "minimum": 0, "maximum": 1}, "right": {"type": "number", "minimum": 0, "maximum": 1}, "bottom": {"type": "number", "minimum": 0, "maximum": 1}}, "required": ["left", "top", "right", "bottom"], "additionalProperties": false},
+    "character_anchor": {"type": "object", "properties": {"position": {"$ref": "#/$defs/point"}, "bounds": {"$ref": "#/$defs/rect"}}, "required": ["position", "bounds"], "additionalProperties": false},
+    "part": {
+      "type": "object",
+      "properties": {
+        "asset": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+\\.(png|webp)$"},
+        "pixel_size": {"$ref": "#/$defs/size"},
+        "anchor": {"$ref": "#/$defs/point"},
+        "pivot": {"$ref": "#/$defs/point"},
+        "depth": {"enum": ["character", "foreground"]},
+        "z": {"type": "integer"},
+        "state_assets": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+\\.(png|webp)$"}}
+      },
+      "required": ["asset", "pixel_size", "anchor", "pivot", "depth", "z", "state_assets"],
+      "additionalProperties": false
+    }
+  }
+}

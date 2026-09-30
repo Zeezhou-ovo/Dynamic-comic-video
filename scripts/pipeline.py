@@ -11,6 +11,7 @@ from PIL import Image
 from acting import asset_names, check_acting, check_character_performance
 from production import inventory, check_dialogue, render_payload, check_direction
 from director import validate_director_plan, compile_director_plan
+from composition_resolver import validate_scene_manifests
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = ('production_brief', 'characters', 'storyboard', 'motion_plan')
@@ -139,6 +140,15 @@ def validate_camera_plan(motion_shot, version, errors, width, height):
 def validate(project, assets=False, shot_id=None):
     data = {n:read(project/(n+'.json')) for n in NAMES}
     errors, warnings = [], []
+    scene_path = project/'scene_manifest.json'
+    character_assets_path = project/'character_assets.json'
+    if scene_path.is_file() != character_assets_path.is_file():
+        errors.append('scene_manifest.json and character_assets.json must be provided together')
+    scene_manifest = read(scene_path) if scene_path.is_file() else None
+    character_asset_manifest = read(character_assets_path) if character_assets_path.is_file() else None
+    if scene_manifest is not None:
+        data['scene_manifest'] = scene_manifest
+        data['character_assets'] = character_asset_manifest
     director_path = project/'director_plan.json'
     director_plan = read(director_path) if director_path.is_file() else None
     for n, d in data.items():
@@ -151,10 +161,25 @@ def validate(project, assets=False, shot_id=None):
         Draft202012Validator.check_schema(schema)
         for e in Draft202012Validator(schema).iter_errors(director_plan):
             errors.append(f'director_plan:{list(e.path)}: {e.message}')
+    if scene_manifest is not None:
+        for name, manifest in (('scene_manifest', scene_manifest), ('character_assets', character_asset_manifest)):
+            schema = read(ROOT/'schemas'/(name+'.schema.json'))
+            Draft202012Validator.check_schema(schema)
+            for e in Draft202012Validator(schema).iter_errors(manifest):
+                errors.append(f'{name}:{list(e.path)}: {e.message}')
     if errors:
         return data, errors, warnings
+    if scene_manifest is not None:
+        try:
+            errors.extend(validate_scene_manifests(scene_manifest, character_asset_manifest,
+                          data['characters']['characters'], project, local,
+                          data['production_brief']['format']))
+        except (ValueError, OSError) as exc:
+            errors.append('Scene/asset validation failed: '+str(exc))
+        if errors:
+            return data, errors, warnings
     if director_plan is not None:
-        errors.extend(validate_director_plan(director_plan, data))
+        errors.extend(validate_director_plan(director_plan, data, scene_manifest, character_asset_manifest))
         if not errors:
             directed = compile_director_plan(director_plan, data, project)
             directed_chars = directed['characters']['characters']
@@ -385,6 +410,8 @@ def main():
     parser.add_argument('--shot',help='Compile or prepare only this shot; preparation rebases its timeline to zero')
     args=parser.parse_args(); project=args.project.resolve()
     data,errors,warnings=validate(project,args.assets or args.command=='prepare',args.shot)
+    scene_manifest = data.get('scene_manifest')
+    character_asset_manifest = data.get('character_assets')
     save(project/'qc_report.json',{'errors':errors,'repetition_warnings':warnings,'visual_review_required':True})
     if errors:
         print('\n'.join(errors)); return 1
@@ -402,6 +429,15 @@ def main():
                 for name in asset_names(layer):
                     dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
                     shutil.copy2(local(project,name),dest)
+        if scene_manifest is not None:
+            scene_asset_paths = [item['asset'] for item in scene_manifest['layers'] if item.get('asset')]
+            scene_asset_paths += [item['asset'] for item in scene_manifest['objects']]
+            scene_asset_paths += [part_path for character in character_asset_manifest['characters']
+                                  for part in character['parts'].values()
+                                  for part_path in [part['asset'], *part['state_assets'].values()]]
+            for name in dict.fromkeys(scene_asset_paths):
+                dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
+                shutil.copy2(local(project,name),dest)
         director_path = project/'director_plan.json'
         render_source = compile_director_plan(read(director_path), data, project) if director_path.is_file() else data
         render_data=render_payload(project,render_source,local,args.shot)
