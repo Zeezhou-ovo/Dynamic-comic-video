@@ -4,7 +4,7 @@
 
 ## V1.0 workflow
 
-新项目使用 `motion_plan` 0.4：默认沿用固定机位的 sequential-comic，逐镜显式启用时由 Remotion 执行确定性 Camera Motion 与五层 2.5D Parallax。旧 0.1–0.3 项目保留原有解释。运行数据和测试方法见 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md)。
+新项目使用 `motion_plan` 0.4：默认沿用固定机位的 sequential-comic，逐镜显式启用时由 Remotion 执行确定性 Camera Motion 与五层 2.5D Parallax。可选的 `director_plan` 0.1 在执行前决定说话人、听者反应、停顿、强调和镜头意图，再调用已有 Camera 与 Character Runtime。旧 0.1–0.3 项目保留原有解释。运行数据和测试方法见 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md) 与 [Dialogue & Performance Director](references/dialogue-performance-director.md)。
 
 ## 安装
 

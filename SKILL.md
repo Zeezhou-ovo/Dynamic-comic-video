@@ -20,10 +20,11 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 生成 master 与分层 | [生图规范](references/image-generation-spec.md)、[分层协议](references/layer-protocol.md)；简化条漫画风读取 [风格预设](references/simple-comic-style.md)，经济档另读 [生图档位](references/comic-generation-economy.md) | 带追溯字段的角色参考、核对过的 master、对齐图层和补全背景 |
 | 设计人物动作 | [自然度](references/motion-naturalness.md)、[有限动画](references/limited-animation.md) | 有原因、可复核的局部动作与静止阶段 |
 | 配音、字幕、嘴型及节奏 | [音频时间轴](references/audio-timeline.md) | 实测音频驱动的统一逐镜时间轴 |
+| 需要安排说话人、听者反应、喜剧停顿或强调镜头 | [Dialogue & Performance Director](references/dialogue-performance-director.md) | 可选 `director_plan.json`；将对白、静默反应、停顿和镜头意图编译到 Phase 1/2 Runtime |
 | 强调字幕、漫画符号、音效或音乐 | [漫画演出](references/comic-performance.md) | 同一时间轴中的必要视听事件 |
 | 校验、预览与交付 | [质量闸门](references/quality-gate.md)、[运行指南](references/runbook.md) | QC 报告、可播放 MP4、视觉复核记录、交付报告 |
 
-写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.4"`，其余三份制作合同为 `"0.1"`；旧 0.1–0.3 合同保持原有解释，不因升级批量改版本。需要相机/视差时读取 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md)。
+写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.4"`，`production_brief`、`characters`、`storyboard` 使用 `"0.1"`；旧 0.1–0.3 合同保持原有解释，不因升级批量改版本。剧情需要对话导演决策时，另使用独立的 `director_plan.version: "0.1"`；它不是所有项目的必需文件。需要相机/视差时读取 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md)。
 
 面向真实观众的视频先完成 [短视频内容策划层](references/content-strategy.md)：明确受众、平台、目标、前 1–2 秒钩子、一个核心承诺、结尾收获和可选 CTA，再把内容拆成 Narrative Beats 与 shots。没有内容策略的工程测试可以继续使用最小 brief，但不能把测试素材当成成片内容。
 
@@ -37,6 +38,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 - 先完整 master，再以它为唯一对齐基准提取或重建图层；保持画布、坐标、透视、尺度与光向，补全被遮挡背景。缺层就记录缺项，不降级成整图推拉。
 - 默认 `performance.mode: sequential-comic`，镜内固定机位；motion_plan 0.4 未提供 Camera 或 `camera.type: static` 时画面保持原构图。只有逐镜显式设置可执行 Camera 时才移动整场景；有多个 depth layer 时 Camera 驱动 Parallax。局部动作需要事件原因和准备→动作→停顿/回稳；静止也是有效表演。大型姿势变化优先拆镜，禁止周期浮动、摇摆和机械呼吸。
 - 实际配音先于最终字幕、嘴型、动作触发与 CUT 定时。没有音频时可以草拟时间，但不能报告为已同步；无对白作品不强加配音或嘴型。
+- 使用 `director_plan` 时把它作为实际播放的权威时间轴：按故事意图分配 beat、speaker/listener、reaction 与 pauses；允许多句对白留在同一镜头，也允许没有对白的 reaction shot。停顿进入帧时长，意图只通过 resolver 映射到已有 Camera/Character Runtime，不能在 renderer 中增写导演 if/else。匹配到本地对白 WAV 时以实测时长排 cue，再验证没有音频/字幕漂移。
 - 默认新生图档位为 `comic-economy`，用户已有选择优先。知识卡、总结卡、CTA、特效和背景音乐只按创作需求启用。
 
 ## 执行与验证

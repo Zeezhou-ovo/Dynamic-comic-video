@@ -61,11 +61,16 @@ type DialogueCue = {
   end_frame: number;
   audio?: string;
   mouth_open_frames?: number[];
+  emphasis?: 'normal' | 'important' | 'reveal' | 'punchline' | 'awkward' | 'surprise';
+  beat_id?: string;
 };
 type ShotPlan = {
   shot_id: string;
   start_frame: number;
   duration_frames: number;
+  shot_intent?: string;
+  camera_intent?: string;
+  framing?: 'wide' | 'medium' | 'close_up';
   camera?: CameraPlan;
   character_performance?: {
     character_id: string;
@@ -175,7 +180,7 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
       {caption && (
         <div style={{
           position: 'absolute', bottom: '10%', left: '6%', right: '6%', textAlign: 'center',
-          color: 'white', fontSize: Math.round(data.format.height * 0.045),
+          color: 'white', fontSize: Math.round(data.format.height * (caption.emphasis === 'punchline' || caption.emphasis === 'surprise' ? 0.052 : 0.045)),
           fontFamily: 'Arial, "Microsoft YaHei", sans-serif', fontWeight: 700,
           whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
           textShadow: '-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black',

@@ -1,6 +1,6 @@
 # 数据契约与版本
 
-新项目的 `production_brief.json`、`characters.json`、`storyboard.json` 使用 `version: "0.1"`，`motion_plan.json` 使用 `version: "0.4"`；四份文件共享 `project_id`，编码为 UTF-8。旧运动合同按 [有限动画协议](limited-animation.md) 兼容。Schema 不允许未声明字段。JSON Schema 负责结构；`pipeline.py` 负责跨文件引用和时间/素材一致性。0.4 的 Camera/Depth 字段见 [Camera 与 Parallax 运行时](camera-parallax-runtime.md)。
+新项目的 `production_brief.json`、`characters.json`、`storyboard.json` 使用 `version: "0.1"`，`motion_plan.json` 使用 `version: "0.4"`；四份基础文件共享 `project_id`，编码为 UTF-8。需要导演时间轴时可增加同样共享 `project_id` 的 `director_plan.json` 0.1。旧运动合同按 [有限动画协议](limited-animation.md) 兼容。Schema 不允许未声明字段。JSON Schema 负责结构；`pipeline.py` 负责跨文件引用和时间/素材一致性。0.4 的 Camera/Depth 字段见 [Camera 与 Parallax 运行时](camera-parallax-runtime.md)。
 
 | 文件 | 所有者与主要字段 | 消费方 |
 |---|---|---|
@@ -8,12 +8,13 @@
 | characters.json | identity 五类稳定特征；reference 路径、提示词、状态与 identity_only | 提示词编译、master QC |
 | storyboard.json | beats 原文摘录/变化/情绪；shots 动作、表情、机位、构图、连续性、master、layers | 编译器、分层、QC |
 | motion_plan.json | asset_mode、逐镜起始帧/时长、显式 camera、逐层 depth/局部动作/z、review | 素材 QC、Remotion |
+| director_plan.json（可选） | 0.1 Dialogue Beat、speaker/listener、semantic performance/reaction、shot/camera intent、pause/emphasis | `scripts/director.py` 解析并编译至现有 motion/character runtime；存在时决定实际播放顺序与时间 |
 
 Schema 文件位于 `../schemas/`，完整实例位于 `../examples/library/`。Narrative Beats 内嵌于 storyboard，合同 0.1 不另增第五个必须文件。Visual Brief 内嵌于 production brief，保持风格与内容设定分离。`content_strategy` 是面向真实观众的可选内容层，字段和节奏规则见 [短视频内容策划层](content-strategy.md)；它不替代 beats、shots 或音频时间轴。提示词输出遵循 [生图规范](image-generation-spec.md)，每个生成文件记录 `prompt_version`、`project_id`、任务角色、参考图用途和不可复制项。
 
 ## 单位与路径
 
-- 宽高为像素，H.264 要求偶数。时间全部为整数帧，区间 `[start_frame, start_frame + duration_frames)`；每镜至少两帧，无空隙无重叠，顺序与 storyboard 一致。
+- 宽高为像素，H.264 要求偶数。时间全部为整数帧，区间 `[start_frame, start_frame + duration_frames)`；每镜至少两帧，无空隙无重叠，顺序与 storyboard 一致。存在 `director_plan.json` 时，导演条目的 `shots` 与 `beats` 编译成连续的绝对播放时间轴；停顿和静默反应会增加 shot 时长，对白 cue 只占说话帧。没有该文件时，沿用 motion_plan 的原有播放时间轴。
 - asset/master/reference 路径相对生产项目根；只能本地相对路径，不能 URL、绝对路径、`..` 或反斜杠。准备渲染时仅复制使用的层到 renderer/public。
 - 全图层与 master 同尺寸；人物 PNG 保留全画布透明区域，不使用紧裁 bbox。中心为变换原点，x/y 为输出画布像素，scale 为统一缩放倍率。from 是镜头首帧，to 是末帧。
 - z 越大越靠前且不得相同。background 必須唯一且最底层，其他层按实际遮挡排列。人物持有的纸条等刚性随身物可归到人物层；独立运动时才另拆。

@@ -1,0 +1,47 @@
+{
+  "shot_intents": {
+    "establishing_wide": {"framing": "wide", "camera": "static"},
+    "group_shot": {"framing": "wide", "camera": "static"},
+    "two_shot": {"framing": "medium", "camera": "static"},
+    "speaker_medium": {"framing": "medium", "camera": "static"},
+    "speaker_closeup": {"framing": "close_up", "camera": "subtle_push"},
+    "listener_reaction": {"framing": "close_up", "camera": "subtle_push"},
+    "insert": {"framing": "close_up", "camera": "stronger_push"},
+    "emphasis_push": {"framing": "close_up", "camera": "stronger_push"}
+  },
+  "camera_intents": {
+    "static": {"type": "static", "zoom_delta": 0.0},
+    "subtle_push": {"type": "push_in", "zoom_delta": 0.08},
+    "stronger_push": {"type": "push_in", "zoom_delta": 0.16},
+    "follow": {"type": "follow", "zoom_delta": 0.0}
+  },
+  "performance_intents": {
+    "neutral": {"speaker": "talk", "listener": "idle"},
+    "ask": {"speaker": "talk", "listener": "idle"},
+    "explain": {"speaker": "talk", "listener": "idle"},
+    "explain_with_point": {"speaker": "talk", "listener": "idle", "gesture": "point"},
+    "confirm": {"speaker": "talk", "listener": "idle"},
+    "joke": {"speaker": "talk", "listener": "idle"},
+    "react": {"speaker": "idle", "listener": "idle"}
+  },
+  "reactions": {
+    "neutral": {"expression_candidates": ["neutral"], "event": null, "camera": "static", "shot_intent": "two_shot", "hold_frames": 0},
+    "interested": {"expression_candidates": ["interested", "happy"], "event": "nod", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 8},
+    "confused": {"expression_candidates": ["confused", "surprised"], "event": "shake_head", "camera": "subtle_push", "shot_intent": "listener_reaction", "hold_frames": 10},
+    "surprised": {"expression_candidates": ["surprised"], "event": "small_bounce", "camera": "subtle_push", "shot_intent": "listener_reaction", "hold_frames": 12},
+    "speechless": {"expression_candidates": ["speechless", "surprised"], "event": "blink", "camera": "subtle_push", "shot_intent": "listener_reaction", "hold_frames": 18},
+    "awkward": {"expression_candidates": ["awkward", "confused"], "event": "blink", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 14},
+    "annoyed": {"expression_candidates": ["annoyed", "confused"], "event": "shake_head", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 10},
+    "amused": {"expression_candidates": ["amused", "happy"], "event": "nod", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 10},
+    "laugh": {"expression_candidates": ["laugh", "happy"], "event": "small_bounce", "camera": "subtle_push", "shot_intent": "listener_reaction", "hold_frames": 16}
+  },
+  "emphasis": {
+    "normal": {"camera": "static", "default_pause_frames": 0},
+    "important": {"camera": "subtle_push", "default_pause_frames": 5},
+    "reveal": {"camera": "stronger_push", "default_pause_frames": 8},
+    "punchline": {"camera": "subtle_push", "default_pause_frames": 10},
+    "awkward": {"camera": "static", "default_pause_frames": 10},
+    "surprise": {"camera": "stronger_push", "default_pause_frames": 8}
+  },
+  "event_part": {"nod": "head", "shake_head": "head", "blink": "eyes", "point": "right_arm", "raise_hand": "right_arm", "small_bounce": "body", "talk": "mouth"}
+}

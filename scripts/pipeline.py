@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator
 from PIL import Image
 from acting import asset_names, check_acting, check_character_performance
 from production import inventory, check_dialogue, render_payload, check_direction
+from director import validate_director_plan, compile_director_plan
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = ('production_brief', 'characters', 'storyboard', 'motion_plan')
@@ -138,13 +139,32 @@ def validate_camera_plan(motion_shot, version, errors, width, height):
 def validate(project, assets=False, shot_id=None):
     data = {n:read(project/(n+'.json')) for n in NAMES}
     errors, warnings = [], []
+    director_path = project/'director_plan.json'
+    director_plan = read(director_path) if director_path.is_file() else None
     for n, d in data.items():
         schema = read(ROOT/'schemas'/(n+'.schema.json'))
         Draft202012Validator.check_schema(schema)
         for e in Draft202012Validator(schema).iter_errors(d):
             errors.append(f'{n}:{list(e.path)}: {e.message}')
+    if director_plan is not None:
+        schema = read(ROOT/'schemas/director_plan.schema.json')
+        Draft202012Validator.check_schema(schema)
+        for e in Draft202012Validator(schema).iter_errors(director_plan):
+            errors.append(f'director_plan:{list(e.path)}: {e.message}')
     if errors:
         return data, errors, warnings
+    if director_plan is not None:
+        errors.extend(validate_director_plan(director_plan, data))
+        if not errors:
+            directed = compile_director_plan(director_plan, data, project)
+            directed_chars = directed['characters']['characters']
+            directed_format = directed['production_brief']['format']
+            for motion_shot in directed['motion_plan']['shots']:
+                board_shot = next(item for item in directed['storyboard']['shots'] if item['id'] == motion_shot['shot_id'])
+                errors.extend(check_character_performance(motion_shot, board_shot, directed_chars, directed['motion_plan']['version']))
+                validate_camera_plan(motion_shot, directed['motion_plan']['version'], errors,
+                                     directed_format['width'], directed_format['height'])
+            errors.extend(check_dialogue(project, directed, local, assets, shot_id))
     brief, chars, board, motion = (data[n] for n in NAMES)
     if len({d['project_id'] for d in data.values()}) != 1:
         errors.append('project_id mismatch')
@@ -269,6 +289,8 @@ def validate(project, assets=False, shot_id=None):
             if char['reference']['status']!='ready' or not local(project,char['reference']['image']).is_file(): errors.append('Character reference not ready: '+char['id'])
     if sids==mids:
         errors.extend(check_dialogue(project,data,local,assets,shot_id))
+    if director_plan is not None and shot_id:
+        errors.append('--shot cannot select a source panel from an authoritative director_plan timeline')
     return data,errors,warnings
 
 def compile_prompts(project,data,shot_id=None):
@@ -380,7 +402,9 @@ def main():
                 for name in asset_names(layer):
                     dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
                     shutil.copy2(local(project,name),dest)
-        render_data=render_payload(project,data,local,args.shot)
+        director_path = project/'director_plan.json'
+        render_source = compile_director_plan(read(director_path), data, project) if director_path.is_file() else data
+        render_data=render_payload(project,render_source,local,args.shot)
         for shot in render_data['shots']:
             for cue in shot['dialogue']:
                 if cue.get('audio'):

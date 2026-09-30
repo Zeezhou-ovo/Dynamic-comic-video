@@ -79,6 +79,22 @@ jobs:
       - name: Render Character Performance MP4
         working-directory: character-performance-renderer
         run: npm run render
+      - name: Build comedy and knowledge director fixtures
+        run: |
+          python scripts/make_director_fixtures.py comedy phase3-comedy-fixture
+          python scripts/make_director_fixtures.py knowledge phase3-knowledge-fixture
+      - name: Prepare and install director renderer
+        run: |
+          python scripts/pipeline.py prepare phase3-comedy-fixture --renderer phase3-director-renderer
+          cd phase3-director-renderer && npm ci
+      - name: Render comedy director MP4
+        working-directory: phase3-director-renderer
+        run: npx remotion render src/index.tsx MangaMotion out/phase3-dialogue-comedy.mp4 --codec=h264
+      - name: Prepare knowledge director timeline
+        run: python scripts/pipeline.py prepare phase3-knowledge-fixture --renderer phase3-director-renderer
+      - name: Render knowledge director MP4
+        working-directory: phase3-director-renderer
+        run: npx remotion render src/index.tsx MangaMotion out/phase3-knowledge-dialogue.mp4 --codec=h264
       - uses: actions/upload-artifact@v4
         with:
           name: manga-motion-video-fixture
@@ -93,4 +109,14 @@ jobs:
         with:
           name: character-performance-video-fixture
           path: character-performance-renderer/out/video.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase3-dialogue-comedy
+          path: phase3-director-renderer/out/phase3-dialogue-comedy.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase3-knowledge-dialogue
+          path: phase3-director-renderer/out/phase3-knowledge-dialogue.mp4
           if-no-files-found: error
