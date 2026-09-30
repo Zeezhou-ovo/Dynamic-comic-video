@@ -38,6 +38,10 @@
             "required": ["intent", "reviewed"],
             "additionalProperties": false
           },
+          "character_performance": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/character_performance"}
+          },
           "start_frame": {
             "type": "integer",
             "minimum": 0
@@ -68,6 +72,11 @@
                   "enum": ["foreground", "character", "midground", "background", "sky"]
                 },
                 "acting": {"$ref": "#/$defs/acting"},
+                "state_assets": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+"}
+                },
                 "region": {"type":"array","items":{"type":"number","minimum":0,"maximum":1},"minItems":4,"maxItems":4},
                 "asset": {
                   "type": "string",
@@ -249,7 +258,7 @@
     "acting": {
       "type": "object",
       "properties": {
-        "part": {"enum": ["whole", "head", "arm", "hand", "eyes", "mouth", "prop", "interface"]},
+        "part": {"enum": ["whole", "body", "head", "arm", "left_arm", "right_arm", "hand", "eyes", "mouth", "hair", "prop", "interface"]},
         "speech": {
           "type":"object",
           "properties":{
@@ -271,6 +280,7 @@
             "description":{"type":"string","minLength":1}
           },"required":["event_id","trigger","start_frame","peak_frame","settle_frame","end_frame","description"],"additionalProperties":false}
         },
+        "easing": {"enum": ["linear", "easeIn", "easeOut", "easeInOut"]},
         "pivot": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 1}, "minItems": 2, "maxItems": 2},
         "keys": {
           "type": "array", "minItems": 2,
@@ -279,6 +289,7 @@
             "properties": {
               "frame": {"type": "integer", "minimum": 0},
               "x": {"type": "number"}, "y": {"type": "number"},
+              "scale": {"type": "number", "exclusiveMinimum": 0},
               "rotation": {"type": "number", "minimum": -180, "maximum": 180},
               "opacity": {"type": "number", "minimum": 0, "maximum": 1}
             },
@@ -297,6 +308,51 @@
         }
       },
       "required": ["part", "pivot", "keys"], "additionalProperties": false
+    },
+    "character_performance": {
+      "type": "object",
+      "properties": {
+        "character_id": {"type": "string", "minLength": 1},
+        "role": {"enum": ["idle", "speaker", "listener"]},
+        "pose": {"type": "string", "minLength": 1},
+        "expression": {"type": "string", "minLength": 1},
+        "root_pivot": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 1}, "minItems": 2, "maxItems": 2},
+        "root_easing": {"enum": ["linear", "easeIn", "easeOut", "easeInOut"]},
+        "root_keys": {
+          "type": "array", "minItems": 2,
+          "items": {
+            "type": "object",
+            "properties": {
+              "frame": {"type": "integer", "minimum": 0},
+              "x": {"type": "number"}, "y": {"type": "number"},
+              "scale": {"type": "number", "exclusiveMinimum": 0},
+              "rotation": {"type": "number", "minimum": -180, "maximum": 180},
+              "opacity": {"type": "number", "minimum": 0, "maximum": 1}
+            },
+            "required": ["frame", "x", "y", "scale", "rotation", "opacity"],
+            "additionalProperties": false
+          }
+        },
+        "events": {"type": "array", "items": {"$ref": "#/$defs/character_event"}}
+      },
+      "required": ["character_id", "role", "events"],
+      "additionalProperties": false
+    },
+    "character_event": {
+      "type": "object",
+      "properties": {
+        "event_id": {"type": "string", "minLength": 1},
+        "preset": {"enum": ["idle", "talk", "nod", "shake_head", "point", "raise_hand", "blink", "small_bounce"]},
+        "start_frame": {"type": "integer", "minimum": 0},
+        "peak_frame": {"type": "integer", "minimum": 0},
+        "settle_frame": {"type": "integer", "minimum": 0},
+        "end_frame": {"type": "integer", "minimum": 0},
+        "part": {"enum": ["body", "head", "eyes", "mouth", "left_arm", "right_arm", "arm", "hair"]},
+        "amplitude": {"type": "number", "minimum": 0, "maximum": 60},
+        "easing": {"enum": ["linear", "easeIn", "easeOut", "easeInOut"]}
+      },
+      "required": ["event_id", "preset", "start_frame", "peak_frame", "settle_frame", "end_frame"],
+      "additionalProperties": false
     },
     "timeline": {
       "type": "object",

@@ -75,10 +75,12 @@ def check_dialogue(project,data,resolve,assets=False,shot_id=None):
 def render_payload(project,data,resolve,shot_id=None):
     shots=[]; fps=data['production_brief']['format']['fps']
     version=data['motion_plan']['version']
+    capabilities={c['id']:c.get('capabilities',{'parts':[],'poses':[],'expressions':[]}) for c in data['characters']['characters']}
     for s in data['motion_plan']['shots']:
         if shot_id and s['shot_id']!=shot_id: continue
         board=next(b for b in data['storyboard']['shots'] if b['id']==s['shot_id'])
         storyboard_layers={layer['id']:layer for layer in board['layers']}
+        storyboard_characters={item['character_id']:item for item in board['characters']}
         cues=[]
         for c in board.get('dialogue',[]):
             cue=dict(c)
@@ -87,6 +89,7 @@ def render_payload(project,data,resolve,shot_id=None):
         motion_layers=[]
         for layer in s['layers']:
             runtime_layer=dict(layer)
+            runtime_layer['character_id']=storyboard_layers.get(layer['layer_id'],{}).get('character_id')
             if version != '0.4' and not runtime_layer.get('depth'):
                 role=storyboard_layers.get(layer['layer_id'],{}).get('role')
                 runtime_layer['depth']={
@@ -95,13 +98,26 @@ def render_payload(project,data,resolve,shot_id=None):
                     'effects':'midground',
                 }.get(role,'character')
             motion_layers.append(runtime_layer)
-        runtime_shot={**s,'layers':motion_layers,'start_frame':0 if shot_id else s['start_frame'],'dialogue':cues}
+        character_performance=[]
+        for performer in s.get('character_performance',[]):
+            board_character=storyboard_characters.get(performer['character_id'],{})
+            manifest=capabilities.get(performer['character_id'],{'parts':[],'poses':[],'expressions':[]})
+            expression=performer.get('expression')
+            if not expression and board_character.get('expression') in manifest.get('expressions',[]):
+                expression=board_character['expression']
+            character_performance.append({
+                **performer,
+                'expression':expression,
+                'capabilities':manifest,
+                'fps':fps,
+            })
+        runtime_shot={**s,'layers':motion_layers,'character_performance':character_performance,'start_frame':0 if shot_id else s['start_frame'],'dialogue':cues}
         if version != '0.4':
             runtime_shot.pop('camera',None)
         shots.append(runtime_shot)
     fmt=dict(data['production_brief']['format'])
     if shot_id: fmt['duration_frames']=shots[0]['duration_frames']
-    return {'format':fmt,**data['motion_plan'],'shots':shots}
+    return {'format':fmt,'character_capabilities':capabilities,**data['motion_plan'],'shots':shots}
 
 def check_direction(data):
     if data['motion_plan']['version'] not in ('0.3','0.4'): return [],[]

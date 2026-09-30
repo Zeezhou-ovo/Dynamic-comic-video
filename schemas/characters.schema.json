@@ -61,6 +61,16 @@
             ],
             "additionalProperties": false
           },
+          "capabilities": {
+            "type": "object",
+            "properties": {
+              "parts": {"type": "array", "items": {"enum": ["body", "head", "eyes", "mouth", "left_arm", "right_arm", "arm", "hair"]}, "uniqueItems": true},
+              "poses": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+              "expressions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+            },
+            "required": ["parts", "poses", "expressions"],
+            "additionalProperties": false
+          },
           "reference": {
             "type": "object",
             "properties": {

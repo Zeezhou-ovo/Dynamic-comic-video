@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: "24"
       - name: Run deterministic camera checks
-        run: node --test scripts/test_camera_runtime.mjs
+        run: node --test scripts/test_camera_runtime.mjs scripts/test_character_runtime.mjs
       - name: Compile example prompts
         run: python scripts/pipeline.py compile examples/library
       - name: Validate example contracts
@@ -67,6 +67,18 @@ jobs:
       - name: Render camera/parallax MP4
         working-directory: camera-renderer
         run: npm run render
+      - name: Build Character Performance and camera regression scene
+        run: python scripts/make_character_performance_fixture.py character-performance-fixture
+      - name: Validate and prepare Character Performance renderer
+        run: |
+          python scripts/pipeline.py validate character-performance-fixture --assets
+          python scripts/pipeline.py prepare character-performance-fixture --renderer character-performance-renderer
+      - name: Install Character Performance renderer dependencies
+        working-directory: character-performance-renderer
+        run: npm ci
+      - name: Render Character Performance MP4
+        working-directory: character-performance-renderer
+        run: npm run render
       - uses: actions/upload-artifact@v4
         with:
           name: manga-motion-video-fixture
@@ -76,4 +88,9 @@ jobs:
         with:
           name: camera-parallax-video-fixture
           path: camera-renderer/out/video.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: character-performance-video-fixture
+          path: character-performance-renderer/out/video.mp4
           if-no-files-found: error

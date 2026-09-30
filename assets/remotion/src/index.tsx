@@ -14,9 +14,15 @@ import input from './render-data.json';
 import { createShotContext } from './runtime/shot-context.mjs';
 import { evaluateCamera } from './runtime/camera-controller.mjs';
 import { evaluateLayerTransform } from './runtime/parallax-controller.mjs';
+import {
+  createCharacterPerformanceContext,
+  evaluateCharacterPerformance,
+  evaluateCharacterPart,
+  resolveCharacterLayerAsset,
+} from './runtime/character-controller.mjs';
 
 type Depth = 'foreground' | 'character' | 'midground' | 'background' | 'sky';
-type Key = { frame: number; x: number; y: number; rotation: number; opacity: number };
+type Key = { frame: number; x: number; y: number; scale?: number; rotation: number; opacity: number };
 type CameraPose = { x: number; y: number; zoom: number };
 type CameraPlan = {
   type: 'static' | 'push_in' | 'pull_out' | 'pan_left' | 'pan_right' | 'follow';
@@ -33,6 +39,8 @@ type Layer = {
   layer_id: string;
   asset: string;
   depth?: Depth;
+  character_id?: string;
+  state_assets?: Record<string, string>;
   region?: [number, number, number, number];
   z: number;
   from: { x: number; y: number; scale: number };
@@ -41,6 +49,7 @@ type Layer = {
     part: string;
     pivot: [number, number];
     keys: Key[];
+    easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
     speech?: { speaker: string; closed_asset: string; open_asset: string };
     poses?: { frame: number; asset: string }[];
   };
@@ -58,6 +67,17 @@ type ShotPlan = {
   start_frame: number;
   duration_frames: number;
   camera?: CameraPlan;
+  character_performance?: {
+    character_id: string;
+    role: 'idle' | 'speaker' | 'listener';
+    pose?: string;
+    expression?: string;
+    root_pivot?: [number, number];
+    root_easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
+    root_keys?: { frame: number; x: number; y: number; scale: number; rotation: number; opacity: number }[];
+    events: { event_id: string; preset: 'idle' | 'talk' | 'nod' | 'shake_head' | 'point' | 'raise_hand' | 'blink' | 'small_bounce'; start_frame: number; peak_frame: number; settle_frame: number; end_frame: number; part?: string; amplitude?: number; easing?: string }[];
+    capabilities: { parts: string[]; poses: string[]; expressions: string[] };
+  }[];
   layers: Layer[];
   dialogue?: DialogueCue[];
 };
@@ -73,6 +93,20 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
   const frame = useCurrentFrame();
   const context = createShotContext(data.version === '0.4' ? shot : { ...shot, camera: undefined }, frame, data.format);
   const camera = evaluateCamera(frame, context);
+  const characterStates = new Map((shot.character_performance ?? []).map(performance => {
+    const characterContext = createCharacterPerformanceContext({
+      characterId: performance.character_id,
+      performance,
+      capabilities: performance.capabilities,
+      absoluteFrame: shot.start_frame + frame,
+      localFrame: frame,
+      startFrame: shot.start_frame,
+      durationFrames: shot.duration_frames,
+      fps: data.format.fps,
+      dialogue: shot.dialogue ?? [],
+    });
+    return [performance.character_id, evaluateCharacterPerformance(characterContext)];
+  }));
   const caption = shot.dialogue?.find(cue => frame >= cue.start_frame && frame < cue.end_frame);
 
   return (
@@ -85,29 +119,35 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
           { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
         );
         const acting = layer.acting;
-        const local = (key: 'x' | 'y' | 'rotation' | 'opacity', fallback: number) => acting
-          ? interpolate(
-              frame,
-              acting.keys.map(keyframe => keyframe.frame),
-              acting.keys.map(keyframe => keyframe[key]),
-              { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
-            )
-          : fallback;
-        let pose = acting?.poses?.filter(item => item.frame <= frame).at(-1)?.asset ?? layer.asset;
+        const performanceState = layer.character_id ? characterStates.get(layer.character_id) : undefined;
+        const local = evaluateCharacterPart(frame, acting, performanceState);
+        let pose = resolveCharacterLayerAsset(layer, performanceState, frame);
         if (acting?.speech) {
           const cue = shot.dialogue?.find(item => item.speaker === acting.speech!.speaker && frame >= item.start_frame && frame < item.end_frame);
-          pose = cue?.mouth_open_frames?.includes(frame - cue.start_frame)
-            ? acting.speech.open_asset
-            : acting.speech.closed_asset;
+          if (performanceState) {
+            pose = performanceState.mouth.state === 'open' ? acting.speech.open_asset : acting.speech.closed_asset;
+          } else {
+            pose = cue?.mouth_open_frames?.includes(frame - cue.start_frame)
+              ? acting.speech.open_asset
+              : acting.speech.closed_asset;
+          }
         }
         const region = layer.region;
         const depthTransform = evaluateLayerTransform(camera, layer.depth ?? 'character', data.format);
+        const root = performanceState?.root;
 
         return (
           <AbsoluteFill
             key={layer.layer_id}
             style={{ transformOrigin: '0 0', transform: depthTransform.transform }}
           >
+            <AbsoluteFill
+              style={{
+                transformOrigin: root ? `${performanceState?.rootPivot[0] * 100}% ${performanceState?.rootPivot[1] * 100}%` : '50% 50%',
+                transform: root ? `translate(${root.x}px, ${root.y}px) rotate(${root.rotation}deg) scale(${root.scale})` : undefined,
+                opacity: root?.opacity,
+              }}
+            >
             <AbsoluteFill
               style={{
                 clipPath: region
@@ -122,11 +162,12 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  opacity: local('opacity', 1),
+                  opacity: local.opacity,
                   transformOrigin: acting ? `${acting.pivot[0] * 100}% ${acting.pivot[1] * 100}%` : '50% 50%',
-                  transform: `translate(${local('x', 0)}px, ${local('y', 0)}px) rotate(${local('rotation', 0)}deg)`,
+                  transform: `translate(${local.x}px, ${local.y}px) rotate(${local.rotation}deg) scale(${local.scale})`,
                 }}
               />
+            </AbsoluteFill>
             </AbsoluteFill>
           </AbsoluteFill>
         );

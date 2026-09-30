@@ -8,7 +8,7 @@ import shutil
 import sys
 from jsonschema import Draft202012Validator
 from PIL import Image
-from acting import asset_names, check_acting
+from acting import asset_names, check_acting, check_character_performance
 from production import inventory, check_dialogue, render_payload, check_direction
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,7 +34,7 @@ def local(root, name):
         raise ValueError('Asset escapes project: '+name)
     return p
 
-def validate_camera_plan(motion_shot, version, errors):
+def validate_camera_plan(motion_shot, version, errors, width, height):
     """Validate executable Camera/Parallax fields introduced in motion_plan 0.4."""
     if version != '0.4':
         if 'camera' in motion_shot or any('depth' in layer for layer in motion_shot['layers']):
@@ -107,6 +107,33 @@ def validate_camera_plan(motion_shot, version, errors):
         values = [strengths.get(depth, DEFAULT_PARALLAX_STRENGTHS[depth]) for depth in depth_names]
         if len(depth_names) < 2 or len(set(values)) < 2:
             errors.append('Parallax needs at least two depth layers with distinct strengths '+sid)
+
+    # Background assets fill the project canvas. Verify endpoint transforms still
+    # cover that viewport so camera motion cannot expose empty canvas edges.
+    background_depth = 'background' if 'background' in depth_names else ('sky' if 'sky' in depth_names else None)
+    if moving and background_depth and from_pose and to_pose and focus:
+        strength = camera.get('parallax_strengths', {}).get(background_depth, DEFAULT_PARALLAX_STRENGTHS[background_depth]) if parallax_enabled else 1.0
+        anchors = (screen['x'] * width, screen['y'] * height)
+        poses = [from_pose, to_pose]
+        if camera_type == 'follow' and camera.get('follow_path'):
+            last_frame = max(1, motion_shot['duration_frames'] - 1)
+            poses = [
+                {
+                    'x': point['x'], 'y': point['y'],
+                    'zoom': from_pose['zoom'] + (to_pose['zoom'] - from_pose['zoom']) * point['frame'] / last_frame,
+                }
+                for point in camera['follow_path']
+            ]
+        for pose in poses:
+            zoom = 1 + (pose['zoom'] - 1) * strength
+            camera_x = focus['x'] + (pose['x'] - focus['x']) * strength
+            camera_y = focus['y'] + (pose['y'] - focus['y']) * strength
+            translate_x = anchors[0] - camera_x * zoom
+            translate_y = anchors[1] - camera_y * zoom
+            if (translate_x > 1 or translate_y > 1
+                    or translate_x + width * zoom < width - 1
+                    or translate_y + height * zoom < height - 1):
+                errors.append('Camera/Parallax may reveal a background canvas edge '+sid)
 
 def validate(project, assets=False, shot_id=None):
     data = {n:read(project/(n+'.json')) for n in NAMES}
@@ -206,6 +233,13 @@ def validate(project, assets=False, shot_id=None):
                     errors.append('Panel patch requires fixed local replacement region '+sid)
             for t in (layer['from'],layer['to']):
                 if abs(t['x'])>(t['scale']-1)*width/2+1e-6 or abs(t['y'])>(t['scale']-1)*height/2+1e-6: errors.append('Motion can reveal canvas edge '+sid+'/'+layer['layer_id'])
+        if item.get('character_performance'):
+            errors.extend(check_character_performance(item,shot,chars['characters'],motion['version']))
+            for performer in item['character_performance']:
+                root_keys=performer.get('root_keys',[])
+                frames=[key['frame'] for key in root_keys]
+                if root_keys and (frames[0]!=0 or frames!=sorted(set(frames)) or frames[-1]>=item['duration_frames']):
+                    errors.append('Invalid character root transform frames '+sid+'/'+performer['character_id'])
         if assets and selected:
             for name,role in [(shot['master'],'master')]+[(name,roles.get(l['layer_id'])) for l in item['layers'] for name in asset_names(l)]:
                 p=local(project,name)
@@ -226,7 +260,7 @@ def validate(project, assets=False, shot_id=None):
                     digest=hashlib.sha256(p.read_bytes()).hexdigest()
                     if digest in backgrounds: errors.append('Mechanically reused background asset: '+sid+' and '+backgrounds[digest])
                     backgrounds[digest]=sid
-        validate_camera_plan(item,motion['version'],errors)
+        validate_camera_plan(item,motion['version'],errors,width,height)
     if cursor!=brief['format']['duration_frames']: errors.append('Total duration mismatch')
     if brief['format']['width']%2 or brief['format']['height']%2: errors.append('H264 dimensions must be even')
     if assets and motion['asset_mode']=='production':
