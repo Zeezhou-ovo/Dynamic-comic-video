@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 import shutil
 import sys
@@ -12,6 +13,13 @@ from production import inventory, check_dialogue, render_payload, check_directio
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = ('production_brief', 'characters', 'storyboard', 'motion_plan')
+CAMERA_TYPES = {'static', 'push_in', 'pull_out', 'pan_left', 'pan_right', 'follow'}
+CAMERA_EASINGS = {'linear', 'easeIn', 'easeOut', 'easeInOut'}
+DEPTHS = {'foreground', 'character', 'midground', 'background', 'sky'}
+DEFAULT_PARALLAX_STRENGTHS = {
+    'foreground': 1.2, 'character': 1.0, 'midground': 0.55,
+    'background': 0.2, 'sky': 0.05,
+}
 
 def read(path):
     return json.loads(path.read_text(encoding='utf-8'))
@@ -25,6 +33,80 @@ def local(root, name):
     if not p.is_relative_to(root.resolve()):
         raise ValueError('Asset escapes project: '+name)
     return p
+
+def validate_camera_plan(motion_shot, version, errors):
+    """Validate executable Camera/Parallax fields introduced in motion_plan 0.4."""
+    if version != '0.4':
+        if 'camera' in motion_shot or any('depth' in layer for layer in motion_shot['layers']):
+            errors.append('Camera and depth fields require motion_plan 0.4 '+motion_shot['shot_id'])
+        return
+    sid = motion_shot['shot_id']
+    layers = motion_shot['layers']
+    for layer in layers:
+        if layer.get('depth') not in DEPTHS:
+            errors.append('motion_plan 0.4 layer needs a valid depth '+sid+'/'+layer['layer_id'])
+        if any(layer[key] != {'x': 0, 'y': 0, 'scale': 1} for key in ('from', 'to')):
+            errors.append('motion_plan 0.4 camera owns scene framing; layer from/to must be identity '+sid+'/'+layer['layer_id'])
+
+    camera = motion_shot.get('camera') or {'type': 'static', 'parallax_enabled': False}
+    camera_type = camera.get('type')
+    if camera_type not in CAMERA_TYPES:
+        errors.append('Invalid camera type '+sid)
+        return
+    moving = camera_type != 'static'
+    from_pose, to_pose = camera.get('from'), camera.get('to')
+    focus = camera.get('focus_target')
+    if camera.get('easing', 'easeInOut') not in CAMERA_EASINGS:
+        errors.append('Invalid camera easing '+sid)
+    screen = camera.get('screen_target', {'x': 0.5, 'y': 0.5})
+    def finite_number(value):
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+    if any(not finite_number(screen.get(axis)) or not 0 <= screen[axis] <= 1 for axis in ('x', 'y')):
+        errors.append('Camera screen_target must use normalized x/y '+sid)
+    if camera_type == 'static' and from_pose and to_pose and from_pose != to_pose:
+        errors.append('static camera from/to poses must match '+sid)
+
+    if moving:
+        if not focus or any(not finite_number(focus.get(axis)) for axis in ('x', 'y')):
+            errors.append('Moving camera needs a finite focus_target x/y '+sid)
+        if not from_pose or not to_pose:
+            errors.append('Moving camera needs from and to camera poses '+sid)
+        else:
+            for pose in (from_pose, to_pose):
+                if any(not finite_number(pose.get(axis)) for axis in ('x', 'y', 'zoom')) or not finite_number(pose.get('zoom')) or pose['zoom'] <= 0:
+                    errors.append('Camera poses need finite x/y and positive zoom '+sid)
+            if camera_type == 'push_in' and to_pose.get('zoom', 0) <= from_pose.get('zoom', 0):
+                errors.append('push_in must increase zoom '+sid)
+            if camera_type == 'pull_out' and to_pose.get('zoom', 0) >= from_pose.get('zoom', 0):
+                errors.append('pull_out must decrease zoom '+sid)
+            if camera_type == 'pan_left' and to_pose.get('x', 0) >= from_pose.get('x', 0):
+                errors.append('pan_left must move camera x left '+sid)
+            if camera_type == 'pan_right' and to_pose.get('x', 0) <= from_pose.get('x', 0):
+                errors.append('pan_right must move camera x right '+sid)
+
+    if camera_type == 'follow':
+        path = camera.get('follow_path', [])
+        duration = motion_shot['duration_frames']
+        frames = [point.get('frame') for point in path]
+        if len(path) < 2 or frames[0] != 0 or frames[-1] != duration - 1 or frames != sorted(set(frames)):
+            errors.append('follow_path must be strictly ordered and cover local frames 0..duration-1 '+sid)
+        if any(not finite_number(point.get(axis)) for point in path for axis in ('x', 'y')):
+            errors.append('follow_path points need finite x/y '+sid)
+        if from_pose and to_pose and len(path) >= 2:
+            if (from_pose.get('x'), from_pose.get('y')) != (path[0].get('x'), path[0].get('y')) or (to_pose.get('x'), to_pose.get('y')) != (path[-1].get('x'), path[-1].get('y')):
+                errors.append('follow_path endpoints must match camera from/to positions '+sid)
+    elif camera.get('follow_path'):
+        errors.append('follow_path is only valid for follow camera '+sid)
+
+    depth_names = {layer.get('depth') for layer in layers if layer.get('depth') in DEPTHS}
+    parallax_enabled = camera.get('parallax_enabled') is True
+    if moving and len(depth_names) > 1 and not parallax_enabled:
+        errors.append('Moving camera with multiple depth layers requires parallax '+sid)
+    if parallax_enabled:
+        strengths = camera.get('parallax_strengths', {})
+        values = [strengths.get(depth, DEFAULT_PARALLAX_STRENGTHS[depth]) for depth in depth_names]
+        if len(depth_names) < 2 or len(set(values)) < 2:
+            errors.append('Parallax needs at least two depth layers with distinct strengths '+sid)
 
 def validate(project, assets=False, shot_id=None):
     data = {n:read(project/(n+'.json')) for n in NAMES}
@@ -90,8 +172,8 @@ def validate(project, assets=False, shot_id=None):
         if not shot: continue
         if item['duration_frames']!=shot['duration_frames']: errors.append('Duration mismatch '+sid)
         sequential=(item.get('performance') or {}).get('mode')=='sequential-comic'
-        if motion['version']=='0.3' and (item.get('performance') or {}).get('mode') not in ('sequential-comic','fixed-camera-micro'):
-            errors.append('motion_plan 0.3 requires a fixed comic performance mode '+sid)
+        if motion['version'] in ('0.3','0.4') and (item.get('performance') or {}).get('mode') not in ('sequential-comic','fixed-camera-micro'):
+            errors.append('motion_plan '+motion['version']+' requires a fixed comic performance mode '+sid)
         if sequential and ('dialogue' not in shot or shot.get('transition')!='cut'):
             errors.append('Sequential comic requires dialogue (empty for silent shots) and cut transition '+sid)
         caption_end=0
@@ -104,7 +186,7 @@ def validate(project, assets=False, shot_id=None):
         unique(item['layers'],'z',sid+' z order')
         roles={l['id']:l['role'] for l in shot['layers']}
         selected=not shot_id or sid==shot_id
-        if motion['version'] in ('0.2','0.3'):
+        if motion['version'] in ('0.2','0.3','0.4'):
             errors.extend(check_acting(item,motion['asset_mode']=='production',assets and selected,roles))
         elif assets and motion['asset_mode']=='production':
             errors.append('Legacy 0.1 is parallax-only; migrate motion_plan to 0.2 for production '+sid)
@@ -144,6 +226,7 @@ def validate(project, assets=False, shot_id=None):
                     digest=hashlib.sha256(p.read_bytes()).hexdigest()
                     if digest in backgrounds: errors.append('Mechanically reused background asset: '+sid+' and '+backgrounds[digest])
                     backgrounds[digest]=sid
+        validate_camera_plan(item,motion['version'],errors)
     if cursor!=brief['format']['duration_frames']: errors.append('Total duration mismatch')
     if brief['format']['width']%2 or brief['format']['height']%2: errors.append('H264 dimensions must be even')
     if assets and motion['asset_mode']=='production':
@@ -208,7 +291,7 @@ def compile_prompts(project,data,shot_id=None):
         index=board['shots'].index(shot)
         neighbors=[{'id':b['id'],'direction':b.get('direction'),'characters':b['characters']} for j,b in enumerate(board['shots']) if abs(j-index)==1]
         shot={**shot,'scene_space':space,'adjacent_shot_context':neighbors,
-            'director_rules':'Keep location geometry, lighting, time and major objects consistent while independently composing each panel from its motivated camera position. Do not reuse the same background image or zoom/crop a previous panel. Preserve character identity and accessories. Default every body part to a stable hold. Trigger one primary action only from speech, information, pause, emotion or explicit action; structure it as prepare → action → settle/hold, then return to stable state. Never use perpetual sin/cos breathing, bobbing, swaying, scaling or repeated blinking; do not animate all parts together. Design both speaking and listening reactions causally; follow incoming/outgoing state, gaze, cut reason and handoff. Hold briefly for a motivated reaction after dialogue. Comic exaggeration only at emotional peaks. The camera remains fixed inside each panel.'}
+            'director_rules':'Keep location geometry, lighting, time and major objects consistent while independently composing each panel from its motivated camera position. Do not reuse the same background image or zoom/crop a previous panel. Preserve character identity and accessories. Default every body part to a stable hold. Trigger one primary action only from speech, information, pause, emotion or explicit action; structure it as prepare → action → settle/hold, then return to stable state. Never use perpetual sin/cos breathing, bobbing, swaying, scaling or repeated blinking; do not animate all parts together. Design both speaking and listening reactions causally; follow incoming/outgoing state, gaze, cut reason and handoff. Hold briefly for a motivated reaction after dialogue. Comic exaggeration only at emotional peaks. '+('Use the explicit 0.4 camera plan and depth layers for scene framing; keep individual artwork on shared world coordinates.' if data['motion_plan']['version']=='0.4' and (plan.get('camera') or {}).get('type','static')!='static' else 'The camera remains fixed inside each panel.')}
         save(project/'prompts'/(shot['id']+'_acting.json'),{
             'prompt_version':'0.1','project_id':brief['project_id'],'shot_id':shot['id'],'prompt_role':'acting_layers',
             'task':'prepare_aligned_acting_assets','master':shot['master'],
@@ -255,7 +338,8 @@ def main():
         if not args.renderer: parser.error('--renderer is required for prepare')
         renderer=args.renderer.resolve()
         if renderer==project or renderer.is_relative_to(project): parser.error('Renderer must be outside the source project')
-        shutil.copytree(ROOT/'assets/remotion',renderer,dirs_exist_ok=True)
+        shutil.copytree(ROOT/'assets/remotion',renderer,dirs_exist_ok=True,
+                        ignore=shutil.ignore_patterns('node_modules','out','.env*'))
         for shot in data['motion_plan']['shots']:
             if args.shot and shot['shot_id']!=args.shot: continue
             for layer in shot['layers']:

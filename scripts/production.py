@@ -50,7 +50,7 @@ def inventory(project,data,resolve):
 
 def check_dialogue(project,data,resolve,assets=False,shot_id=None):
     errors=[]; fps=data['production_brief']['format']['fps']
-    v3=data['motion_plan']['version']=='0.3'
+    v3=data['motion_plan']['version'] in ('0.3','0.4')
     for shot in data['storyboard']['shots']:
         if shot_id and shot['id']!=shot_id: continue
         plan=next(s for s in data['motion_plan']['shots'] if s['shot_id']==shot['id'])
@@ -74,21 +74,37 @@ def check_dialogue(project,data,resolve,assets=False,shot_id=None):
 
 def render_payload(project,data,resolve,shot_id=None):
     shots=[]; fps=data['production_brief']['format']['fps']
+    version=data['motion_plan']['version']
     for s in data['motion_plan']['shots']:
         if shot_id and s['shot_id']!=shot_id: continue
         board=next(b for b in data['storyboard']['shots'] if b['id']==s['shot_id'])
+        storyboard_layers={layer['id']:layer for layer in board['layers']}
         cues=[]
         for c in board.get('dialogue',[]):
             cue=dict(c)
             cue['mouth_open_frames']=wav_timing(resolve(project,c['audio']),fps)[1] if c.get('audio') else []
             cues.append(cue)
-        shots.append({**s,'start_frame':0 if shot_id else s['start_frame'],'dialogue':cues})
+        motion_layers=[]
+        for layer in s['layers']:
+            runtime_layer=dict(layer)
+            if version != '0.4' and not runtime_layer.get('depth'):
+                role=storyboard_layers.get(layer['layer_id'],{}).get('role')
+                runtime_layer['depth']={
+                    'background':'background', 'panel_base':'background',
+                    'character':'character', 'foreground':'foreground',
+                    'effects':'midground',
+                }.get(role,'character')
+            motion_layers.append(runtime_layer)
+        runtime_shot={**s,'layers':motion_layers,'start_frame':0 if shot_id else s['start_frame'],'dialogue':cues}
+        if version != '0.4':
+            runtime_shot.pop('camera',None)
+        shots.append(runtime_shot)
     fmt=dict(data['production_brief']['format'])
     if shot_id: fmt['duration_frames']=shots[0]['duration_frames']
     return {'format':fmt,**data['motion_plan'],'shots':shots}
 
 def check_direction(data):
-    if data['motion_plan']['version']!='0.3': return [],[]
+    if data['motion_plan']['version'] not in ('0.3','0.4'): return [],[]
     errors=[]; warnings=[]; board=data['storyboard']; scenes=board.get('scenes',[])
     scene_ids={s['id'] for s in scenes}
     if not scenes or len(scene_ids)!=len(scenes): errors.append('motion_plan 0.3 requires unique scene space records')

@@ -2,6 +2,10 @@
 
 这个仓库只维护 `dynamic-comic-video` Codex Skill：从故事和角色参考制作分镜、master 插画与对齐图层，设计局部表演和音频时间轴，再用 Remotion 预览与输出动态漫画。
 
+## V1.0 workflow
+
+新项目使用 `motion_plan` 0.4：默认沿用固定机位的 sequential-comic，逐镜显式启用时由 Remotion 执行确定性 Camera Motion 与五层 2.5D Parallax。旧 0.1–0.3 项目保留原有解释。运行数据和测试方法见 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md)。
+
 ## 安装
 
 macOS/Linux：

@@ -23,7 +23,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 强调字幕、漫画符号、音效或音乐 | [漫画演出](references/comic-performance.md) | 同一时间轴中的必要视听事件 |
 | 校验、预览与交付 | [质量闸门](references/quality-gate.md)、[运行指南](references/runbook.md) | QC 报告、可播放 MP4、视觉复核记录、交付报告 |
 
-写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.3"`，其余三份制作合同为 `"0.1"`；旧 0.2 动作按有限动画协议兼容，不因 Skill 升级批量改版本。
+写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.4"`，其余三份制作合同为 `"0.1"`；旧 0.1–0.3 合同保持原有解释，不因升级批量改版本。需要相机/视差时读取 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md)。
 
 面向真实观众的视频先完成 [短视频内容策划层](references/content-strategy.md)：明确受众、平台、目标、前 1–2 秒钩子、一个核心承诺、结尾收获和可选 CTA，再把内容拆成 Narrative Beats 与 shots。没有内容策略的工程测试可以继续使用最小 brief，但不能把测试素材当成成片内容。
 
@@ -35,7 +35,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 - Character Reference 只锁身份、服装、比例与辨识锚点，不锁姿势、表情、景别和构图。新绘镜头按剧情设计表演，不能反复粘贴固定立绘。
 - 先提取 Narrative Beats，再设计 Shots。跨镜维持空间连续，背景随独立机位重新构图；不能只裁切放大同一图冒充新镜头。已有分镜的复用边界由总控规则统一定义。
 - 先完整 master，再以它为唯一对齐基准提取或重建图层；保持画布、坐标、透视、尺度与光向，补全被遮挡背景。缺层就记录缺项，不降级成整图推拉。
-- 默认 `performance.mode: sequential-comic`，镜内固定机位，禁用镜头推拉、平移、旋转、缩放及视差。局部动作需要事件原因和准备→动作→停顿/回稳；静止也是有效表演。大型姿势变化优先拆镜，禁止周期浮动、摇摆和机械呼吸。
+- 默认 `performance.mode: sequential-comic`，镜内固定机位；motion_plan 0.4 未提供 Camera 或 `camera.type: static` 时画面保持原构图。只有逐镜显式设置可执行 Camera 时才移动整场景；有多个 depth layer 时 Camera 驱动 Parallax。局部动作需要事件原因和准备→动作→停顿/回稳；静止也是有效表演。大型姿势变化优先拆镜，禁止周期浮动、摇摆和机械呼吸。
 - 实际配音先于最终字幕、嘴型、动作触发与 CUT 定时。没有音频时可以草拟时间，但不能报告为已同步；无对白作品不强加配音或嘴型。
 - 默认新生图档位为 `comic-economy`，用户已有选择优先。知识卡、总结卡、CTA、特效和背景音乐只按创作需求启用。
 

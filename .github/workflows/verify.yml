@@ -21,6 +21,11 @@ jobs:
         run: python -m pip install -r requirements.txt
       - name: Run behavioral checks
         run: python -m unittest discover -s scripts -p 'test_*.py'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Run deterministic camera checks
+        run: node --test scripts/test_camera_runtime.mjs
       - name: Compile example prompts
         run: python scripts/pipeline.py compile examples/library
       - name: Validate example contracts
@@ -50,8 +55,25 @@ jobs:
       - name: Render fixture MP4
         working-directory: manga-renderer
         run: npm run render
+      - name: Build camera/parallax test scene
+        run: python scripts/make_camera_parallax_fixture.py camera-fixture
+      - name: Validate and prepare camera/parallax renderer
+        run: |
+          python scripts/pipeline.py validate camera-fixture --assets
+          python scripts/pipeline.py prepare camera-fixture --renderer camera-renderer
+      - name: Install camera renderer dependencies
+        working-directory: camera-renderer
+        run: npm ci
+      - name: Render camera/parallax MP4
+        working-directory: camera-renderer
+        run: npm run render
       - uses: actions/upload-artifact@v4
         with:
           name: manga-motion-video-fixture
           path: manga-renderer/out/video.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: camera-parallax-video-fixture
+          path: camera-renderer/out/video.mp4
           if-no-files-found: error

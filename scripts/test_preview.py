@@ -67,7 +67,7 @@ class PreviewTests(unittest.TestCase):
             (rendered / "video.mp4").write_bytes(b"preview")
             with patch("preview.subprocess.run") as run:
                 destination = run_preview(project, renderer)
-            self.assertEqual(destination, project / "preview.mp4")
+            self.assertEqual(destination, (project / "preview.mp4").resolve())
             self.assertEqual(destination.read_bytes(), b"preview")
             self.assertEqual(run.call_count, len(steps(project, renderer)))
 
@@ -93,7 +93,7 @@ class PreviewTests(unittest.TestCase):
                 (review / f"shot_001_{position}.png").write_bytes(position.encode())
             with patch("preview.subprocess.run") as run:
                 destination = run_preview(project, renderer, shot="shot/001")
-            self.assertEqual(destination, project / "preview_shot_001.mp4")
+            self.assertEqual(destination, (project / "preview_shot_001.mp4").resolve())
             manifest = json.loads((project / "visual_review.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["version"], "0.2")
             self.assertEqual(manifest["scope"]["shot"], "shot/001")
@@ -152,7 +152,7 @@ class PreviewTests(unittest.TestCase):
             with patch("preview.subprocess.run", side_effect=fake_run) as run:
                 result = run_simple_comic_preview(project)
 
-            self.assertEqual(result, destination)
+            self.assertEqual(result, destination.resolve())
             self.assertTrue(destination.is_file())
             self.assertIn("render_simple_comic_preview.py", str(run.call_args.args[0]))
 

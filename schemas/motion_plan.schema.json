@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:dynamic-comic-video:motion_plan:0.1",
+  "$id": "urn:dynamic-comic-video:motion_plan:0.4",
   "title": "motion_plan",
   "type": "object",
   "properties": {
     "version": {
-      "enum": ["0.1", "0.2", "0.3"]
+      "enum": ["0.1", "0.2", "0.3", "0.4"]
     },
     "project_id": {
       "type": "string",
@@ -49,6 +49,9 @@
           "transition": {
             "const": "cut"
           },
+          "camera": {
+            "$ref": "#/$defs/camera"
+          },
           "timeline": {
             "$ref": "#/$defs/timeline"
           },
@@ -60,6 +63,9 @@
                 "layer_id": {
                   "type": "string",
                   "minLength": 1
+                },
+                "depth": {
+                  "enum": ["foreground", "character", "midground", "background", "sky"]
                 },
                 "acting": {"$ref": "#/$defs/acting"},
                 "region": {"type":"array","items":{"type":"number","minimum":0,"maximum":1},"minItems":4,"maxItems":4},
@@ -173,6 +179,73 @@
   ],
   "additionalProperties": false,
   "$defs": {
+    "camera": {
+      "type": "object",
+      "properties": {
+        "type": {"enum": ["static", "push_in", "pull_out", "pan_left", "pan_right", "follow"]},
+        "focus_target": {
+          "type": "object",
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "x": {"type": "number"},
+            "y": {"type": "number"}
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
+        },
+        "from": {"$ref": "#/$defs/camera_pose"},
+        "to": {"$ref": "#/$defs/camera_pose"},
+        "follow_path": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/camera_path_point"},
+          "minItems": 2
+        },
+        "easing": {"enum": ["linear", "easeIn", "easeOut", "easeInOut"]},
+        "screen_target": {
+          "type": "object",
+          "properties": {
+            "x": {"type": "number", "minimum": 0, "maximum": 1},
+            "y": {"type": "number", "minimum": 0, "maximum": 1}
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
+        },
+        "parallax_enabled": {"type": "boolean"},
+        "parallax_strengths": {
+          "type": "object",
+          "properties": {
+            "foreground": {"type": "number", "minimum": 0, "maximum": 2},
+            "character": {"type": "number", "minimum": 0, "maximum": 2},
+            "midground": {"type": "number", "minimum": 0, "maximum": 2},
+            "background": {"type": "number", "minimum": 0, "maximum": 2},
+            "sky": {"type": "number", "minimum": 0, "maximum": 2}
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "parallax_enabled"],
+      "additionalProperties": false
+    },
+    "camera_pose": {
+      "type": "object",
+      "properties": {
+        "x": {"type": "number"},
+        "y": {"type": "number"},
+        "zoom": {"type": "number", "exclusiveMinimum": 0}
+      },
+      "required": ["x", "y", "zoom"],
+      "additionalProperties": false
+    },
+    "camera_path_point": {
+      "type": "object",
+      "properties": {
+        "frame": {"type": "integer", "minimum": 0},
+        "x": {"type": "number"},
+        "y": {"type": "number"}
+      },
+      "required": ["frame", "x", "y"],
+      "additionalProperties": false
+    },
     "acting": {
       "type": "object",
       "properties": {

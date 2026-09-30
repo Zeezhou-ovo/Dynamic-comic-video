@@ -16,11 +16,12 @@ class DocumentationTests(unittest.TestCase):
         contracts = read("references/contracts.md")
         comic = read("references/sequential-comic.md")
         limited = read("references/limited-animation.md")
-        self.assertIn('motion_plan.version: "0.3"', skill)
-        self.assertIn('motion_plan.json` 使用 `version: "0.3"', contracts)
-        self.assertIn("motion_plan 使用版本0.3", comic)
-        self.assertIn('motion_plan.version="0.3"', limited)
-        self.assertIn("0.2` 是可读取的旧有限动画合同", limited)
+        self.assertIn('motion_plan.version: "0.4"', skill)
+        self.assertIn('motion_plan.json` 使用 `version: "0.4"', contracts)
+        self.assertIn("motion_plan 使用版本0.4", comic)
+        self.assertIn('motion_plan.version="0.4"', limited)
+        self.assertIn("`0.2` 和 `0.3` 是可读取的旧有限动画合同", limited)
+        self.assertIn("Camera 与 Parallax 运行时", contracts)
 
     def test_legacy_entry_points_delegate_to_current_rules(self):
         intake = read("references/project-intake.md")

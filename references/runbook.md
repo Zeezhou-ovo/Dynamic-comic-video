@@ -21,6 +21,19 @@ npm run still -- --frame=24
 
 输出为 renderer 的 `out/video.mp4`。依赖安装需要网络，但内容渲染和 fixture 生成在本地执行，不需要 API Key。完整时长 144 帧 / 24 fps = 6 秒，960×540，三镜硬切。可选 `npm run studio` 进行交互预览。
 
+## Camera / 2.5D 验证场景（motion_plan 0.4）
+
+```powershell
+python scripts/make_camera_parallax_fixture.py ../camera-fixture
+python scripts/pipeline.py validate ../camera-fixture --assets
+python scripts/pipeline.py prepare ../camera-fixture --renderer ../camera-renderer
+cd ../camera-renderer
+npm ci
+npm run render
+```
+
+输出 `../camera-renderer/out/video.mp4`：前 48 帧固定广角，接着 48 帧推进，最后 48 帧右移；五个 depth 从前到后分别响应相机。该场景是合成几何测试素材，不是正式剧情。纯函数测试使用 `node --test scripts/test_camera_runtime.mjs`，Python 合同测试包含在仓库的 unittest 集中。
+
 ## 正式故事
 
 1. 先按 [短视频内容策划层](content-strategy.md) 确定受众、平台、钩子、核心承诺和结尾收获；再把四份示例 JSON 复制到独立生产目录，按原文重写 brief、characters、beats、shots 与 motion；不要仅替换角色姓名。
