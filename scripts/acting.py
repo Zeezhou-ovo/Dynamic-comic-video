@@ -1,10 +1,10 @@
 """Finite animation validation; transforms alone cannot prove convincing acting."""
 def asset_names(layer):
     a=layer.get('acting',{}); speech=a.get('speech',{})
-    return list(dict.fromkeys([layer['asset']]+[p['asset'] for p in a.get('poses',[])]+[speech[k] for k in ('closed_asset','open_asset') if k in speech]+list(layer.get('state_assets',{}).values())))
+    return list(dict.fromkeys([layer['asset']]+[p['asset'] for p in a.get('poses',[])]+[speech[k] for k in ('closed_asset','open_asset') if k in speech]+list(layer.get('state_assets',{}).values())+list(speech.get('shape_assets',{}).values())))
 
 def check_acting(shot, production, assets, roles):
-    errors=[]; active=False
+    errors=[]; active=any(e.get('pose_asset') for e in (shot.get('timeline') or {}).get('expression_events',[]))
     sid=shot['shot_id']; perf=shot.get('performance')
     if not perf: errors.append('Missing performance plan '+sid)
     micro=(perf or {}).get('mode')=='fixed-camera-micro'

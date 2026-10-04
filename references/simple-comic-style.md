@@ -36,11 +36,10 @@ do not render any text, speech balloons, captions, logos or watermark in the ima
 
 ## 局部表演
 
-简单画风不能退化成逐镜静帧。每个有对白的镜头至少规划一个可复核的嘴部开合区间；较长镜头可增加一次短眨眼。眼睛和嘴部必须使用与同一 master 对齐的局部变体，不能用整图缩放、随机漂移或循环摆动冒充表演。生成变体前保存 `simple_comic_motion.json`，其中记录角色、归一化眼/嘴区域、说话帧和眨眼帧；生成后用首帧、说话帧和眨眼帧检查接缝。
+简单画风不能退化成逐镜静帧。每个有对白的镜头至少规划一个可复核的嘴部开合区间；较长镜头可增加一次短眨眼。眼睛和嘴部必须使用与同一 master 对齐的局部变体，不能用整图缩放、随机漂移或循环摆动冒充表演。正式配音项目在 motion_plan 的局部 acting 轨记录眼/嘴区域、嘴部资产与事件；生成后用首帧、说话帧和眨眼帧检查接缝。旧 simple-comic 无声速览路径不具备完整音频演出能力，不作为有对白成片的默认路径。generate_simple_comic_motion_assets.py 的 mouth_open 目前保留源图，不能用该脚本声称新绘了张嘴资产。
 
 ```powershell
-python scripts/generate_simple_comic_motion_assets.py <project>
-python scripts/preview.py <project> --simple-comic
+python scripts/preview.py <project> --renderer <external-renderer>
 ```
 
 没有实际配音时，嘴部帧只能标记为估计预演；正式成片仍需用本地配音重算字幕和嘴型时间轴。
@@ -55,3 +54,5 @@ no busy background behind the face or subtitle-safe area;
 no extra fingers, fused hands, identity drift or missing accessories;
 no independent lighting between layers, no transparent holes in the background.
 ```
+
+扩展嘴部、局部缓动、直接表情事件和可播放音效的字段与验收见 [对话喜剧的局部表演](comedy-acting.md)。这些是可选扩展，现有合同版本不变；旧项目不自动新增素材或改变已确认内容。

@@ -1,6 +1,6 @@
 ---
 name: dynamic-comic-video
-description: Create and revise sequential motion-comic videos from stories, scripts, character references, or independent panels. Use for dynamic comics, motion comics, 动态漫画, or 漫剧 with consistent characters, fixed-camera local acting, timed audio/subtitles, and Remotion MP4 output. Not for generic slideshows, full frame-by-frame animation, or phoneme lip sync.
+description: Create and revise sequential motion-comic videos from stories, scripts, character references, or independent panels. Use for dynamic comics, motion comics, 动态漫画, or 漫剧 with consistent characters, fixed-camera local acting, timed audio/subtitles, multi-shape speech, local acting and comic/sound events, and Remotion MP4 output. Not for generic slideshows, full frame-by-frame animation, or phoneme lip sync.
 ---
 
 # Dynamic Comic Video — V1.0 workflow
@@ -30,6 +30,12 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 条件模块：选择纸片拼贴时读 [画风预设](references/paper-collage-style.md)，选择简化搞笑条漫画风时读 [风格预设](references/simple-comic-style.md)；明确固定机位微动作时读 [微动作模式](references/fixed-camera-micro.md)；要求知识卡、总结卡或 CTA 时读 [收束卡](references/outro-card.md)。发布验收才读 [制作闭环与验收](references/v04-production.md)，规划能力扩展才读 [后续优化路线](references/v05-roadmap.md)。
 
+## 对话短剧与参考效果
+
+用户要求接近二维动物搞笑短剧、人物表演更自然，或反馈“像静帧”时，读取 [对话喜剧的局部表演](references/comedy-acting.md)。要求提升帧率或动作流畅度时，先区分输出采样率与实际姿态更新，按该文档的帧率转换规则联动重算时间线；不以高帧率代替过渡动作。先从参考抽取连续动作；区分关节关键帧、中间姿态、能量嘴型和精确音素口型。当前默认渲染器支持缓动局部关节、扩展嘴部形状、时间轴表情替换、关键词字幕、漫画符号与定时本地 WAV 音效。功能需要实际对齐素材才能成立，不能用文案或状态标签替代。
+
+对话短剧默认采用自然表演、白字黑描边字幕。默认不添加汗滴、问号等叠加情绪符号，不使用彩色关键词；只有用户明确要求时启用。特效必须短促、明确结束，并复核出现前、结束帧和结束后，不能用符号替代角色表情。
+
 ## 全程保持的创作约束
 
 - 保留原文的题材、地域、时代、关系、因果、事实边界与情绪。视觉语言由用户或 brief 决定，示例不是题材限制。关键设定无法可靠判断才问，其余合理假设写入 brief。
@@ -52,7 +58,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 5. 多镜头返工使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；处理后更新为 `resolved`。需要只重做变更镜头时使用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`，它只更新指纹变化或缓存缺失的镜头。
 6. 新机器或 renderer 变更后先运行 `python scripts/doctor.py`；它只检查本地环境，不安装依赖、不上传项目和密钥。
 7. 视觉复核批准且返工台账清空后运行 `python scripts/deliver.py <project>`；交付闸门会用本地 `ffprobe` 验证 MP4 的可播放性、尺寸、帧率和时长，并把结果写入 `delivery_report.json`。报告为 `FAIL` 时按 `blocking_issues` 修复。
-8. 选择 `style_preset: "simple-comic"` 做图片优先试片时，先用 `scripts/generate_simple_comic_motion_assets.py <project>` 生成明确标注的眨眼和源图嘴型变体，再用 `scripts/preview.py <project> --simple-comic` 渲染。没有变体时仍可出静态预览，但不能声称包含眼睛或嘴部表演；未经对齐审核的通用嘴型不得覆盖 master。
+8. `style_preset: "simple-comic"` 的有对白试片使用对齐眼/嘴/手素材与标准 Remotion preview 路径，见 [对话喜剧的局部表演](references/comedy-acting.md)。旧 `--simple-comic` 仅作无声图片速览；其本地 mouth_open 生成器保留源图，不能声称新绘了张嘴资产。未经对齐审核的通用嘴型不得覆盖 master。
 5. 重复检查包括相邻 pose_tag、连续三镜景别/角度/构图标签和人物 PNG 哈希。标签或哈希不同不证明画面不同；合理重复写明 `repetition_exception`，不能改标签掩盖固定立绘复用。
 6. 交付说明实际完成阶段、测试/正式素材状态、时长、尺寸、输出绝对路径与剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
 
@@ -60,7 +66,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 ## 工具、隐私与保留
 
-使用当前环境可用且已获授权的图像/音频工具，读取相应技能说明；本项目不内置云端生成 API。能力边界是局部关键帧、对齐姿态切换与简单音量驱动嘴型，不承诺自动抠图、骨骼绑定、精确音素口型或完整逐帧动画。
+使用当前环境可用且已获授权的图像/音频工具，读取相应技能说明；本项目不内置云端生成 API。能力边界是缓动局部关键帧、对齐姿态切换与能量驱动多形状嘴型，不承诺自动抠图、骨骼绑定、精确音素口型或完整逐帧动画。
 
 用户原文、参考、JSON、配音、master、图层、预览和 MP4 保存在仓库之外的独立项目目录，renderer 位于项目之外。保留源素材和恢复所需中间文件；只在用户要求清理时删除已明确范围的临时文件，不因交付完成自动删除。
 

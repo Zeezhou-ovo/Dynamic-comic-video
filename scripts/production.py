@@ -6,6 +6,7 @@ import struct
 import wave
 from pathlib import Path
 from acting import asset_names
+from performance import wav_shapes,event_assets
 
 def wav_timing(path, fps):
     with wave.open(str(path),'rb') as w:
@@ -27,7 +28,7 @@ def wav_timing(path, fps):
 def files_for_shot(data, shot):
     board=next(b for b in data['storyboard']['shots'] if b['id']==shot['shot_id'])
     refs=[c['reference']['image'] for c in data['characters']['characters'] if c['id'] in {p['character_id'] for p in board['characters']}]
-    return list(dict.fromkeys([board['master']]+refs+[p for l in shot['layers'] for p in asset_names(l)]+[c['audio'] for c in board.get('dialogue',[]) if c.get('audio')]))
+    return list(dict.fromkeys([board['master']]+refs+[p for l in shot['layers'] for p in asset_names(l)]+[c['audio'] for c in board.get('dialogue',[]) if c.get('audio')]+event_assets(shot)))
 
 def inventory(project,data,resolve):
     previous={}
@@ -85,10 +86,12 @@ def render_payload(project,data,resolve,shot_id=None):
         for c in board.get('dialogue',[]):
             cue=dict(c)
             cue['mouth_open_frames']=wav_timing(resolve(project,c['audio']),fps)[1] if c.get('audio') else []
+            cue['mouth_shape_frames']=wav_shapes(resolve(project,c['audio']),fps) if c.get('audio') else []
             cues.append(cue)
         motion_layers=[]
         for layer in s['layers']:
             runtime_layer=dict(layer)
+            runtime_layer['role']=storyboard_layers.get(layer['layer_id'],{}).get('role')
             runtime_layer['character_id']=storyboard_layers.get(layer['layer_id'],{}).get('character_id')
             if version != '0.4' and not runtime_layer.get('depth'):
                 role=storyboard_layers.get(layer['layer_id'],{}).get('role')
