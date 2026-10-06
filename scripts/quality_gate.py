@@ -30,6 +30,8 @@ def issue(report, severity, category, shot, message, fix=None):
 MAX_IDLE_LEAD_SECONDS = 1.0
 MAX_IDLE_TAIL_SECONDS = 1.0
 MIN_PUNCHLINE_HOLD_SECONDS = 0.4
+REVEAL_MAX_CUT_DELAY_SECONDS = 0.5   # cut to the reveal as the setup line ends
+MIN_REVEAL_HOLD_SECONDS = 0.5        # let the audience see the reveal before the next line
 TAIL_EVENT_KEYS = ("action_events", "expression_events", "visual_events", "sound_events")
 
 
@@ -45,6 +47,61 @@ def _event_frames(timeline):
             end = event.get("end_frame", start)
             if isinstance(start, int) and isinstance(end, int):
                 yield start, max(start, end)
+
+
+def _prop_starts(motion_shot):
+    return [event["start_frame"] for layer in (motion_shot or {}).get("layers", [])
+            for event in (layer.get("prop_motion") or {}).get("events", [])]
+
+
+def _acted_between(timeline, motion_shot, start, end):
+    """Something visible or audible begins in [start, end): an event or a prop motion."""
+    return _has_event_in(timeline, start, end) or any(start <= frame < end for frame in _prop_starts(motion_shot))
+
+
+def check_reveals_and_ending(report, board, motion, fps):
+    """Reveal shots cut on the setup line and hold before speech; the final line gets a reaction."""
+    motion_by_id = {item["shot_id"]: item for item in motion.get("shots", [])}
+    shots = board["shots"]
+    max_delay = round(REVEAL_MAX_CUT_DELAY_SECONDS * fps)
+    for index, shot in enumerate(shots):
+        reveal = shot.get("reveal")
+        if not reveal:
+            continue
+        sid = shot["id"]
+        motion_shot = motion_by_id.get(sid) or {}
+        timeline = motion_shot.get("timeline") or {}
+        if index:
+            previous = shots[index - 1]
+            lines = previous.get("dialogue") or []
+            prev_timeline = (motion_by_id.get(previous["id"]) or {}).get("timeline") or {}
+            cut = prev_timeline.get("cut_at_frame", previous["duration_frames"])
+            if lines and cut - max(c["end_frame"] for c in lines) > max_delay:
+                delay = cut - max(c["end_frame"] for c in lines)
+                issue(report, "Major", "reveal", sid,
+                      f"setup line in {previous['id']} ends {_seconds(delay, fps)}s before the cut to the reveal; cut as the line ends (≤ {_seconds(max_delay, fps)}s)",
+                      f"shorten {previous['id']} after its last line")
+        hold = reveal.get("hold_frames", round(MIN_REVEAL_HOLD_SECONDS * fps))
+        lines = shot.get("dialogue") or []
+        first = min((c["start_frame"] for c in lines), default=shot["duration_frames"])
+        if first < hold:
+            issue(report, "Major", "reveal", sid,
+                  f"someone speaks {_seconds(first, fps)}s into the reveal ({reveal['what']}); hold at least {_seconds(hold, fps)}s first",
+                  "start the first line later in the reveal shot")
+        if not _acted_between(timeline, motion_shot, 0, max(1, first)):
+            issue(report, "Minor", "reveal", sid,
+                  "the reveal hold has no visible or audible event (prop motion, expression, sound)",
+                  "let the revealed thing move or make a sound once")
+    if shots and shots[-1].get("dialogue"):
+        last = shots[-1]
+        motion_shot = motion_by_id.get(last["id"]) or {}
+        timeline = motion_shot.get("timeline") or {}
+        end = max(c["end_frame"] for c in last["dialogue"])
+        cut = timeline.get("cut_at_frame", last["duration_frames"])
+        if not _acted_between(timeline, motion_shot, max(0, end - 2), max(cut, end)):
+            issue(report, "Minor", "ending", last["id"],
+                  "the video ends on the last line with no reaction; finish on a reaction beat (expression, prop, sound) before the cut",
+                  "add a short reaction after the last line")
 
 
 def _has_event_in(timeline, start, end):
@@ -266,6 +323,7 @@ def scan(project, autofix=False):
             issue(report, "Minor", "motion_density", sid, f"Shot contains {actions} acting events; ordinary dialogue usually needs 0–2")
 
     check_pacing(report, board, motion, fps)
+    check_reveals_and_ending(report, board, motion, fps)
 
     for cid, identity in identities.items():
         anchors = identity.get("distinctive_features") or identity.get("anchors")
@@ -286,6 +344,8 @@ def scan(project, autofix=False):
         "pacing": "空白与节奏",
         "punchline": "笑点停顿",
         "reverse_shot": "正反打背景",
+        "reveal": "揭示节奏",
+        "ending": "结尾反应",
     }
     for key, label in categories.items():
         report["checks"][key] = "FIX" if any(i["category"] == key for i in report["issues"]) else "PASS"

@@ -107,8 +107,13 @@
                   "enum": [
                     "dialogue",
                     "reaction",
-                    "pause"
+                    "pause",
+                    "reveal"
                   ]
+                },
+                "reveal_what": {
+                  "type": "string",
+                  "minLength": 1
                 },
                 "speaker": {
                   "type": "string",
@@ -272,6 +277,23 @@
                   "then": {
                     "required": [
                       "duration_frames"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "reveal"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "reveal_what"
                     ]
                   }
                 }

@@ -32,6 +32,10 @@ python scripts/quality_gate.py <project> --autofix
 | `pacing` | Minor | 第一句台词前超过 1 秒、或最后一句台词后超过 1 秒加上 `reaction_hold_frames`，且这段时间内没有任何动作/表情/特效/音效事件开始，记为空白。报告的 `pacing.silent_ratio` 给出全片无台词帧占比。 |
 | `punchline` | Major | 被标为 punchline 的台词（台词或字幕 `emphasis/priority`，或 `visual_events.priority`）结束后，到下一句台词开始（包括跨 CUT 到下一镜）不足 0.4 秒。 |
 | `reverse_shot` | Minor | 相邻两镜同场景、各只有一个且不同的人物、相机位置不同，但 `background_view` 相同。 |
+| `reveal` | Major / Minor | 分镜写了 `reveal` 的镜头：上一镜铺垫台词结束到切镜超过 0.5 秒，或揭示镜头开口早于 `hold_frames`（默认 0.5 秒）为 Major；停顿里没有任何动作、表情、道具运动或音效为 Minor。 |
+| `ending` | Minor | 全片最后一句台词之后，到结束都没有动作、表情、道具运动或音效作为收尾反应。 |
+
+姿态、位置和正反打背景在生图前由 `pipeline.py validate` 检查（`posture`、`placement`、`reverse_background` 提示），不必等到成片。
 
 交付闸门另外用本机 `ffmpeg` 测量成片的综合响度、真峰值和数字静音占比，写入 `delivery_report.json` 的 `audio_loudness` 检查。目标是 −14 ± 2 LUFS、真峰值不超过 −1 dBTP、数字静音不超过 25%。这一项只给提示不阻止交付，因为不同平台的响度标准不同；没有安装 ffmpeg 时记为 `SKIPPED`。像素级脸型、五官、发根接缝、背景透视、表演自然度和字幕是否遮挡表情仍需查看接触表与关键帧。
 

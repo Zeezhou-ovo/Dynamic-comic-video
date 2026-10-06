@@ -7,6 +7,7 @@ import wave
 from pathlib import Path
 from acting import asset_names
 from performance import wav_shapes, event_assets
+from continuity import posture_warnings, reverse_warnings
 
 def wav_timing(path, fps):
     with wave.open(str(path),'rb') as w:
@@ -163,4 +164,6 @@ def check_direction(data):
             prev=board['shots'][i-1].get('direction',{})
             if (prev.get('scene_id'),prev.get('view_id'))==(d['scene_id'],d['view_id']):
                 warnings.append({'shot':sid,'check':'background_view','message':'Adjacent shots repeat the same background view; visually verify a motivated new composition','exception':shot.get('repetition_exception','')})
+    warnings.extend(posture_warnings(board))
+    warnings.extend(reverse_warnings(board))
     return errors,warnings
