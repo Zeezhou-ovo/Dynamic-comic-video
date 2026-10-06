@@ -4,6 +4,8 @@
 
 ### 新增
 
+- README 改为通用 AI skill 说明并按当前功能重写；新增 `AGENTS.md` 作为任意 AI 助手的入口。安装脚本不再默认写入某个特定 AI 的目录：不带参数时只检查环境，`--dest`（PowerShell 用 `-Dest`）可复制到任意 skill 目录并可重复；旧的直接传路径写法仍然有效。
+
 - 渲染器新增漫画表演运行时（`references/performance-runtime.md`）：从此前本地升级版移植三档嘴型（`shape_assets`、`mouth_shape_frames`、`mouth_events`）、表情替换（`expression_events.layer_id/pose_asset`）、带音量的音效文件（`sound_events.asset/volume/source_start_frame`）和漫画符号（`visual_events.position/size/intensity/color/keyword`），字段与本地版兼容，原有本地项目无需修改即可通过校验。
 - 新增道具运动 `prop_motion`（带衰减的 rock 与一次性 lean，可沿地面滚动）和 `attach_to`（局部补丁跟随道具），以及全片底噪 `audio_bed`；`scripts/make_sfx.py` 生成原创吱呀声、底噪和轻弹音。
 - `preview.py` 渲染后默认用固定增益把响度调到约 −14 LUFS（`--keep-loudness` 跳过）；新增 `scripts/loudness.py`。
