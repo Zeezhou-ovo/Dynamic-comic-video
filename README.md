@@ -33,3 +33,7 @@ Set-Location Dynamic-comic-video
 ## Mode + Template runtime
 
 Phase 5 可以用同一份对白和同一套资产切换 `dialogue-comedy`、`knowledge-explainer`、`motion-comic`、`story-animation`。`generic-room` 和 `generic-outdoor` Template 提供场景、站位、角色和道具。创建入口是 `scripts/compose_project.py`，执行流程、参数、兼容性与限制见 [Mode + Template 使用说明](docs/phase5-mode-template.md)。
+
+## V1.0 workflow
+
+当前制作流程支持独立分镜、角色一致性、实际配音时间轴、局部关键帧与姿态、能量驱动多嘴型、时间轴表情、关键词字幕和定时本地音效。行为与素材边界见 [对话喜剧的局部表演](references/comedy-acting.md)。已有两态嘴型项目保持兼容；新能力需要实际对齐的美术素材。
