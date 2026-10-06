@@ -22,6 +22,30 @@ shots/shot_001/
 
 合同 0.1 的层清单和运动元数据直接放在 storyboard.json / motion_plan.json，不另存重复的 shot.json。
 
+## 只有 master 时：用 extract_layer.py 拆层
+
+项目只有完整 master、又需要让其中一部分整体运动（例如道具连同骑在上面的角色一起摇动）时，可以用本地工具从 master 拆出这一层，并补全它后面的背景，不必重新生图：
+
+```sh
+python scripts/extract_layer.py extract <project> --master shots/shot_003/master.png \
+    --name shot_003_capy_horse --rect 705,110,1185,680 \
+    --fg-box 882,262,902,296 --fg-line "740,585 800,615 950,652 1150,585" \
+    --bg-poly "700,376 752,376 736,428 812,470 786,562 700,578" \
+    --line-art 800,180,858,232 --extend-down-until 345 --pivot 950,664
+```
+
+坐标是 master 画布上的像素。`--rect` 框住要拆的整体；和背景颜色接近、容易被漏掉的部分（白衬衫贴白墙、细长的弧形底座）用 `--fg-box` / `--fg-line` 标出来；从缝隙里看到的家具等后方物体用 `--bg-poly` 在分割后剔除；胡须、发丝这类细线用 `--line-art` 框住找回。`--extend-down-until Y` 让 Y 以上的墙面按列向下延伸，柱子和墙边保持笔直；其余区域用图像修补。
+
+工具输出四个文件：透明全画布图层 `<name>.png`、补全后的背景板 `<name>_plate.png`、检查图 `<name>_review.png` 和记录参数与文件指纹的 `<name>.extract.json`。检查图有四格：抠图边缘叠在压暗的 master 上、补好的背景板、以及图层绕 `--pivot` 左右倾斜 `--max-angle`（默认 3°）后的合成，对应上面第 6、7 步的零变换比对和最大位移检查。
+
+打开检查图确认边缘没有漏掉或多带背景、倾斜时露出的背景可以接受，再记录批准：
+
+```sh
+python scripts/extract_layer.py approve <project> layers/shot_003_capy_horse.extract.json --note "边缘与±3°露底已检查"
+```
+
+正式素材（`asset_mode: production`）下，`validate --assets` 会拒绝未批准的拆层结果；批准后图层、背景板或 master 只要有改动，批准就失效，需要重新运行 extract（可以用 `--hints <旧的 .extract.json>` 沿用原参数）再看一次检查图。工具不保证分割正确，检查图必须真的有人看过。复杂毛发、半透明物体或大面积遮挡仍需回到生图或手工修图。
+
 ## 必须检查
 
 - reference 锁 identity 不锁 pose；master 的表演由这一个 shot 决定。

@@ -12,7 +12,7 @@
 
 **固定机位的局部表演。** 嘴型按实际配音的音量在闭 / 半开 / 全开之间切换，也可以手工指定；眨眼、手势姿态切换、表情替换（比如惊讶眉眼）都按事件触发，动作有准备、动作、回稳，静止也算表演，不做机械的漂浮和摇摆。
 
-**道具运动。** 从 master 抠出的道具可以连同骑在上面的角色一起摇动或前倾（比如摇木马），角色身上的嘴、眼补丁会跟着一起动，后方背景需要补全。
+**道具运动与拆层。** 道具可以连同骑在上面的角色一起摇动或前倾（比如摇木马），角色身上的嘴、眼补丁会跟着一起动。只有完整 master 时，自带的拆层工具能把道具抠成透明图层、补全它后面的背景，并生成一张检查图，人工确认后才能在正式项目里使用。
 
 **镜头与导演（可选）。** 逐镜启用推拉摇移和五层 2.5D 视差；用对话导演文件安排谁说话、谁反应、在哪里停顿、哪句是笑点。同一份对白和素材还能切换搞笑对话、知识讲解、动态漫画、故事动画四种模式。
 
@@ -61,6 +61,7 @@ bash scripts/setup.sh --dest <你的 AI 工具读取的 skill 目录>/dynamic-co
 python scripts/pipeline.py validate <项目> --assets        # 校验数据和素材
 python scripts/quality_gate.py <项目>                       # 预览前的质量闸门
 python scripts/make_sfx.py <项目>                           # 生成原创音效到 <项目>/audio/sfx/
+python scripts/extract_layer.py extract <项目> --master <master> --name <图层名> --rect x0,y0,x1,y1   # 从 master 拆层并补背景
 python scripts/preview.py <项目> --renderer <项目外的渲染目录> --npm-install   # 渲染预览 MP4 和复核帧
 python scripts/project_state.py review <项目> --approve     # 看过复核帧后记录批准
 python scripts/deliver.py <项目>                            # 交付闸门

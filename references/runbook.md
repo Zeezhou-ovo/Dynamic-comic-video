@@ -61,6 +61,8 @@ python scripts/preview.py <project> --renderer <project-outside-renderer>
 
 脚本会先重新校验素材、运行质量闸门，再编译、prepare、渲染，并把 `renderer/out/video.mp4` 复制为 `<project>/preview.mp4`，同时把首/中/末帧复制到 `<project>/visual-review/` 并写入带指纹的 `visual_review.json`。打开这些帧完成检查后，运行 `python scripts/project_state.py review <project> --approve`；发现问题运行 `--reject --note "..."`。只预览单镜头时追加 `--shot shot_002`；首次使用该 renderer 时增加 `--npm-install`。它不会上传项目文件，也不会读取或写入 API Key。
 
+只有 master、又要让其中的道具整体运动时，先用 `python scripts/extract_layer.py extract ...` 拆出图层和补全背景，查看生成的检查图后运行 `approve`，用法见 [分层协议](layer-protocol.md)。
+
 预览默认把整体响度调到约 −14 LUFS（固定增益加峰值限制，不改变对白与音效比例），需要原始音量时追加 `--keep-loudness`。需要木马吱呀、室内底噪等原创音效时，先运行 `python scripts/make_sfx.py <project>`，再在 `sound_events` 或 `audio_bed` 中引用 `audio/sfx/` 下的文件。
 
 如果只需要更新改过的镜头，可以运行：
