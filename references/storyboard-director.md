@@ -20,9 +20,9 @@
 
 ## 连续性与切镜
 
-先拆 Narrative Beats，再按信息、动作、视线或情绪变化拆 Shots。每镜写 incoming_state、outgoing_state、cut_reason、handoff。连续性必须能解释：看到消息→抬头告知→倾听者反应→回应。禁止无原因换姿势、跳机位、换背景空间。坐/站、在桌后/桌前、拿起/放下这类大姿态和位置变化，要么在某一镜里演出来，要么在跨镜时保持不变，不能在 CUT 后直接换成另一种状态。
+先拆 Narrative Beats，再按信息、动作、视线或情绪变化拆 Shots。每镜写 incoming_state、outgoing_state、cut_reason、handoff。连续性必须能解释：看到消息→抬头告知→倾听者反应→回应。禁止无原因换姿势、跳机位、换背景空间。坐/站、在桌后/桌前、拿起/放下这类大姿态和位置变化，要么在某一镜里演出来，要么在跨镜时保持不变，不能在 CUT 后直接换成另一种状态。分镜里每个角色可以写 `posture`（standing、seated、lying、kneeling、crouching、riding、other）和 `placement`（如“办公桌后”），姿态或位置在同一场景里变化的那一镜写 `posture_change` 说明怎么演出来；`validate` 会在生图前对没交代的变化给出 `posture` / `placement` 提示，括号里的备注不算位置变化。
 
-正反打（A 朝右说话 → B 朝左回应）时，两镜背景应来自相反方向：A 身后是房间一侧，B 身后是对面一侧。两镜都画同一面墙会让观众误以为两人站在同一边。质量闸门会把“同场景、单人、相机位置不同但 background_view 相同”的相邻镜头记为 `reverse_shot` 提示。
+正反打（A 朝右说话 → B 朝左回应）时，两镜背景应来自相反方向：A 身后是房间一侧，B 身后是对面一侧。两镜都画同一面墙会让观众误以为两人站在同一边。`validate` 在生图前就会对这样的相邻单人镜头检查 `background_view` 是否相同（`reverse_background` 提示），`compile` 还会在后一镜的提示词里写明“这是反打，背景必须是对面一侧”；成片阶段质量闸门另有 `reverse_shot` 提示。每镜的 `continuity_instructions` 同时写入角色的姿态和位置，要求与上一镜保持一致或按 `posture_change` 画出变化。
 
 每次切镜回答“为什么此刻需要切到这个画面？”可以是呈现新信息、展示反应、强调细节或形成笑点，不能只是“换个画面避免重复”。用 next_shot_id 指向实际下一镜，末镜设 null；handoff 说明动作、视线或情绪如何承接，末镜说明如何收束。更换场景应交代时间或空间转移，不把不同空间画成同一个空间。
 

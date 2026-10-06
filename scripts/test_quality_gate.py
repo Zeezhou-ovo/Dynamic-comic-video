@@ -29,6 +29,8 @@ class QualityGateTests(unittest.TestCase):
                 "sound_events": [],
                 "cut_at_frame": shot["duration_frames"],
             }
+        # a well-formed piece ends on a reaction after the last line
+        motion["shots"][-1]["timeline"]["expression_events"] = [{"event_id": "button", "trigger": "pause", "start_frame": 43, "peak_frame": 44, "settle_frame": 46, "end_frame": 47, "description": "closing reaction"}]
         save(self.project / "motion_plan.json", motion)
 
     def tearDown(self):
@@ -136,6 +138,42 @@ class QualityGateTests(unittest.TestCase):
         report = {"issues": []}
         check_pacing(report, board, read(self.project / "motion_plan.json"), 24)
         self.assertTrue(any(item["category"] == "reverse_shot" and item["shot"] == "shot_002" for item in report["issues"]))
+
+    def test_ending_without_reaction_is_noted(self):
+        motion = read(self.project / "motion_plan.json")
+        motion["shots"][-1]["timeline"]["expression_events"] = []
+        save(self.project / "motion_plan.json", motion)
+        report = scan(self.project)
+        self.assertTrue(any(item["category"] == "ending" and item["severity"] == "Minor" for item in report["issues"]))
+
+    def test_prop_motion_counts_as_an_ending_reaction(self):
+        motion = read(self.project / "motion_plan.json")
+        shot = motion["shots"][-1]
+        shot["timeline"]["expression_events"] = []
+        shot["layers"][1]["prop_motion"] = {"pivot": [0.5, 0.9], "events": [{"event_id": "wobble", "trigger": "pause", "kind": "lean",
+                                              "start_frame": 43, "end_frame": 48, "amplitude_deg": 1, "description": "wobble"}]}
+        save(self.project / "motion_plan.json", motion)
+        self.assertFalse(any(item["category"] == "ending" for item in scan(self.project)["issues"]))
+
+    def test_reveal_must_follow_the_setup_line_and_hold_before_speech(self):
+        def edit(board):
+            board["shots"][1]["reveal"] = {"what": "the hidden prop", "hold_frames": 12}
+            board["shots"][0]["dialogue"][0]["end_frame"] = 20   # 28 frames between line end and cut
+        report = self._board(edit)
+        reveal = [item for item in report["issues"] if item["category"] == "reveal"]
+        self.assertTrue(any("before the cut" in item["message"] and item["severity"] == "Major" for item in reveal))
+        self.assertTrue(any("speaks" in item["message"] for item in reveal), "the line at frame 6 is inside the 12-frame hold")
+        self.assertTrue(any(item["severity"] == "Minor" for item in reveal), "nothing happens during the hold")
+
+    def test_well_timed_reveal_passes(self):
+        motion = read(self.project / "motion_plan.json")
+        motion["shots"][1]["timeline"]["sound_events"] = [{"event_id": "sting", "trigger": "information", "start_frame": 1, "peak_frame": 1, "settle_frame": 2, "end_frame": 5, "description": "reveal sting"}]
+        save(self.project / "motion_plan.json", motion)
+
+        def edit(board):
+            board["shots"][1]["reveal"] = {"what": "the hidden prop", "hold_frames": 6}
+        report = self._board(edit)
+        self.assertFalse(any(item["category"] == "reveal" for item in report["issues"]))
 
 
 if __name__ == "__main__":

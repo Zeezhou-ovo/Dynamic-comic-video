@@ -11,6 +11,7 @@ from PIL import Image
 from acting import asset_names, check_acting, check_character_performance
 from production import inventory, check_dialogue, render_payload, check_direction
 from performance import check_performance, event_assets
+from continuity import prompt_instructions
 from director import validate_director_plan, compile_director_plan
 from composition_resolver import validate_scene_manifests
 
@@ -407,7 +408,8 @@ def compile_prompts(project,data,shot_id=None):
             'style_addition':style_addition,'beat':next(b for b in board['beats'] if b['id']==shot['beat_id']),
             'shot':shot,'identity_references':[{'image':lookup[c['character_id']]['reference']['image'],'identity':lookup[c['character_id']]['identity'],'reference_scope':'identity_only: face/hair/clothes/proportions/distinctive_features; do not copy pose, expression, shot_size, camera or composition'} for c in shot['characters']],
             'negative_constraints':['Do not change cultural setting or topic','Do not paste or recycle a reference standing pose','No baked-in dialogue, captions or speech bubbles','No extra characters, fingers or broken contact points','No camera zoom, pan, rotation, parallax or whole-image stretch']+style_avoid,
-            'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.'
+            'layer_instruction':'Generate and review the complete master FIRST. Extract/reconstruct aligned layers from this exact master; fill all occluded background. Never independently invent unrelated layers.',
+            'continuity_instructions':prompt_instructions(board,shot['id'])
         })
 
 def main():

@@ -16,7 +16,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 新建、素材入口或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md)、[内容策划](references/content-strategy.md) | 独立项目目录、brief、内容策略与明确假设 |
 | 恢复已有项目 | [项目状态机](references/project-state.md) | inspect 先做 Schema 检查，再结合素材指纹、返工台账和视觉复核清单判断下一步 |
 | 建立或复核角色 | [角色一致性](references/character-consistency.md) | characters 与核对过的身份参考；无人物允许空列表 |
-| 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿 |
+| 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿；角色写 posture/placement，揭示镜头写 reveal，生图前用 validate 检查姿态与正反打背景 |
 | 生成 master 与分层（只有 master 时可用 `scripts/extract_layer.py` 拆层并补背景，检查图需人工批准） | [生图规范](references/image-generation-spec.md)、[分层协议](references/layer-protocol.md)；简化条漫画风读取 [风格预设](references/simple-comic-style.md)，经济档另读 [生图档位](references/comic-generation-economy.md) | 带追溯字段的角色参考、核对过的 master、对齐图层和补全背景 |
 | 设计人物动作 | [自然度](references/motion-naturalness.md)、[有限动画](references/limited-animation.md) | 有原因、可复核的局部动作与静止阶段 |
 | 配音、字幕、嘴型及节奏 | [音频时间轴](references/audio-timeline.md) | 实测音频驱动的统一逐镜时间轴 |

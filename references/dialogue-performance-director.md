@@ -64,6 +64,18 @@ the audio and existing runtimes before renderer preparation.
 }
 ```
 
+## Reveal beats
+
+A shot whose first beat is `{"kind": "reveal", "reveal_what": "..."}` pays off
+the previous shot's last line with something the audience must *see*. The
+compiler caps the previous shot's trailing pause at
+`reveal.max_cut_delay_frames` (4) so the cut lands as the setup line ends, then
+holds silently for `duration_frames` (default `reveal.default_hold_frames`, 14)
+before the next beat. The compiled storyboard shot carries
+`reveal: {what, hold_frames}`, so the quality gate checks the result. A reveal
+must be the first beat of its shot and cannot open the first shot. For an
+ending, finish with a `reaction` beat rather than a bare line.
+
 Validate and prepare as usual:
 
 ```sh

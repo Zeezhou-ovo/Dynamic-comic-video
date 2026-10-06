@@ -4,6 +4,9 @@
 
 ### 新增
 
+- 分镜生图前的连续性预检（`scripts/continuity.py`）：角色可写 `posture`、`placement`、`posture_change`，同一场景里没交代的坐/站或位置变化在 `validate` 时提示；相邻单人正反打镜头的 `background_view` 相同时提示；`compile` 在每镜提示词里写入 `continuity_instructions`（姿态保持或变化方式、反打必须画对面一侧）。
+- 揭示与收尾：分镜可写 `reveal`，质量闸门检查“铺垫台词一结束就切到揭示、揭示后留够停顿再开口、停顿里有动作或声音”；全片最后一句后没有任何反应时给出 `ending` 提示。导演文件新增 `reveal` 节拍，自动把上一镜压到台词结束即切，并在揭示镜头开头留出停顿。
+
 - 新增 `scripts/extract_layer.py`：从完整 master 拆出透明图层（两遍 GrabCut，可用前景框/线、背景框/多边形和细线框修正），补全背后的背景板（墙面按列延伸，其余修补），生成含左右倾斜预览的检查图和记录参数与指纹的 `.extract.json`；`approve` 子命令记录人工确认。正式素材下，未批准或批准后被改动的拆层结果会被 `validate --assets` 拒绝。在《马上交报告》第三镜上与手工抠图的重合度为 0.999。
 
 - README 改为通用 AI skill 说明并按当前功能重写；新增 `AGENTS.md` 作为任意 AI 助手的入口。安装脚本不再默认写入某个特定 AI 的目录：不带参数时只检查环境，`--dest`（PowerShell 用 `-Dest`）可复制到任意 skill 目录并可重复；旧的直接传路径写法仍然有效。

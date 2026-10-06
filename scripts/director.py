@@ -168,7 +168,15 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
     character_ids = {char['id'] for char in chars}
     timeline_board, timeline_motion = [], []
     absolute_cursor = 0
-    for entry in plan['shots']:
+    reveal_rules = rules()['reveal']
+    for index, entry in enumerate(plan['shots']):
+        if entry['beats'][0]['kind'] != 'reveal' and any(beat['kind'] == 'reveal' for beat in entry['beats']):
+            raise ValueError('reveal must be the first beat of its shot '+entry['instance_id'])
+        if entry['beats'][0]['kind'] == 'reveal' and index == 0:
+            raise ValueError('the first shot cannot be a reveal; it pays off a previous line '+entry['instance_id'])
+    for index, entry in enumerate(plan['shots']):
+        # a reveal in the next shot pays off this shot's last line: cut as that line ends
+        cut_into_reveal = index + 1 < len(plan['shots']) and plan['shots'][index + 1]['beats'][0]['kind'] == 'reveal'
         source_id = entry['source_shot_id']
         if source_id not in board_by_id or source_id not in motion_by_id:
             raise ValueError('director_plan references unknown source shot '+source_id)
@@ -232,9 +240,12 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
         cues = []
         reaction_specs = []
         emphasis_pause = (0 if policy else rules()['emphasis'][entry['emphasis']]['default_pause_frames'])
-        for beat in beats:
+        reveal_spec = None
+        for beat_index, beat in enumerate(beats):
             local_cursor += beat.get('pause_before', 0)
             pause_after = max(beat.get('pause_after', 0), emphasis_pause)
+            if cut_into_reveal and beat_index == len(beats) - 1:
+                pause_after = min(pause_after, reveal_rules['max_cut_delay_frames'])
             if beat['kind'] == 'dialogue':
                 duration = beat['duration_frames']
                 # Authored local audio, when present, determines speech length.
@@ -267,12 +278,18 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                 reaction_specs.append((target, beat['reaction'], local_cursor, hold,
                                        beat['beat_id'], beat.get('reaction_strength', 'medium')))
                 local_cursor += hold + pause_after
+            elif beat['kind'] == 'reveal':
+                hold = beat.get('duration_frames', reveal_rules['default_hold_frames'])
+                reveal_spec = {'what': beat['reveal_what'], 'hold_frames': hold}
+                local_cursor += hold + pause_after
             else:
                 local_cursor += beat['duration_frames'] + pause_after
         duration_frames = max(2, local_cursor)
         board_copy = deepcopy(source_board)
         board_copy.update({'id': entry['instance_id'], 'duration_frames': duration_frames,
                            'dialogue': cues, 'shot_size': resolved['framing']})
+        if reveal_spec:
+            board_copy['reveal'] = reveal_spec
         if phase4:
             board_copy['characters'] = [character for character in source_board['characters']
                                         if character['character_id'] in set(visible)]

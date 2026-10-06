@@ -102,6 +102,34 @@ class DirectorTests(unittest.TestCase):
             _, errors, _ = validate(project)
             self.assertEqual(errors, [])
 
+    def test_reveal_cuts_on_the_setup_line_and_holds_before_speech(self):
+        plan, data = self._load(self.comedy)
+        punch = next(index for index, entry in enumerate(plan['shots']) if entry['instance_id'] == 'comedy_b_punchline')
+        reveal_shot = dict(plan['shots'][punch + 1])
+        reveal_shot['instance_id'] = 'comedy_reveal'
+        reveal_shot['beats'] = [{'beat_id': 'reveal_prop', 'kind': 'reveal', 'reveal_what': 'what the joke was about',
+                                 'pause_before': 0, 'pause_after': 0}] + [
+            {**beat, 'beat_id': beat['beat_id'] + '_r'} for beat in reveal_shot['beats']]
+        plan['shots'].insert(punch + 1, reveal_shot)
+        rendered = compile_director_plan(plan, data)
+        board = {shot['id']: shot for shot in rendered['storyboard']['shots']}
+        setup = board['comedy_b_punchline']
+        self.assertLessEqual(setup['duration_frames'] - setup['dialogue'][-1]['end_frame'], 4, 'cut as the setup line ends')
+        reveal = board['comedy_reveal']
+        self.assertEqual(reveal['reveal'], {'what': 'what the joke was about', 'hold_frames': 14})
+        first_line = min((cue['start_frame'] for cue in reveal['dialogue']), default=reveal['duration_frames'])
+        self.assertGreaterEqual(first_line, 14)
+
+    def test_reveal_must_open_a_later_shot(self):
+        plan, data = self._load(self.comedy)
+        plan['shots'][0]['beats'].insert(0, {'beat_id': 'too_early', 'kind': 'reveal', 'reveal_what': 'x', 'pause_before': 0, 'pause_after': 0})
+        with self.assertRaisesRegex(ValueError, 'first shot cannot be a reveal'):
+            compile_director_plan(plan, data)
+        plan, data = self._load(self.comedy)
+        plan['shots'][1]['beats'].append({'beat_id': 'late', 'kind': 'reveal', 'reveal_what': 'x', 'pause_before': 0, 'pause_after': 0})
+        with self.assertRaisesRegex(ValueError, 'first beat'):
+            compile_director_plan(plan, data)
+
 
 if __name__ == '__main__':
     unittest.main()

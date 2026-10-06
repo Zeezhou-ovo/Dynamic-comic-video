@@ -43,5 +43,6 @@
     "awkward": {"camera": "static", "default_pause_frames": 10},
     "surprise": {"camera": "stronger_push", "default_pause_frames": 8}
   },
+  "reveal": {"default_hold_frames": 14, "max_cut_delay_frames": 4},
   "event_part": {"nod": "head", "shake_head": "head", "blink": "eyes", "point": "right_arm", "raise_hand": "right_arm", "small_bounce": "body", "talk": "mouth"}
 }
