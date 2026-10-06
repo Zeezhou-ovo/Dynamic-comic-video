@@ -85,6 +85,26 @@ class DeliveryTests(unittest.TestCase):
         media = next(item for item in report["checks"] if item["name"] == "media")
         self.assertEqual(media["status"], "PASS")
 
+    def test_quiet_mix_is_an_advisory_warning_not_a_blocker(self):
+        self.seed_review()
+        quiet = {"integrated_lufs": -22.8, "true_peak_dbtp": -8.1, "digital_silence_seconds": 3.9, "digital_silence_ratio": 0.65}
+        with patch("deliver._probe_media", return_value={"width": 960, "height": 540, "fps": 24.0, "duration_seconds": 6.0}), \
+                patch("deliver._measure_audio", return_value=quiet):
+            report = check(self.project)
+        self.assertEqual(report["status"], "PASS")
+        audio = next(item for item in report["checks"] if item["name"] == "audio_loudness")
+        self.assertEqual(len(audio["warnings"]), 2)
+        self.assertEqual(audio["measurement"]["integrated_lufs"], -22.8)
+
+    def test_missing_ffmpeg_skips_loudness(self):
+        self.seed_review()
+        with patch("deliver._probe_media", return_value={"width": 960, "height": 540, "fps": 24.0, "duration_seconds": 6.0}), \
+                patch("deliver._which", side_effect=lambda name: None if name == "ffmpeg" else "/usr/bin/" + name):
+            report = check(self.project)
+        audio = next(item for item in report["checks"] if item["name"] == "audio_loudness")
+        self.assertEqual(audio["status"], "SKIPPED")
+        self.assertEqual(report["status"], "PASS")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,6 +9,7 @@ is explicit and repeatable.
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -26,6 +27,13 @@ from project_state import (
 
 
 PASS_QUALITY_STATUSES = {"PASS", "PASS_WITH_NOTES"}
+# Short-video platforms normalise speech-led clips to roughly -14 LUFS; quieter
+# uploads sound weak next to neighbouring videos. These are advisory targets.
+TARGET_LUFS = -14.0
+LUFS_TOLERANCE = 2.0
+MAX_TRUE_PEAK_DBTP = -1.0
+DIGITAL_SILENCE_DB = -60
+MAX_DIGITAL_SILENCE_RATIO = 0.25
 
 
 def _which(command):
@@ -97,6 +105,74 @@ def _probe_media(path):
         "fps": _fps(stream.get("avg_frame_rate")),
         "duration_seconds": duration,
     }
+
+
+def _measure_audio(path):
+    """Measure integrated loudness, true peak and digital silence with local ffmpeg.
+
+    Returns None when the file has no audio stream.
+    """
+    command = _which("ffmpeg")
+    if not command:
+        raise RuntimeError("ffmpeg not found; loudness was not measured")
+    result = subprocess.run(
+        [
+            command, "-hide_banner", "-nostats", "-i", str(path), "-vn",
+            "-af", f"ebur128=peak=true,silencedetect=n={DIGITAL_SILENCE_DB}dB:d=0.3",
+            "-f", "null", "-",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    log = result.stderr or ""
+    if "does not contain any stream" in log or "matches no streams" in log or "Output file does not contain" in log:
+        return None
+    if result.returncode != 0:
+        raise RuntimeError((log.strip().splitlines() or ["ffmpeg failed"])[-1])
+    summary = log[log.rfind("Summary:"):] if "Summary:" in log else ""
+    integrated = re.search(r"I:\s+(-?[\d.]+|-inf)\s+LUFS", summary)
+    if not integrated:
+        return None
+    peak = re.search(r"True peak:\s+Peak:\s+(-?[\d.]+|-inf)\s+dBFS", summary)
+    durations = [float(value) for value in re.findall(r"silence_duration:\s*([\d.]+)", log)]
+    total = re.search(r"Duration:\s*(\d+):(\d+):([\d.]+)", log)
+    seconds = int(total.group(1)) * 3600 + int(total.group(2)) * 60 + float(total.group(3)) if total else None
+    starts = [float(value) for value in re.findall(r"silence_start:\s*([\d.]+)", log)]
+    if seconds and len(starts) > len(durations):  # silence runs to the end of the file
+        durations.append(max(0.0, seconds - starts[-1]))
+    as_float = lambda match: float(match.group(1)) if match and match.group(1) != "-inf" else None
+    return {
+        "integrated_lufs": as_float(integrated),
+        "true_peak_dbtp": as_float(peak),
+        "digital_silence_seconds": round(sum(durations), 3),
+        "digital_silence_ratio": round(sum(durations) / seconds, 3) if seconds else None,
+    }
+
+
+def _check_audio(media_check):
+    """Advisory loudness report; it never blocks delivery because targets vary by platform."""
+    path = media_check.get("path")
+    if media_check.get("status") != "PASS" or not path:
+        return {"name": "audio_loudness", "status": "SKIPPED", "warnings": ["media check did not pass"]}
+    try:
+        measured = _measure_audio(path)
+    except (OSError, RuntimeError) as error:
+        return {"name": "audio_loudness", "status": "SKIPPED", "warnings": [str(error)]}
+    if measured is None:
+        return {"name": "audio_loudness", "status": "PASS", "warnings": [], "note": "no audio stream"}
+    warnings = []
+    lufs = measured["integrated_lufs"]
+    if lufs is None or abs(lufs - TARGET_LUFS) > LUFS_TOLERANCE:
+        shown = "silent" if lufs is None else f"{lufs:.1f} LUFS"
+        warnings.append(f"integrated loudness {shown}; short-video target is {TARGET_LUFS:.0f} ± {LUFS_TOLERANCE:.0f} LUFS")
+    peak = measured["true_peak_dbtp"]
+    if peak is not None and peak > MAX_TRUE_PEAK_DBTP:
+        warnings.append(f"true peak {peak:.1f} dBTP exceeds {MAX_TRUE_PEAK_DBTP:.0f} dBTP; risk of clipping after platform encoding")
+    ratio = measured["digital_silence_ratio"]
+    if ratio is not None and ratio > MAX_DIGITAL_SILENCE_RATIO:
+        warnings.append(f"{ratio:.0%} of the video is digital silence; add low room tone or music bed under pauses")
+    return {"name": "audio_loudness", "status": "PASS", "warnings": warnings, "measurement": measured}
 
 
 def _check_contracts(root):
@@ -251,7 +327,9 @@ def check(project, output=None):
     visual = _check_visual_review(root)
     checks.append(visual)
     checks.append(_check_revisions(root))
-    checks.append(_check_media(root, contracts, visual))
+    media = _check_media(root, contracts, visual)
+    checks.append(media)
+    checks.append(_check_audio(media))
     blocking = [f"{item['name']}: {error}" for item in checks if item.get("status") == "FAIL" for error in item.get("errors", [])]
     report = {
         "version": "0.1",
