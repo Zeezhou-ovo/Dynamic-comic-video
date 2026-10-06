@@ -61,6 +61,8 @@ python scripts/preview.py <project> --renderer <project-outside-renderer>
 
 脚本会先重新校验素材、运行质量闸门，再编译、prepare、渲染，并把 `renderer/out/video.mp4` 复制为 `<project>/preview.mp4`，同时把首/中/末帧复制到 `<project>/visual-review/` 并写入带指纹的 `visual_review.json`。打开这些帧完成检查后，运行 `python scripts/project_state.py review <project> --approve`；发现问题运行 `--reject --note "..."`。只预览单镜头时追加 `--shot shot_002`；首次使用该 renderer 时增加 `--npm-install`。它不会上传项目文件，也不会读取或写入 API Key。
 
+预览默认把整体响度调到约 −14 LUFS（固定增益加峰值限制，不改变对白与音效比例），需要原始音量时追加 `--keep-loudness`。需要木马吱呀、室内底噪等原创音效时，先运行 `python scripts/make_sfx.py <project>`，再在 `sound_events` 或 `audio_bed` 中引用 `audio/sfx/` 下的文件。
+
 如果只需要更新改过的镜头，可以运行：
 
 ```powershell
@@ -92,6 +94,6 @@ python scripts/deliver.py <project>
 - 缺图、大小不一致、透明通道不合格：返回 master/layer 阶段处理。
 - Timeline gap/overlap：重新累加 start_frame，保持整数帧与总长一致。
 - Motion can reveal canvas edge：减小位移或适度放大；放大仍须检查脸部和构图裁切。
-- 浏览器首次下载/渲染失败：保存明确错误，检查本地浏览器和网络条件；不得把仅成功的 JSON 校验报告成 MP4 成功。
+- 浏览器首次下载/渲染失败：保存明确错误，检查本地浏览器和网络条件；不得把仅成功的 JSON 校验报告成 MP4 成功。无法下载 Remotion 的 Chrome Headless Shell 时，可用 `npx remotion render ... --browser-executable <本机 headless_shell 或 Chrome 路径>` 指向已安装的浏览器。
 
 模板使用镜头内帧驱动确定性插值。实现依据：[Remotion Sequence](https://www.remotion.dev/docs/sequence)、[CLI render](https://www.remotion.dev/docs/cli/render)。

@@ -202,7 +202,10 @@ def run_incremental_preview(project, renderer, install=False):
     return manifest
 
 
-def run_preview(project, renderer, output=None, install=False, shot=None):
+LAST_LOUDNESS = {}
+
+
+def run_preview(project, renderer, output=None, install=False, shot=None, loudness=True):
     """Build a full or shot preview MP4 and visual review frame manifest."""
     project = Path(project).resolve()
     renderer = Path(renderer).resolve()
@@ -221,7 +224,12 @@ def run_preview(project, renderer, output=None, install=False, shot=None):
         raise FileNotFoundError(f"Remotion did not produce {rendered}")
     destination = (Path(output).resolve() if output else project / (f"preview_{_safe_name(shot)}.mp4" if shot else "preview.mp4"))
     destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(rendered, destination)
+    if loudness:
+        from loudness import normalize
+        LAST_LOUDNESS.clear()
+        LAST_LOUDNESS.update(normalize(rendered, destination))
+    else:
+        shutil.copy2(rendered, destination)
     if points:
         review_root = project / "visual-review"
         review_root.mkdir(parents=True, exist_ok=True)
@@ -291,6 +299,7 @@ def main():
     parser.add_argument("--incremental", action="store_true", help="Render only changed shots into incremental-preview/")
     parser.add_argument("--simple-comic", action="store_true", help="Use the image-first simple-comic renderer with local eye/mouth variants")
     parser.add_argument("--motion-config", type=Path, help="Face-motion manifest for --simple-comic")
+    parser.add_argument("--keep-loudness", action="store_true", help="Copy the render without normalising audio to -14 LUFS")
     args = parser.parse_args()
     if args.simple_comic:
         result = run_simple_comic_preview(args.project, args.output, args.motion_config)
@@ -302,11 +311,11 @@ def main():
         result = run_incremental_preview(args.project, args.renderer, args.npm_install)
         print(json.dumps({"status": "PASS", "incremental": result}, ensure_ascii=False, default=str))
         return 0
-    destination = run_preview(args.project, args.renderer, args.output, args.npm_install, args.shot)
+    destination = run_preview(args.project, args.renderer, args.output, args.npm_install, args.shot, not args.keep_loudness)
     visual_review = args.project.resolve() / "visual_review.json"
     if not visual_review.is_file():
         visual_review = None
-    print(json.dumps({"status": "PASS", "preview": str(destination), "visual_review": str(visual_review) if visual_review else None}, ensure_ascii=False))
+    print(json.dumps({"status": "PASS", "preview": str(destination), "visual_review": str(visual_review) if visual_review else None, "loudness": LAST_LOUDNESS or None}, ensure_ascii=False))
     return 0
 
 

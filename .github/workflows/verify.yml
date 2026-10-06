@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: "24"
       - name: Run deterministic camera checks
-        run: node --test scripts/test_camera_runtime.mjs scripts/test_character_runtime.mjs
+        run: node --test scripts/test_camera_runtime.mjs scripts/test_character_runtime.mjs scripts/test_performance_runtime.mjs
       - name: Compile example prompts
         run: python scripts/pipeline.py compile examples/library
       - name: Validate example contracts
@@ -95,6 +95,17 @@ jobs:
       - name: Render knowledge director MP4
         working-directory: phase3-director-renderer
         run: npx remotion render src/index.tsx MangaMotion out/phase3-knowledge-dialogue.mp4 --codec=h264
+      - name: Build comic performance fixture (prop motion, sound, effects, audio bed)
+        run: |
+          python scripts/make_performance_fixture.py performance-fixture
+          python scripts/pipeline.py validate performance-fixture --assets
+          python scripts/pipeline.py prepare performance-fixture --renderer performance-renderer
+      - name: Install comic performance renderer dependencies
+        working-directory: performance-renderer
+        run: npm ci
+      - name: Render comic performance MP4
+        working-directory: performance-renderer
+        run: npm run render
       - uses: actions/upload-artifact@v4
         with:
           name: manga-motion-video-fixture
@@ -114,6 +125,11 @@ jobs:
         with:
           name: phase3-dialogue-comedy
           path: phase3-director-renderer/out/phase3-dialogue-comedy.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: comic-performance-video-fixture
+          path: performance-renderer/out/video.mp4
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:

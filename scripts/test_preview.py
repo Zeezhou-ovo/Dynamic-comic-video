@@ -66,10 +66,30 @@ class PreviewTests(unittest.TestCase):
             rendered.mkdir()
             (rendered / "video.mp4").write_bytes(b"preview")
             with patch("preview.subprocess.run") as run:
-                destination = run_preview(project, renderer)
+                destination = run_preview(project, renderer, loudness=False)
             self.assertEqual(destination, (project / "preview.mp4").resolve())
             self.assertEqual(destination.read_bytes(), b"preview")
             self.assertEqual(run.call_count, len(steps(project, renderer)))
+
+    def test_run_preview_normalises_loudness_by_default(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            project, renderer = root / "project", root / "renderer"
+            project.mkdir()
+            (renderer / "out").mkdir(parents=True)
+            (project / "production_brief.json").write_text("{}", encoding="utf-8")
+            (renderer / "out" / "video.mp4").write_bytes(b"preview")
+
+            def fake_normalize(source, destination):
+                Path(destination).write_bytes(Path(source).read_bytes())
+                return {"applied": True, "gain_db": 3.0}
+
+            with patch("preview.subprocess.run"), patch("loudness.normalize", side_effect=fake_normalize) as normalize:
+                destination = run_preview(project, renderer)
+            normalize.assert_called_once()
+            self.assertEqual(destination.read_bytes(), b"preview")
 
     def test_shot_preview_copies_visual_review_artifacts(self):
         import json
@@ -92,7 +112,7 @@ class PreviewTests(unittest.TestCase):
             for position in ("first", "middle", "last"):
                 (review / f"shot_001_{position}.png").write_bytes(position.encode())
             with patch("preview.subprocess.run") as run:
-                destination = run_preview(project, renderer, shot="shot/001")
+                destination = run_preview(project, renderer, shot="shot/001", loudness=False)
             self.assertEqual(destination, (project / "preview_shot_001.mp4").resolve())
             manifest = json.loads((project / "visual_review.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["version"], "0.2")

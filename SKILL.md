@@ -21,7 +21,8 @@ description: Create and revise sequential motion-comic videos from stories, scri
 | 设计人物动作 | [自然度](references/motion-naturalness.md)、[有限动画](references/limited-animation.md) | 有原因、可复核的局部动作与静止阶段 |
 | 配音、字幕、嘴型及节奏 | [音频时间轴](references/audio-timeline.md) | 实测音频驱动的统一逐镜时间轴 |
 | 需要安排说话人、听者反应、喜剧停顿或强调镜头 | [Dialogue & Performance Director](references/dialogue-performance-director.md) | 可选 `director_plan.json`；将对白、静默反应、停顿和镜头意图编译到 Phase 1/2 Runtime |
-| 强调字幕、漫画符号、音效或音乐 | [漫画演出](references/comic-performance.md) | 同一时间轴中的必要视听事件 |
+| 强调字幕、漫画符号、音效或音乐 | [漫画演出](references/comic-performance.md)、[漫画表演运行时](references/performance-runtime.md) | 同一时间轴中的必要视听事件；符号与彩色字幕默认不加 |
+| 道具连人一起摇动、三档嘴型、表情替换 | [漫画表演运行时](references/performance-runtime.md) | 透明道具层、补全底图、附着补丁与可渲染事件 |
 | 校验、预览与交付 | [质量闸门](references/quality-gate.md)、[运行指南](references/runbook.md) | QC 报告、可播放 MP4、视觉复核记录、交付报告 |
 
 写 JSON 前读取 [契约说明](references/contracts.md) 和对应 `schemas/*.schema.json`。新项目使用 `motion_plan.version: "0.4"`，`production_brief`、`characters`、`storyboard` 使用 `"0.1"`；旧 0.1–0.3 合同保持原有解释，不因升级批量改版本。剧情需要对话导演决策时，另使用独立的 `director_plan.version: "0.1"`；它不是所有项目的必需文件。需要相机/视差时读取 [Camera 与 Parallax 运行时](references/camera-parallax-runtime.md)。

@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator
 from PIL import Image
 from acting import asset_names, check_acting, check_character_performance
 from production import inventory, check_dialogue, render_payload, check_direction
+from performance import check_performance, event_assets
 from director import validate_director_plan, compile_director_plan
 from composition_resolver import validate_scene_manifests
 
@@ -321,6 +322,7 @@ def validate(project, assets=False, shot_id=None):
             if char['reference']['status']!='ready' or not local(project,char['reference']['image']).is_file(): errors.append('Character reference not ready: '+char['id'])
     if sids==mids:
         errors.extend(check_dialogue(project,data,local,assets,shot_id))
+        errors.extend(check_performance(project,data,local,assets,shot_id))
     if director_plan is not None and shot_id:
         errors.append('--shot cannot select a source panel from an authoritative director_plan timeline')
     return data,errors,warnings
@@ -432,10 +434,13 @@ def main():
                         ignore=shutil.ignore_patterns('node_modules','out','.env*'))
         for shot in data['motion_plan']['shots']:
             if args.shot and shot['shot_id']!=args.shot: continue
-            for layer in shot['layers']:
-                for name in asset_names(layer):
-                    dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
-                    shutil.copy2(local(project,name),dest)
+            for name in [n for layer in shot['layers'] for n in asset_names(layer)]+event_assets(shot):
+                dest=local(renderer/'public',name); dest.parent.mkdir(parents=True,exist_ok=True)
+                shutil.copy2(local(project,name),dest)
+        bed=data['motion_plan'].get('audio_bed')
+        if bed:
+            dest=local(renderer/'public',bed['asset']); dest.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(local(project,bed['asset']),dest)
         if scene_manifest is not None:
             scene_asset_paths = [item['asset'] for item in scene_manifest['layers'] if item.get('asset')]
             scene_asset_paths += [item['asset'] for item in scene_manifest['objects']]
