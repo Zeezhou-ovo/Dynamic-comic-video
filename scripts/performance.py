@@ -4,6 +4,7 @@ Ported from the local performance upgrade (three/four-level mouths, expression
 pose swaps, sound files, drawn comic effects) and extended with rigid prop
 motion, layers attached to a prop, and a whole-video audio bed.
 """
+import json
 import math
 import struct
 import wave
@@ -42,6 +43,26 @@ def _pcm_wav_frames(path, fps):
         if stream.getsampwidth() != 2 or stream.getcomptype() != 'NONE':
             raise ValueError('requires 16-bit PCM WAV')
         return stream.getnframes() / stream.getframerate() * fps
+
+
+def check_extractions(shot, resolve, project):
+    """Layers made by extract_layer.py must be approved and unchanged since approval."""
+    from extract_layer import manifest_for_asset, stale_outputs
+    errors = []
+    seen = set()
+    for layer in shot['layers']:
+        manifest_path = manifest_for_asset(resolve(project, '.'), layer['asset'])
+        if manifest_path is None or manifest_path in seen:
+            continue
+        seen.add(manifest_path)
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        name = manifest_path.name
+        if not manifest.get('reviewed'):
+            errors.append('Extracted layer review sheet not approved ' + shot['shot_id'] + '/' + name)
+        stale = stale_outputs(resolve(project, '.'), manifest)
+        if stale:
+            errors.append('Extracted layer changed after extraction/approval ' + shot['shot_id'] + '/' + name + ': ' + ', '.join(map(str, stale)))
+    return errors
 
 
 def check_props(shot, roles, resolve=None, project=None, assets=False):
@@ -116,6 +137,8 @@ def check_performance(project, data, resolve, assets=False, shot_id=None):
         layers = {layer['layer_id']: layer for layer in shot['layers']}
         roles = {layer['id']: layer['role'] for layer in board['layers']}
         errors.extend(check_props(shot, roles, resolve, project, assets))
+        if assets and production:
+            errors.extend(check_extractions(shot, resolve, project))
         cues = board.get('dialogue', [])
         previous = {}
         for event in timeline.get('mouth_events', []):
