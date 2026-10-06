@@ -4,6 +4,10 @@
 
 ### 新增
 
+- 质量闸门新增节奏检查：`pacing` 标记台词前后超过约 1 秒且没有表演事件的空白，并在报告中给出全片无台词占比；`punchline` 在笑点台词后不足 0.4 秒就接下一句（含跨 CUT）时报 Major；`reverse_shot` 提示正反打两镜使用了同一背景。
+- 交付闸门新增 `audio_loudness`：用本机 ffmpeg 测量综合响度、真峰值和数字静音占比，按短视频目标（−14 ± 2 LUFS、≤ −1 dBTP）给出非阻塞提示。
+- 漫画演出规则补充视觉揭示时机、双关词前后统一强调和结尾反应按钮；分镜规则补充大姿态跨镜连续性和正反打背景方向；音频规则要求对白之间铺底噪或音乐床。
+
 - 将代码逐帧绘制路线移至独立公开仓库 [code-painted-video](https://github.com/zeezhouovo-creator/code-painted-video)；本仓库只维护 Remotion 分层动态漫画 Skill，安装脚本也只安装该 Skill。
 
 ### 变更

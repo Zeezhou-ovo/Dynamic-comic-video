@@ -68,6 +68,75 @@ class QualityGateTests(unittest.TestCase):
         report = scan(self.project)
         self.assertTrue(any(item["category"] == "mouth_sync" and "no speech mouth layer" in item["message"] for item in report["issues"]))
 
+    def _board(self, edit):
+        board = read(self.project / "storyboard.json")
+        edit(board)
+        save(self.project / "storyboard.json", board)
+        return scan(self.project)
+
+    def test_long_idle_tail_after_last_line_is_reported(self):
+        def edit(board):
+            board["shots"][0]["dialogue"][0]["end_frame"] = 12  # 36 idle frames, allowance 24 + 6
+        report = self._board(edit)
+        self.assertTrue(any(item["category"] == "pacing" and item["shot"] == "shot_001" and "after the last line" in item["message"] for item in report["issues"]))
+        self.assertIn("silent_ratio", report["pacing"])
+
+    def test_authored_reaction_hold_covers_tail(self):
+        def edit(board):
+            board["shots"][0]["dialogue"][0]["end_frame"] = 12
+            board["shots"][0]["direction"]["reaction_hold_frames"] = 12
+        report = self._board(edit)
+        self.assertFalse(any(item["category"] == "pacing" and item["shot"] == "shot_001" for item in report["issues"]))
+
+    def test_idle_lead_before_first_line_is_reported(self):
+        motion = read(self.project / "motion_plan.json")
+        motion["shots"][0]["timeline"]["action_events"] = []
+        save(self.project / "motion_plan.json", motion)
+
+        def edit(board):
+            board["shots"][0]["dialogue"][0]["start_frame"] = 30
+        report = self._board(edit)
+        self.assertTrue(any(item["category"] == "pacing" and "before the first line" in item["message"] for item in report["issues"]))
+
+    def test_punchline_without_hold_across_cut_is_major(self):
+        motion = read(self.project / "motion_plan.json")
+        motion["shots"][0]["timeline"]["visual_events"] = [{
+            "event_id": "pun", "priority": "punchline", "effect_type": "subtitle_emphasis",
+            "start_frame": 20, "end_frame": 40, "description": "double meaning lands",
+        }]
+        save(self.project / "motion_plan.json", motion)
+
+        def edit(board):
+            board["shots"][0]["dialogue"][0]["end_frame"] = 46  # 2 frames to the cut
+            board["shots"][1]["dialogue"][0]["start_frame"] = 1  # next speaker starts at once
+        report = self._board(edit)
+        self.assertEqual(report["status"], "FIX_REQUIRED")
+        self.assertTrue(any(item["category"] == "punchline" and item["severity"] == "Major" for item in report["issues"]))
+
+    def test_punchline_with_hold_passes(self):
+        motion = read(self.project / "motion_plan.json")
+        motion["shots"][0]["timeline"]["visual_events"] = [{
+            "event_id": "pun", "priority": "punchline", "effect_type": "subtitle_emphasis",
+            "start_frame": 20, "end_frame": 40, "description": "double meaning lands",
+        }]
+        save(self.project / "motion_plan.json", motion)
+        report = scan(self.project)
+        self.assertFalse(any(item["category"] == "punchline" for item in report["issues"]))
+
+    def test_reverse_shot_with_same_background_is_noted(self):
+        def edit(board):
+            first, second = board["shots"][0], board["shots"][1]
+            other = dict(second["characters"][0], character_id="bo")
+            second["characters"] = [other]
+            second["dialogue"][0]["speaker"] = "bo"
+            second["direction"]["background_view"] = first["direction"]["background_view"]
+        board = read(self.project / "storyboard.json")
+        edit(board)
+        from quality_gate import check_pacing
+        report = {"issues": []}
+        check_pacing(report, board, read(self.project / "motion_plan.json"), 24)
+        self.assertTrue(any(item["category"] == "reverse_shot" and item["shot"] == "shot_002" for item in report["issues"]))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -24,6 +24,120 @@ def issue(report, severity, category, shot, message, fix=None):
     report["issues"].append(item)
 
 
+# Pacing thresholds in seconds; converted to frames with the project fps.
+# A shot may hold longer than these limits when the extra frames are authored
+# as a reaction (``direction.reaction_hold_frames``) or carry a visible event.
+MAX_IDLE_LEAD_SECONDS = 1.0
+MAX_IDLE_TAIL_SECONDS = 1.0
+MIN_PUNCHLINE_HOLD_SECONDS = 0.4
+TAIL_EVENT_KEYS = ("action_events", "expression_events", "visual_events", "sound_events")
+
+
+def _seconds(frames, fps):
+    return round(frames / fps, 2)
+
+
+def _event_frames(timeline):
+    """Yield (start, end) of every authored performance event in a timeline."""
+    for key in TAIL_EVENT_KEYS:
+        for event in timeline.get(key, []):
+            start = event.get("start_frame")
+            end = event.get("end_frame", start)
+            if isinstance(start, int) and isinstance(end, int):
+                yield start, max(start, end)
+
+
+def _has_event_in(timeline, start, end):
+    """True when an authored event begins inside [start, end), i.e. the hold is acted, not idle."""
+    return any(start <= e_start < end for e_start, _ in _event_frames(timeline))
+
+
+def _punchline_ends(shot, timeline):
+    """Frames where a punchline line finishes inside this shot."""
+    ends = set()
+    dialogue = shot.get("dialogue", [])
+    for cue in dialogue:
+        if cue.get("emphasis") == "punchline" or cue.get("priority") == "punchline":
+            ends.add(cue["end_frame"])
+    for event in timeline.get("subtitle_events", []):
+        if event.get("emphasis") == "punchline" or event.get("priority") == "punchline":
+            ends.add(event.get("end_frame", 0))
+    for event in timeline.get("visual_events", []):
+        if event.get("priority") != "punchline":
+            continue
+        start = event.get("start_frame", 0)
+        overlapping = [cue["end_frame"] for cue in dialogue if cue["start_frame"] <= start <= cue["end_frame"]]
+        ends.add(max(overlapping) if overlapping else event.get("end_frame", start))
+    return sorted(ends)
+
+
+def check_pacing(report, board, motion, fps):
+    """Report dead air, missing punchline holds and reverse shots sharing one background."""
+    motion_by_id = {item["shot_id"]: item for item in motion.get("shots", [])}
+    shots = board["shots"]
+    max_lead = round(MAX_IDLE_LEAD_SECONDS * fps)
+    max_tail = round(MAX_IDLE_TAIL_SECONDS * fps)
+    min_hold = round(MIN_PUNCHLINE_HOLD_SECONDS * fps)
+    silent_total = 0
+    total = 0
+    for index, shot in enumerate(shots):
+        sid = shot["id"]
+        duration = shot["duration_frames"]
+        total += duration
+        dialogue = sorted(shot.get("dialogue", []), key=lambda cue: cue["start_frame"])
+        timeline = (motion_by_id.get(sid) or {}).get("timeline") or {}
+        direction = shot.get("direction", {})
+        cut_at = timeline.get("cut_at_frame", duration)
+        if not isinstance(cut_at, int) or not 0 <= cut_at <= duration:
+            cut_at = duration
+        if not dialogue:
+            continue
+        spoken = sum(max(0, min(cue["end_frame"], cut_at) - cue["start_frame"]) for cue in dialogue)
+        silent_total += max(0, cut_at - spoken)
+
+        lead = dialogue[0]["start_frame"]
+        if lead > max_lead and not _has_event_in(timeline, 0, lead):
+            issue(report, "Minor", "pacing", sid,
+                  f"{_seconds(lead, fps)}s of idle screen before the first line",
+                  "start the line earlier, shorten the shot head, or author a visible action")
+
+        last_end = max(cue["end_frame"] for cue in dialogue)
+        tail = cut_at - last_end
+        allowance = max_tail + int(direction.get("reaction_hold_frames") or 0)
+        if tail > allowance and not _has_event_in(timeline, last_end, cut_at):
+            issue(report, "Minor", "pacing", sid,
+                  f"{_seconds(tail, fps)}s of idle screen after the last line (allowed {_seconds(allowance, fps)}s)",
+                  "cut sooner, or turn the hold into an authored reaction")
+
+        next_shot = shots[index + 1] if index + 1 < len(shots) else None
+        for end in _punchline_ends(shot, timeline):
+            later = [cue["start_frame"] for cue in dialogue if cue["start_frame"] >= end]
+            if later:
+                hold = min(later) - end
+            elif next_shot and next_shot.get("dialogue"):
+                hold = (cut_at - end) + min(cue["start_frame"] for cue in next_shot["dialogue"])
+            else:
+                continue
+            if hold < min_hold:
+                issue(report, "Major", "punchline", sid,
+                      f"Punchline is followed by speech after {_seconds(hold, fps)}s; leave at least {_seconds(min_hold, fps)}s to land",
+                      "add pause_after, reaction_hold_frames, or a silent reaction/reveal shot")
+
+        if next_shot:
+            here, there = direction, next_shot.get("direction", {})
+            cast_here = {c.get("character_id") for c in shot.get("characters", [])}
+            cast_there = {c.get("character_id") for c in next_shot.get("characters", [])}
+            if (here.get("scene_id") and here.get("scene_id") == there.get("scene_id")
+                    and len(cast_here) == 1 and len(cast_there) == 1 and cast_here != cast_there
+                    and here.get("background_view") and here.get("background_view") == there.get("background_view")
+                    and here.get("camera_position") != there.get("camera_position")):
+                issue(report, "Minor", "reverse_shot", next_shot["id"],
+                      "Shot/reverse-shot pair shares the same background view; the reverse angle should show the opposite side of the room",
+                      "redraw the background from the reverse camera position or record a repetition_exception")
+    if total:
+        report["pacing"] = {"silent_frames": silent_total, "total_frames": total, "silent_ratio": round(silent_total / total, 3)}
+
+
 def audio_frames(path, fps):
     try:
         with wave.open(str(path), "rb") as stream:
@@ -151,6 +265,8 @@ def scan(project, autofix=False):
         if actions > 2:
             issue(report, "Minor", "motion_density", sid, f"Shot contains {actions} acting events; ordinary dialogue usually needs 0–2")
 
+    check_pacing(report, board, motion, fps)
+
     for cid, identity in identities.items():
         anchors = identity.get("distinctive_features") or identity.get("anchors")
         if not anchors:
@@ -167,6 +283,9 @@ def scan(project, autofix=False):
         "repetition": "重复构图",
         "motion_density": "动作密度",
         "timeline": "统一时间轴",
+        "pacing": "空白与节奏",
+        "punchline": "笑点停顿",
+        "reverse_shot": "正反打背景",
     }
     for key, label in categories.items():
         report["checks"][key] = "FIX" if any(i["category"] == key for i in report["issues"]) else "PASS"
