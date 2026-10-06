@@ -4,6 +4,13 @@
 
 ### 新增
 
+- README 改为通用 AI skill 说明并按当前功能重写；新增 `AGENTS.md` 作为任意 AI 助手的入口。安装脚本不再默认写入某个特定 AI 的目录：不带参数时只检查环境，`--dest`（PowerShell 用 `-Dest`）可复制到任意 skill 目录并可重复；旧的直接传路径写法仍然有效。
+
+- 渲染器新增漫画表演运行时（`references/performance-runtime.md`）：从此前本地升级版移植三档嘴型（`shape_assets`、`mouth_shape_frames`、`mouth_events`）、表情替换（`expression_events.layer_id/pose_asset`）、带音量的音效文件（`sound_events.asset/volume/source_start_frame`）和漫画符号（`visual_events.position/size/intensity/color/keyword`），字段与本地版兼容，原有本地项目无需修改即可通过校验。
+- 新增道具运动 `prop_motion`（带衰减的 rock 与一次性 lean，可沿地面滚动）和 `attach_to`（局部补丁跟随道具），以及全片底噪 `audio_bed`；`scripts/make_sfx.py` 生成原创吱呀声、底噪和轻弹音。
+- `preview.py` 渲染后默认用固定增益把响度调到约 −14 LUFS（`--keep-loudness` 跳过）；新增 `scripts/loudness.py`。
+- 新增 `make_performance_fixture.py` 与 CI 渲染步骤，以及 Python/Node 回归测试。符号、彩色关键词和震动默认不加，只在明确要求时写入。
+
 - 质量闸门新增节奏检查：`pacing` 标记台词前后超过约 1 秒且没有表演事件的空白，并在报告中给出全片无台词占比；`punchline` 在笑点台词后不足 0.4 秒就接下一句（含跨 CUT）时报 Major；`reverse_shot` 提示正反打两镜使用了同一背景。
 - 交付闸门新增 `audio_loudness`：用本机 ffmpeg 测量综合响度、真峰值和数字静音占比，按短视频目标（−14 ± 2 LUFS、≤ −1 dBTP）给出非阻塞提示。
 - 漫画演出规则补充视觉揭示时机、双关词前后统一强调和结尾反应按钮；分镜规则补充大姿态跨镜连续性和正反打背景方向；音频规则要求对白之间铺底噪或音乐床。

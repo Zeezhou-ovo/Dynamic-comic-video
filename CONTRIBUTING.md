@@ -10,6 +10,7 @@
 
    ```powershell
    python -m unittest discover -s scripts -p 'test_*.py'
+   node --test scripts/test_camera_runtime.mjs scripts/test_character_runtime.mjs scripts/test_performance_runtime.mjs
    python scripts/pipeline.py compile examples\library
    python scripts/pipeline.py validate examples\library
    ```

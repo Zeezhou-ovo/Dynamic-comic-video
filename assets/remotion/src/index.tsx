@@ -23,6 +23,15 @@ import {
   evaluateCharacterPart,
   resolveCharacterLayerAsset,
 } from './runtime/character-controller.mjs';
+import {
+  captionRuns,
+  drivingPropMotion,
+  expressionAsset,
+  mouthAsset,
+  propTransform,
+  shakeOffset,
+} from './runtime/performance-controller.mjs';
+import { ComicEffects, VisualEvent } from './comic-effects';
 
 type Depth = 'foreground' | 'character' | 'midground' | 'background' | 'sky';
 type Key = { frame: number; x: number; y: number; scale?: number; rotation: number; opacity: number };
@@ -38,8 +47,15 @@ type CameraPlan = {
   parallax_enabled?: boolean;
   parallax_strengths?: Partial<Record<Depth, number>>;
 };
+type PropMotion = {
+  pivot: [number, number];
+  roll_radius?: number;
+  events: { event_id: string; kind: 'rock' | 'lean'; start_frame: number; end_frame: number; amplitude_deg: number; period_frames?: number; decay_frames?: number }[];
+};
 type Layer = {
   layer_id: string;
+  prop_motion?: PropMotion;
+  attach_to?: string;
   asset: string;
   depth?: Depth;
   character_id?: string;
@@ -53,7 +69,7 @@ type Layer = {
     pivot: [number, number];
     keys: Key[];
     easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
-    speech?: { speaker: string; closed_asset: string; open_asset: string };
+    speech?: { speaker: string; closed_asset: string; open_asset: string; shape_assets?: Partial<Record<'small' | 'round' | 'wide', string>> };
     poses?: { frame: number; asset: string }[];
   };
 };
@@ -64,6 +80,7 @@ type DialogueCue = {
   end_frame: number;
   audio?: string;
   mouth_open_frames?: number[];
+  mouth_shape_frames?: string[];
   emphasis?: 'normal' | 'important' | 'reveal' | 'punchline' | 'awkward' | 'surprise';
   beat_id?: string;
 };
@@ -91,6 +108,12 @@ type ShotPlan = {
   }[];
   layers: Layer[];
   dialogue?: DialogueCue[];
+  timeline?: {
+    mouth_events?: { speaker: string; shape: string; start_frame: number; end_frame: number }[];
+    expression_events?: { layer_id?: string; pose_asset?: string; start_frame: number; end_frame: number }[];
+    visual_events?: VisualEvent[];
+    sound_events?: { event_id: string; asset?: string; start_frame: number; end_frame: number; source_start_frame?: number; volume?: number }[];
+  };
 };
 type RenderData = {
   version?: string;
@@ -100,6 +123,7 @@ type RenderData = {
   scene_manifest?: any;
   character_assets?: any;
   presentation?: { subtitle?: { font_height_ratio: number; emphasis_scale: number; hold_frames: number } };
+  audio_bed?: { asset: string; volume?: number };
 };
 const data = input as RenderData;
 const sceneAssetLoader = data.scene_manifest && data.character_assets
@@ -182,6 +206,7 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
           </AbsoluteFill>
         );
       })}
+      <ComicEffects events={shot.timeline?.visual_events ?? []} frame={frame} width={data.format.width} height={data.format.height} />
       {caption && (
         <div style={{
           position: 'absolute', zIndex: 1000, bottom: '7%', left: '6%', right: '6%', textAlign: 'center',
@@ -201,9 +226,13 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
   const camera = evaluateCamera(frame, context);
   const characterStates = evaluateShotCharacters(shot, frame);
   const caption = selectSubtitleCue(shot.dialogue, frame, data.presentation?.subtitle?.hold_frames ?? 0);
+  const timeline = shot.timeline ?? {};
+  const visualEvents = timeline.visual_events ?? [];
+  const shake = shakeOffset(frame, visualEvents);
 
   return (
     <AbsoluteFill style={{ overflow: 'hidden' }}>
+      <AbsoluteFill style={{ transform: shake ? `translate(${shake}px, 0px)` : undefined }}>
       {[...shot.layers].sort((a, b) => a.z - b.z).map(layer => {
         const value = (key: 'x' | 'y' | 'scale') => interpolate(
           frame,
@@ -215,16 +244,15 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
         const performanceState = layer.character_id ? characterStates.get(layer.character_id) : undefined;
         const local = evaluateCharacterPart(frame, acting, performanceState);
         let pose = resolveCharacterLayerAsset(layer, performanceState, frame);
+        pose = expressionAsset(frame, layer.layer_id, timeline.expression_events ?? []) ?? pose;
         if (acting?.speech) {
-          const cue = shot.dialogue?.find(item => item.speaker === acting.speech!.speaker && frame >= item.start_frame && frame < item.end_frame);
           if (performanceState) {
             pose = performanceState.mouth.state === 'open' ? acting.speech.open_asset : acting.speech.closed_asset;
           } else {
-            pose = cue?.mouth_open_frames?.includes(frame - cue.start_frame)
-              ? acting.speech.open_asset
-              : acting.speech.closed_asset;
+            pose = mouthAsset(frame, acting.speech, shot.dialogue ?? [], timeline.mouth_events ?? []);
           }
         }
+        const prop = propTransform(frame, drivingPropMotion(layer, shot.layers));
         const region = layer.region;
         const depthTransform = evaluateLayerTransform(camera, layer.depth ?? 'character', data.format);
         const root = performanceState?.root;
@@ -234,6 +262,7 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
             key={layer.layer_id}
             style={{ transformOrigin: '0 0', transform: depthTransform.transform }}
           >
+            <AbsoluteFill style={prop ? { transformOrigin: prop.origin, transform: prop.transform } : undefined}>
             <AbsoluteFill
               style={{
                 transformOrigin: root ? `${performanceState?.rootPivot[0] * 100}% ${performanceState?.rootPivot[1] * 100}%` : '50% 50%',
@@ -262,9 +291,12 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
               />
             </AbsoluteFill>
             </AbsoluteFill>
+            </AbsoluteFill>
           </AbsoluteFill>
         );
       })}
+      </AbsoluteFill>
+      <ComicEffects events={visualEvents} frame={frame} width={data.format.width} height={data.format.height} />
       {caption && (
         <div style={{
           position: 'absolute', bottom: '10%', left: '6%', right: '6%', textAlign: 'center',
@@ -272,7 +304,9 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
           fontFamily: 'Arial, "Microsoft YaHei", sans-serif', fontWeight: 700,
           whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
           textShadow: '-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black',
-        }}>{caption.text}</div>
+        }}>{captionRuns(caption.text, frame, visualEvents).map((run, index) => (
+          run.highlight ? <span key={index} style={{ color: run.color }}>{run.text}</span> : <React.Fragment key={index}>{run.text}</React.Fragment>
+        ))}</div>
       )}
       {data.asset_mode === 'fixture' && (
         <div style={{ position: 'absolute', left: 24, bottom: 20, color: 'white', background: '#172332', padding: '8px 14px', fontSize: 18, fontFamily: 'sans-serif' }}>
@@ -293,8 +327,14 @@ const Video = () => (
             <Audio src={staticFile(cue.audio!)} />
           </Sequence>
         ))}
+        {(shot.timeline?.sound_events ?? []).filter(event => event.asset).map(event => (
+          <Sequence key={event.event_id} from={event.start_frame} durationInFrames={event.end_frame - event.start_frame}>
+            <Audio src={staticFile(event.asset!)} startFrom={event.source_start_frame ?? 0} volume={event.volume ?? 0.35} />
+          </Sequence>
+        ))}
       </Sequence>
     ))}
+    {data.audio_bed && <Audio src={staticFile(data.audio_bed.asset)} loop volume={data.audio_bed.volume ?? 0.15} />}
   </AbsoluteFill>
 );
 

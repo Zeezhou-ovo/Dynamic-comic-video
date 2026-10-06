@@ -36,7 +36,7 @@ class DocumentationTests(unittest.TestCase):
         readme = read("README.md")
         closure = read("references/v04-production.md")
         self.assertIn("当前对外版本是 V1.0", skill)
-        self.assertIn("## V1.0 workflow", readme)
+        self.assertIn("当前工作流版本是 V1.0", readme)
         self.assertIn("不是当前对外版本", closure)
         self.assertNotIn("V1.0 candidate / V0.4 stable engine", readme)
 

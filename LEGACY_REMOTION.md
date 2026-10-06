@@ -26,7 +26,7 @@ cd Dynamic-comic-video
 bash scripts/setup.sh
 ```
 
-安装脚本会把 Skill 放到 Codex 的 Skill 目录，在本地创建 Python 虚拟环境，并在 `assets/remotion` 中安装 npm 依赖。安装完成后，用户可以直接用 Codex 制作动态漫画，也可以进入独立项目执行校验、预览和 MP4 渲染。
+安装脚本默认只检查本机环境；用 `--dest <目录>` 可以把 Skill 复制到任意 AI 工具读取的 skill 目录。这个 Skill 不绑定特定 AI，能读文件、能执行命令的 AI 助手都可以按 SKILL.md 制作动态漫画，也可以进入独立项目手动执行校验、预览和 MP4 渲染。详见 [README](README.md)。
 
 每个故事、角色图片、配音、渲染项目和成片都保存在仓库之外。不要把 `node_modules`、`.venv`、API Key 或用户内容提交到 GitHub。更新时在仓库目录执行 `git pull`，再重新运行对应的安装脚本。
 

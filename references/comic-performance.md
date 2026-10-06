@@ -49,6 +49,8 @@
 
 所有视觉事件、音效和背景音乐变化继续写入同一个 `motion_plan.timeline`。例如：关键词开始 → 表情变化 → 重点字幕与音效出现 → 短震动 → 字幕恢复 → 保持表情 → CUT。禁止视觉特效和声音系统建立互相冲突的独立时间轴。
 
+渲染器已经实现的字段和默认关闭原则见 [漫画表演运行时](performance-runtime.md)：符号、彩色关键词和震动只在用户明确要求时加入。
+
 推荐的 Remotion 组件边界包括 `SubtitleEffect`、`ReactionEffect`、`ImpactEffect`、`QuestionEffect`、`EmbarrassmentEffect`、`ScreenShake`、`SoundEffect`、`AmbientSound` 和 `BackgroundMusic`。这些组件只在时间轴事件发生时渲染，不默认挂载到所有 Scene。
 
 ## 输出前检查

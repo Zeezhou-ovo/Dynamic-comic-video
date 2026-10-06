@@ -1,6 +1,6 @@
 # 数据契约与版本
 
-新项目的 `production_brief.json`、`characters.json`、`storyboard.json` 使用 `version: "0.1"`，`motion_plan.json` 使用 `version: "0.4"`；四份基础文件共享 `project_id`，编码为 UTF-8。需要导演时间轴时可增加同样共享 `project_id` 的 `director_plan.json` 0.1。旧运动合同按 [有限动画协议](limited-animation.md) 兼容。Schema 不允许未声明字段。JSON Schema 负责结构；`pipeline.py` 负责跨文件引用和时间/素材一致性。0.4 的 Camera/Depth 字段见 [Camera 与 Parallax 运行时](camera-parallax-runtime.md)。
+新项目的 `production_brief.json`、`characters.json`、`storyboard.json` 使用 `version: "0.1"`，`motion_plan.json` 使用 `version: "0.4"`；四份基础文件共享 `project_id`，编码为 UTF-8。需要导演时间轴时可增加同样共享 `project_id` 的 `director_plan.json` 0.1。旧运动合同按 [有限动画协议](limited-animation.md) 兼容。Schema 不允许未声明字段。JSON Schema 负责结构；`pipeline.py` 负责跨文件引用和时间/素材一致性。0.4 的 Camera/Depth 字段见 [Camera 与 Parallax 运行时](camera-parallax-runtime.md)；三档嘴型、表情替换、道具运动、音效、环境声和漫画符号的可选字段见 [漫画表演运行时](performance-runtime.md)。
 
 | 文件 | 所有者与主要字段 | 消费方 |
 |---|---|---|
