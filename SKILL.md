@@ -66,3 +66,8 @@ description: Create and revise sequential motion-comic videos from stories, scri
 用户原文、参考、JSON、配音、master、图层、预览和 MP4 保存在仓库之外的独立项目目录，renderer 位于项目之外。保留源素材和恢复所需中间文件；只在用户要求清理时删除已明确范围的临时文件，不因交付完成自动删除。
 
 API Key、Token、密码不得写入项目 JSON、提示词、renderer/public、日志、交付包或上传网络。需要凭据时优先从本地环境变量或加密配置读取，且遵守用户仅限本地使用的约束。用户粘贴明文密钥时提示风险并指导改用本地配置，不用该明文密钥请求网络。配置帮助只询问本地文件路径，提供用户本地执行的命令；不兼容上述限制的适配器明确说明。
+
+
+## 共享素材库
+
+当用户复用共享素材库时，先读取 [共享素材库规范](references/asset-library.md)。`asset_id` 用于查找与追溯；现有项目 JSON 仍填写复制到项目内后的相对路径。
