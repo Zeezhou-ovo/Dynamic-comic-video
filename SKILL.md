@@ -13,7 +13,8 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 | 当前任务 | 读取 | 本阶段结果 |
 | --- | --- | --- |
-| 新建、素材入口或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md)、[内容策划](references/content-strategy.md) | 独立项目目录、brief、内容策略与明确假设 |
+| 新建项目或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md)；面向真实观众时再读[内容策划](references/content-strategy.md) | 独立项目目录、最小 brief 与明确假设；面向真实观众时补齐内容策略 |
+| 复用共享素材库 | [共享素材库规范](references/asset-library.md) | 按精确 `asset_id` 选择素材，复制到项目并记录来源 |
 | 恢复已有项目 | [项目状态机](references/project-state.md) | inspect 先做 Schema 检查，再结合素材指纹、返工台账和视觉复核清单判断下一步 |
 | 建立或复核角色 | [角色一致性](references/character-consistency.md) | characters 与核对过的身份参考；无人物允许空列表 |
 | 生成或改写分镜 | [分镜主规则](references/storyboard-director.md)、[连续分镜](references/sequential-comic.md) | 场景空间、Narrative Beats、shots 与17项逐镜审阅稿；角色写 posture/placement，揭示镜头写 reveal，生图前用 validate 检查姿态与正反打背景 |
@@ -46,16 +47,15 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 从本文件定位绝对技能目录，保留独立项目与 renderer 的绝对路径。文档中的 `scripts/...` 均相对技能目录，`<project>` 指用户项目；路径含空格时加引号。优先使用已安装环境的 Python，不假定当前目录就是技能根目录。
 
-1. 完成当前阶段的数据与资产，再运行 `scripts/pipeline.py validate <project>` 和 `compile <project>`；compile 整理导演决策，不替代剧情设计或图像生成。
-2. 核对角色、master、图层及实际运动范围后才填写 `ready`、`review` 或 `performance.reviewed`。fixture 只用于管线测试，不得改标签冒充正式素材。
-3. 预览可用 `scripts/preview.py <project> --renderer <external-renderer>`；单镜头可追加 `--shot <shot_id>`，输出默认为 `preview_<shot_id>.mp4`。流程执行素材校验、质量闸门安全修正、再校验、编译、prepare 和 Remotion 渲染；首次安装 renderer 依赖才追加 `--npm-install`。每次预览还会把首/中/末帧复制到 `<project>/visual-review/`，并写入 `visual_review.json`。
-4. Critical/Major 问题修复后才进入预览。自动闸门只验证可计算条件；打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕与节奏。按叙事需要保留反应时间；实际查看后使用 `python scripts/project_state.py review <project> --approve`，发现问题使用 `--reject --note`。复核清单绑定当前源文件和媒体指纹，修改输入后必须重新预览。
-5. 多镜头返工使用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录；处理后更新为 `resolved`。需要只重做变更镜头时使用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`，它只更新指纹变化或缓存缺失的镜头。
-6. 新机器或 renderer 变更后先运行 `python scripts/doctor.py`；它只检查本地环境，不安装依赖、不上传项目和密钥。
-7. 视觉复核批准且返工台账清空后运行 `python scripts/deliver.py <project>`；交付闸门会用本地 `ffprobe` 验证 MP4 的可播放性、尺寸、帧率和时长，并把结果写入 `delivery_report.json`。报告为 `FAIL` 时按 `blocking_issues` 修复。
-8. 选择 `style_preset: "simple-comic"` 做图片优先试片时，先用 `scripts/generate_simple_comic_motion_assets.py <project>` 生成明确标注的眨眼和源图嘴型变体，再用 `scripts/preview.py <project> --simple-comic` 渲染。没有变体时仍可出静态预览，但不能声称包含眼睛或嘴部表演；未经对齐审核的通用嘴型不得覆盖 master。
-5. 重复检查包括相邻 pose_tag、连续三镜景别/角度/构图标签和人物 PNG 哈希。标签或哈希不同不证明画面不同；合理重复写明 `repetition_exception`，不能改标签掩盖固定立绘复用。
-6. 交付说明实际完成阶段、测试/正式素材状态、时长、尺寸、输出绝对路径与剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
+1. 新机器先运行 `python scripts/doctor.py`；更换 renderer 时可追加 `<project> --renderer <external-renderer>` 检查指定环境。该脚本只检查本地环境，不安装依赖、不上传项目或密钥。
+2. 完成当前阶段的数据后，依次运行 `python scripts/pipeline.py validate <project>` 和 `python scripts/pipeline.py compile <project>`。compile 只整理导演决策，不替代剧情设计或图像生成。
+3. 正式角色参考图存在并核对后，将 `characters[].reference.status` 设为 `ready`；使用正式素材时将 `motion_plan.asset_mode` 设为 `production`。逐镜人工核对 master 对齐、背景补全和运动边界后，填写 `motion_plan.shots[].review.master_alignment`、`background_completed`、`motion_bounds_checked` 与 `notes`。fixture 只用于管线测试，不得标成正式素材。
+4. 素材就绪后运行 `python scripts/pipeline.py validate <project> --assets`，查看 `repetition_warnings`、重复角色图层错误和图像接触表。核对相邻人物姿势标签、连续三镜的景别/角度/构图标签及实际画面。标签重复会产生 warning，合理复用时在该镜头写入 `repetition_exception`；完全相同的人物 PNG 会触发资产校验错误，不能用 exception 绕过，应提供正确分层。标签或文件哈希的差异也不能证明画面真实不同。
+5. Critical/Major 问题修复后才预览。使用 `python scripts/preview.py <project> --renderer <external-renderer>`；单镜头可追加 `--shot <shot_id>`，输出默认为 `preview_<shot_id>.mp4`。预览会校验素材、运行质量闸门安全修正、再次校验、编译、prepare 并渲染；仅首次安装该 renderer 的依赖时追加 `--npm-install`。每次预览会把首/中/末帧放入 `<project>/visual-review/` 并写入 `visual_review.json`。使用 `style_preset: "simple-comic"` 时，预览前先运行 `scripts/generate_simple_comic_motion_assets.py <project>` 生成眨眼和嘴型变体，再追加 `--simple-comic`；没有变体时只能称为静态预览，未经对齐审核的通用嘴型不得覆盖 master。
+6. 打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕和节奏。按叙事需要保留反应时间；实际查看后运行 `python scripts/project_state.py review <project> --approve`，发现问题则用 `--reject --note`。清单绑定当前源文件和媒体指纹，修改输入后必须重新预览和复核。
+7. 多镜头返工用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录，处理后标为 `resolved`。只重做变化镜头时可用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`；它只更新指纹变化或缺失缓存的镜头，不替代最终全片预览。
+8. 视觉复核批准且返工台账清空后运行 `python scripts/deliver.py <project>`。交付闸门用本地 `ffprobe` 检查 MP4 可播放性、尺寸、帧率和时长；报告为 `FAIL` 时按 `blocking_issues` 修复。
+9. 交付说明实际完成的阶段、测试/正式素材状态、时长、尺寸、输出绝对路径和剩余问题。只通过校验不能声称已渲染；存在 MP4 也不等于完成视觉验收。
 
 缺少图像、配音或渲染能力时，保存已完成文件，列出具体缺项和恢复入口，继续完成不依赖缺项的工作。不得虚构资源、复核或成片成功。
 
@@ -67,7 +67,3 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 API Key、Token、密码不得写入项目 JSON、提示词、renderer/public、日志、交付包或上传网络。需要凭据时优先从本地环境变量或加密配置读取，且遵守用户仅限本地使用的约束。用户粘贴明文密钥时提示风险并指导改用本地配置，不用该明文密钥请求网络。配置帮助只询问本地文件路径，提供用户本地执行的命令；不兼容上述限制的适配器明确说明。
 
-
-## 共享素材库
-
-当用户复用共享素材库时，先读取 [共享素材库规范](references/asset-library.md)。`asset_id` 用于查找与追溯；现有项目 JSON 仍填写复制到项目内后的相对路径。
