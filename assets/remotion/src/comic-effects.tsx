@@ -26,9 +26,18 @@ export const ComicEffects = ({ events, frame, width, height }: { events: VisualE
       }
       if (e.effect_type === 'radial_burst') {
         const burstColor = e.color ?? '#f5c84c';
+        const burstSize = Math.max(1, size);
+        const mask = 'radial-gradient(circle, black 0%, black 56%, transparent 100%)';
         return <AbsoluteFill key={e.event_id} style={{
+          left: x * width - burstSize,
+          top: y * height - burstSize,
+          width: burstSize * 2,
+          height: burstSize * 2,
+          borderRadius: '50%',
           opacity,
-          background: `repeating-conic-gradient(from 0deg at ${x * 100}% ${y * 100}%, ${burstColor} 0deg 10deg, transparent 10deg 20deg)`,
+          background: `repeating-conic-gradient(from 0deg, ${burstColor} 0deg 10deg, transparent 10deg 20deg)`,
+          maskImage: mask,
+          WebkitMaskImage: mask,
         }} />;
       }
       if (['question', 'exclamation', 'ellipsis'].includes(e.effect_type)) {
