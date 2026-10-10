@@ -98,6 +98,7 @@ def build(project: Path) -> Path:
                     "end_frame": 21,
                     "intensity": 0.34,
                     "position": [0.39, 0.48],
+                    "size": 0.24,
                     "color": "#f0c64f"
                 },
                 {
