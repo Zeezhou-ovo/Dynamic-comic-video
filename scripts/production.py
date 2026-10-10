@@ -81,6 +81,7 @@ def render_payload(project,data,resolve,shot_id=None):
     shots=[]; fps=data['production_brief']['format']['fps']
     version=data['motion_plan']['version']
     capabilities={c['id']:c.get('capabilities',{'parts':[],'poses':[],'expressions':[]}) for c in data['characters']['characters']}
+    animation_shots={item['shot_id']:item for item in data.get('animation_system',{}).get('shots',[])}
     for s in data['motion_plan']['shots']:
         if shot_id and s['shot_id']!=shot_id: continue
         board=next(b for b in data['storyboard']['shots'] if b['id']==s['shot_id'])
@@ -89,8 +90,8 @@ def render_payload(project,data,resolve,shot_id=None):
         cues=[]
         for c in board.get('dialogue',[]):
             cue=dict(c)
-            cue['mouth_open_frames']=wav_timing(resolve(project,c['audio']),fps)[1] if c.get('audio') else []
-            cue['mouth_shape_frames']=wav_shapes(resolve(project,c['audio']),fps) if c.get('audio') else []
+            cue['mouth_open_frames']=wav_timing(resolve(project,c['audio']),fps)[1] if c.get('audio') else cue.get('mouth_open_frames', [])
+            cue['mouth_shape_frames']=wav_shapes(resolve(project,c['audio']),fps) if c.get('audio') else cue.get('mouth_shape_frames', [])
             cues.append(cue)
         motion_layers=[]
         for layer in s['layers']:
@@ -121,6 +122,8 @@ def render_payload(project,data,resolve,shot_id=None):
                 'fps':fps,
             })
         runtime_shot={**s,'layers':motion_layers,'character_performance':character_performance,'start_frame':0 if shot_id else s['start_frame'],'dialogue':cues}
+        if s['shot_id'] in animation_shots:
+            runtime_shot['animation']=animation_shots[s['shot_id']]
         if version != '0.4':
             runtime_shot.pop('camera',None)
         shots.append(runtime_shot)
