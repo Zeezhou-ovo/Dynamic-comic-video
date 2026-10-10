@@ -39,9 +39,12 @@ def _part_image(folder: Path, shot_index: int, character_id: str, part: str, sta
         draw.ellipse((cx - 56, 128, cx + 56, 240), fill=skin, outline="#172332", width=5)
         draw.arc((cx - 55, 122, cx + 55, 218), 185, 355, fill=spec["color"], width=12)
     elif part == "eyes":
-        if state == "blink":
+        if state in ("blink", "closed"):
             draw.line((cx - 31, 184, cx - 15, 184), fill="#172332", width=5)
             draw.line((cx + 15, 184, cx + 31, 184), fill="#172332", width=5)
+        elif state == "half":
+            draw.ellipse((cx - 29, 178, cx - 16, 190), fill="#172332")
+            draw.ellipse((cx + 16, 178, cx + 29, 190), fill="#172332")
         elif state == "surprised":
             draw.ellipse((cx - 32, 168, cx - 14, 198), fill="#172332")
             draw.ellipse((cx + 14, 168, cx + 32, 198), fill="#172332")
@@ -51,6 +54,10 @@ def _part_image(folder: Path, shot_index: int, character_id: str, part: str, sta
     elif part == "mouth":
         if state == "open":
             draw.ellipse((cx - 9, 211, cx + 9, 228), fill="#6f3039")
+        elif state == "small":
+            draw.ellipse((cx - 6, 213, cx + 6, 225), fill="#6f3039")
+        elif state == "wide":
+            draw.ellipse((cx - 13, 210, cx + 13, 229), fill="#6f3039")
         elif state == "happy":
             draw.arc((cx - 20, 202, cx + 20, 237), 10, 170, fill="#6f3039", width=5)
         else:
@@ -141,10 +148,12 @@ def build(project: Path) -> Path:
         dialogue = []
         if index in (0, 3):
             speaker = "lin" if index == 0 else "bo"
+            mouth_cycle = ("closed", "small", "open", "wide", "open", "small")
             dialogue = [{
                 "speaker": speaker,
                 "text": "Hey, take a look!" if speaker == "lin" else "That's a great idea!",
                 "start_frame": 2, "end_frame": duration - 2,
+                "mouth_shape_frames": [mouth_cycle[offset % len(mouth_cycle)] for offset in range(duration - 4)],
             }]
         characters = [
             {"character_id": "lin", "action": "speaks" if index == 0 else purpose,
@@ -200,14 +209,26 @@ def build(project: Path) -> Path:
                 rel = f"shots/{shot_id}/layers/{asset_path.name}"
                 state_assets = {}
                 if part == "eyes":
-                    blink = _part_image(folder, index, cid, part, "blink")
+                    half = _part_image(folder, index, cid, part, "half")
+                    closed = _part_image(folder, index, cid, part, "closed")
                     surprised = _part_image(folder, index, cid, part, "surprised")
-                    state_assets = {"blink": f"shots/{shot_id}/layers/{blink.name}", "expression:surprised": f"shots/{shot_id}/layers/{surprised.name}"}
+                    half_rel = f"shots/{shot_id}/layers/{half.name}"
+                    closed_rel = f"shots/{shot_id}/layers/{closed.name}"
+                    state_assets = {
+                        "open": rel, "half": half_rel, "closed": closed_rel, "blink": closed_rel,
+                        "expression:surprised": f"shots/{shot_id}/layers/{surprised.name}",
+                    }
                 if part == "mouth":
                     closed = asset_path
+                    small = _part_image(folder, index, cid, part, "small")
                     opened = _part_image(folder, index, cid, part, "open")
+                    wide = _part_image(folder, index, cid, part, "wide")
                     happy = _part_image(folder, index, cid, part, "happy")
-                    state_assets = {"closed": rel, "open": f"shots/{shot_id}/layers/{opened.name}", "expression:happy": f"shots/{shot_id}/layers/{happy.name}"}
+                    state_assets = {
+                        "closed": rel, "small": f"shots/{shot_id}/layers/{small.name}",
+                        "open": f"shots/{shot_id}/layers/{opened.name}", "wide": f"shots/{shot_id}/layers/{wide.name}",
+                        "expression:happy": f"shots/{shot_id}/layers/{happy.name}",
+                    }
                 if part == "right_arm":
                     pointing = _part_image(folder, index, cid, part, "point")
                     state_assets["pose:point"] = f"shots/{shot_id}/layers/{pointing.name}"

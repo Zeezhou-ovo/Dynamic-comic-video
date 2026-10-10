@@ -69,6 +69,8 @@ class V2AnimationPlanTests(unittest.TestCase):
         animated = payload["shots"][0]["animation"]
         self.assertEqual(animated["characters"][0]["pose_clips"][0]["action_pose"], "dash")
         self.assertEqual(animated["effects"][0]["effect_type"], "radial_burst")
+        dialogue = payload["shots"][0]["dialogue"][0]
+        self.assertEqual(dialogue["mouth_shape_frames"][:4], ["closed", "small", "open", "wide"])
 
     def test_pose_clip_must_fit_inside_shot(self):
         animation = read(self.project / "animation_system.json")

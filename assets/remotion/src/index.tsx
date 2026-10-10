@@ -54,6 +54,7 @@ type PropMotion = {
   roll_radius?: number;
   events: { event_id: string; kind: 'rock' | 'lean'; start_frame: number; end_frame: number; amplitude_deg: number; period_frames?: number; decay_frames?: number }[];
 };
+type MouthShape = 'closed' | 'small' | 'open' | 'round' | 'wide';
 type Layer = {
   layer_id: string;
   prop_motion?: PropMotion;
@@ -82,7 +83,7 @@ type DialogueCue = {
   end_frame: number;
   audio?: string;
   mouth_open_frames?: number[];
-  mouth_shape_frames?: string[];
+  mouth_shape_frames?: MouthShape[];
   emphasis?: 'normal' | 'important' | 'reveal' | 'punchline' | 'awkward' | 'surprise';
   beat_id?: string;
 };
@@ -287,7 +288,12 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
         pose = expressionAsset(frame, layer.layer_id, timeline.expression_events ?? []) ?? pose;
         if (acting?.speech) {
           if (performanceState) {
-            pose = performanceState.mouth.state === 'open' ? acting.speech.open_asset : acting.speech.closed_asset;
+            const shape = performanceState.mouth.state as MouthShape;
+            pose = shape === 'closed'
+              ? acting.speech.closed_asset
+              : shape === 'open'
+                ? acting.speech.open_asset
+                : acting.speech.shape_assets?.[shape] ?? acting.speech.open_asset;
           } else {
             pose = mouthAsset(frame, acting.speech, shot.dialogue ?? [], timeline.mouth_events ?? []);
           }

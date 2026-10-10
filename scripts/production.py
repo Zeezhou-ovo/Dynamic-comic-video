@@ -90,8 +90,8 @@ def render_payload(project,data,resolve,shot_id=None):
         cues=[]
         for c in board.get('dialogue',[]):
             cue=dict(c)
-            cue['mouth_open_frames']=wav_timing(resolve(project,c['audio']),fps)[1] if c.get('audio') else []
-            cue['mouth_shape_frames']=wav_shapes(resolve(project,c['audio']),fps) if c.get('audio') else []
+            cue['mouth_open_frames']=wav_timing(resolve(project,c['audio']),fps)[1] if c.get('audio') else cue.get('mouth_open_frames', [])
+            cue['mouth_shape_frames']=wav_shapes(resolve(project,c['audio']),fps) if c.get('audio') else cue.get('mouth_shape_frames', [])
             cues.append(cue)
         motion_layers=[]
         for layer in s['layers']:
