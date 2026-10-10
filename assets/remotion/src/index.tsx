@@ -72,7 +72,7 @@ type Layer = {
     pivot: [number, number];
     keys: Key[];
     easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
-    speech?: { speaker: string; closed_asset: string; open_asset: string; shape_assets?: Partial<Record<'small' | 'round' | 'wide', string>> };
+    speech?: { speaker: string; closed_asset: string; open_asset: string; shape_assets?: Partial<Record<MouthShape, string>> };
     poses?: { frame: number; asset: string }[];
   };
 };
