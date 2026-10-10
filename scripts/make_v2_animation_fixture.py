@@ -37,10 +37,10 @@ def build(project: Path) -> Path:
     first = motion["shots"][0]
     first["camera"] = {
         "type": "push_in",
-        "focus_target": {"id": "lin", "x": 300, "y": 290},
+        "focus_target": {"id": "characters", "x": 480, "y": 270},
         "from": {"x": 480, "y": 270, "zoom": 1.0},
         "to": {"x": 430, "y": 270, "zoom": 1.12},
-        "screen_target": {"x": 0.45, "y": 0.54},
+        "screen_target": {"x": 0.5, "y": 0.5},
         "easing": "easeInOut",
         "parallax_enabled": True
     }
