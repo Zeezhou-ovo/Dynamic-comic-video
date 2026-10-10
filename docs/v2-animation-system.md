@@ -96,6 +96,7 @@ The synthetic V2 action fixture from `scripts/make_v2_animation_fixture.py` exer
 - [x] [Run #106](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38039480954) passed after the status documentation update; its V2 artifact was 691,422 bytes.
 - [x] [Run #108](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38040285417) passed validation, Python/Node checks, prepare, all fixture renders, and artifact uploads. The V2 artifact is ID `11665144790` (651,600 bytes).
 - [x] [Run #112](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38041893306) passed Python/Node checks, fixture validation, renderer preparation, the V2 Remotion render, and all other fixture jobs. The V2 artifact is ID `11665369145` (654,973 bytes); its fixture exercises the authored mouth/eye states.
+- [x] [Run #113](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38042291297) passed `validate`, Python/Node checks, renderer preparation, all fixture renders, and artifact uploads. The V2 artifact is ID `11665379592` (655,906 bytes).
 - [x] Visual review of Run #108 checked anticipation, dash, effect timing, camera framing, and canvas coverage. The radial burst is now masked to its authored local size; the character action remains readable.
 
 Run #103 exposed an animation-test fixture mismatch: the camera-only fixture contained no characters. Run #104 exposed a camera framing issue that could reveal the background edge. Both were fixed. Visual review of the earlier artifact also found that radial burst filled the whole frame; the effect is now bounded around its authored center.
@@ -104,36 +105,35 @@ These assets are synthetic and labeled as a pipeline fixture. The visual review 
 
 ### M2 — Character Asset Standard (in progress)
 
-M2 establishes a reusable art/rig contract and completes one pilot character before the standard is copied to the rest of the cast.
+The user-uploaded seven-character reference set is stored in the private [media asset library](https://github.com/Zeezhou-ovo/media-asset-library/tree/main/characters/journalism-communication-main-cast). Each character now has a neutral four-pose reference sheet: standing, walking, pointing, and arms crossed. The sheets use the uploaded manga style and keep the same neutral face across poses. Expression variants are intentionally deferred. These are pose references, not separated, transparent rig parts.
 
-**Pilot:** `lin` / 林岚 from `examples/library/characters.json`. Its reference status remains `planned`; the production reference and art pack have not been created or approved.
+**Pilot:** 唐可可 / `character-cardigan-girl-001` from the user-provided cast. Use her uploaded reference and pose sheet to validate the actual identity and rig contract. The synthetic `lin` / 林岚 example remains a runtime fixture only and is not production character art.
+
+**Current approved art scope**
+
+- Poses: `idle`, `walk`, `point`, `arms_crossed`, all with a neutral face.
+- Expression, mouth, eye, and smear art: deferred; do not add these variants to the current art pack.
 
 **Identity and rig contract**
 
-- Keep one identity-only reference with front, three-quarter, and profile views. Record 3–5 stable visual anchors for face, hair, clothing, proportions, and distinctive features.
+- Keep the uploaded character reference as the source of truth for front, three-quarter, and profile views. Record 3–5 stable visual anchors for face, hair, clothing, proportions, and distinctive features.
 - Use the existing `characters.json` identity/capability fields and `character_assets.schema.json` manifest. Declare one `reference_size`, `root_anchor`, required root/body/face anchors, optional head/eyes/mouth/hand anchors, and normalized bounds in the `normalized-0-to-1` coordinate system.
 - Start with separate `body`, `head`, `eyes`, `mouth`, `left_arm`, and `right_arm` parts. Add hair as a separate part only when a shot needs it to move independently.
 - Use transparent PNG or WebP part assets. Keep each part's pixel size, anchor, pivot, and transparent padding consistent across its state variants. Do not bake in a background, ground shadow, or other character parts.
-- Keep all asset references relative to the project root and use `state_assets` for named variants. Use `pose:<name>` variants on the body and affected limbs; keep expression variants on face parts so pose and expression can combine.
+- Keep all asset references relative to the project root and use `state_assets` for named variants. Use `pose:<name>` variants on the body and affected limbs; keep future expression variants on face parts so pose and expression can combine.
 
-**Pilot state inventory**
+**Runtime capability, future art assets**
 
-- Poses: `idle`, `talk`, `point`, `arms_crossed`, `sitting`, `tired`, `shocked`, `dash`.
-- Expressions: `neutral`, `happy`, `angry`, `confused`, `deadpan`.
-- Mouth art: `closed`, `small`, `open`, `wide`.
-- Eye art: `open`, `half`, `closed`.
-- Smear art is optional and remains outside the required set until the renderer supports it.
-
-The four mouth shapes and three eye states define the target art pack. Runtime now maps `mouth_shape_frames` from WAV analysis or authored storyboard cues to `closed`, `small`, `open`, and `wide` mouth assets (`round` remains supported for compatibility). Eye layers default to `open`; a blink event passes through `half` and `closed` states and resolves the matching `state_assets`, with a fallback for legacy `blink` assets. The deterministic Node checks and Run #112 fixture render cover these mappings. This completes runtime support only: the fixture art is synthetic, and the Lin production art pack remains pending review.
+The runtime maps `mouth_shape_frames` from WAV analysis or authored storyboard cues to `closed`, `small`, `open`, and `wide` mouth assets (`round` remains supported). Eye layers default to `open`; a blink event passes through `half` and `closed` states, with a fallback for legacy `blink` assets. Deterministic Node checks and the V2 fixture render cover these mappings. This confirms runtime support only; no mouth or eye variants are included in the current production art.
 
 **Pilot acceptance**
 
-1. All parts and state variants align to the same declared rig, with no visible seams, drift, or accidental cropping.
-2. The identity anchors remain recognizable across the reference and representative pose/expression combinations.
+1. The four neutral poses align to the same declared rig, with no visible seams, drift, or accidental cropping.
+2. The identity anchors remain recognizable across the uploaded reference and four pose states.
 3. The manifest validates, every referenced asset exists, and a representative Remotion render has been visually reviewed.
-4. Set `characters[].reference.status` to `ready` only after the reference and assembled pilot states are reviewed.
+4. Set `characters[].reference.status` to `ready` only after the pilot rig and render are reviewed.
 
-M2 remains in progress until the Lin pilot art pack passes this checklist.
+M2 remains in progress until the pilot character is rigged and its representative render passes this checklist.
 
 ### M3 — Animation Director
 
