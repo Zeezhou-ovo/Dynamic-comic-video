@@ -83,8 +83,8 @@ V2 继续复用 V1 已有的 Camera、Character、Performance、Scene Graph 与�
 - [x] Pose System 基础运行时
 - [x] Effect System 基础运行时
 - [x] animation_system 0.1 Schema
-- [ ] runtime tests
-- [ ] renderer integration
+- [x] runtime tests written (execution pending CI)
+- [x] renderer integration (Scene Graph + legacy Layer renderer)
 
 ### M2 — Character Asset Standard
 
