@@ -88,13 +88,14 @@ V2 继续复用 V1 已有的 Camera、Character、Performance、Scene Graph 与�
 
 ### M1.5 — V2 technical fixture
 
-The synthetic V2 action fixture from `scripts/make_v2_animation_fixture.py` exercises anticipation, dash pose, translation, squash/stretch, rotation, speed lines, radial burst, screen shake, flash, and a camera push-in.
+The synthetic V2 action fixture from `scripts/make_v2_animation_fixture.py` exercises anticipation, dash pose, translation, squash/stretch, rotation, speed lines, radial burst, screen shake, flash, camera push-in, four mouth shapes, and three eye states.
 
 - [x] CI validates the fixture with `validate --assets` and prepares the V2 renderer.
 - [x] Remotion renders the V2 fixture and uploads `v2-limited-animation-video-fixture`.
 - [x] [Run #105](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38039148329) passed the initial end-to-end pipeline.
 - [x] [Run #106](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38039480954) passed after the status documentation update; its V2 artifact was 691,422 bytes.
 - [x] [Run #108](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38040285417) passed validation, Python/Node checks, prepare, all fixture renders, and artifact uploads. The V2 artifact is ID `11665144790` (651,600 bytes).
+- [x] [Run #112](https://github.com/Zeezhou-ovo/Dynamic-comic-video/actions/runs/38041893306) passed Python/Node checks, fixture validation, renderer preparation, the V2 Remotion render, and all other fixture jobs. The V2 artifact is ID `11665369145` (654,973 bytes); its fixture exercises the authored mouth/eye states.
 - [x] Visual review of Run #108 checked anticipation, dash, effect timing, camera framing, and canvas coverage. The radial burst is now masked to its authored local size; the character action remains readable.
 
 Run #103 exposed an animation-test fixture mismatch: the camera-only fixture contained no characters. Run #104 exposed a camera framing issue that could reveal the background edge. Both were fixed. Visual review of the earlier artifact also found that radial burst filled the whole frame; the effect is now bounded around its authored center.
@@ -123,7 +124,7 @@ M2 establishes a reusable art/rig contract and completes one pilot character bef
 - Eye art: `open`, `half`, `closed`.
 - Smear art is optional and remains outside the required set until the renderer supports it.
 
-The four mouth shapes and three eye states define the target art pack. The current V2 character runtime selects binary closed/open mouth states and blink; small/wide mouth selection and half/closed eye selection need runtime mapping before those variants can be used as production capabilities.
+The four mouth shapes and three eye states define the target art pack. Runtime now maps `mouth_shape_frames` from WAV analysis or authored storyboard cues to `closed`, `small`, `open`, and `wide` mouth assets (`round` remains supported for compatibility). Eye layers default to `open`; a blink event passes through `half` and `closed` states and resolves the matching `state_assets`, with a fallback for legacy `blink` assets. The deterministic Node checks and Run #112 fixture render cover these mappings. This completes runtime support only: the fixture art is synthetic, and the Lin production art pack remains pending review.
 
 **Pilot acceptance**
 
