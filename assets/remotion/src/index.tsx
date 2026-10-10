@@ -32,6 +32,8 @@ import {
   shakeOffset,
 } from './runtime/performance-controller.mjs';
 import { ComicEffects, VisualEvent } from './comic-effects';
+import { evaluatePoseTrack } from './runtime/pose-controller.mjs';
+import { evaluateEffects } from './runtime/effect-controller.mjs';
 
 type Depth = 'foreground' | 'character' | 'midground' | 'background' | 'sky';
 type Key = { frame: number; x: number; y: number; scale?: number; rotation: number; opacity: number };
@@ -114,6 +116,18 @@ type ShotPlan = {
     visual_events?: VisualEvent[];
     sound_events?: { event_id: string; asset?: string; start_frame: number; end_frame: number; source_start_frame?: number; volume?: number }[];
   };
+  animation?: {
+    shot_id: string;
+    characters?: {
+      character_id: string;
+      pose_clips: {
+        clip_id: string; start_frame: number; anticipation_end_frame?: number; action_end_frame?: number;
+        hold_end_frame?: number; end_frame: number; base_pose: string; action_pose: string; smear?: boolean;
+        rotation_deg?: number; translate?: {x: number; y: number}; squash_stretch?: {x: number; y: number};
+      }[];
+    }[];
+    effects?: VisualEvent[];
+  };
 };
 type RenderData = {
   version?: string;
@@ -160,30 +174,46 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
     viewport: data.format,
   });
   const caption = selectSubtitleCue(shot.dialogue, frame, data.presentation?.subtitle?.hold_frames ?? 0);
+  const v2Effects = evaluateEffects(frame, shot.animation?.effects ?? []);
+  const v2Shake = v2Effects.screenShakeX;
 
   return (
-    <AbsoluteFill style={{ overflow: 'hidden' }}>
+    <AbsoluteFill style={{ overflow: 'hidden', transform: v2Shake ? `translate(${v2Shake}px, 0px)` : undefined }}>
       {sceneGraph.nodes.map(node => {
         const depth = node.depth as Depth;
         const depthTransform = evaluateLayerTransform(camera, depth, data.format);
         if (node.nodeType === 'character') {
           const state = characterStates.get(node.id);
-          const root = state?.root ?? { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 };
+          const poseTrack = shot.animation?.characters?.find(item => item.character_id === node.id)?.pose_clips ?? [];
+          const poseState = evaluatePoseTrack(frame, poseTrack);
+          const baseRoot = state?.root ?? { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 };
+          const root = {
+            x: baseRoot.x + (poseState?.root.x ?? 0),
+            y: baseRoot.y + (poseState?.root.y ?? 0),
+            scale: baseRoot.scale,
+            rotation: baseRoot.rotation + (poseState?.root.rotation ?? 0),
+            opacity: baseRoot.opacity,
+            scaleX: poseState?.root.scaleX ?? 1,
+            scaleY: poseState?.root.scaleY ?? 1,
+          };
+          const v2State = poseState?.pose
+            ? {...state, states: {...(state?.states ?? {}), pose: `pose:${poseState.pose}`}}
+            : state;
           return (
             <AbsoluteFill key={node.id} style={{ transformOrigin: '0 0', transform: depthTransform.transform }}>
               <div style={{
                 position: 'absolute', left: node.x + root.x, top: node.y + root.y,
                 width: node.referenceSize.width, height: node.referenceSize.height,
                 transformOrigin: `${node.rootAnchor[0] * 100}% ${node.rootAnchor[1] * 100}%`,
-                transform: `scale(${node.scaleX * root.scale}, ${node.scaleY * root.scale}) rotate(${root.rotation}deg)`,
+                transform: `scale(${node.scaleX * root.scale * root.scaleX}, ${node.scaleY * root.scale * root.scaleY}) rotate(${root.rotation}deg)`,
                 opacity: root.opacity,
               }}>
                 {node.parts.map(part => {
                   const acting = { part: part.partId, pivot: part.pivot, keys: [] };
-                  const local = evaluateCharacterPart(frame, acting, state);
+                  const local = evaluateCharacterPart(frame, acting, v2State);
                   const asset = resolveCharacterLayerAsset({
                     asset: part.asset, state_assets: part.state_assets, acting,
-                  }, state, frame);
+                  }, v2State, frame);
                   return (
                     <Img key={part.id} src={staticFile(sceneAssetLoader!.resolve(asset))} style={{
                       position: 'absolute', left: part.x + local.x, top: part.y + local.y,
@@ -206,7 +236,7 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
           </AbsoluteFill>
         );
       })}
-      <ComicEffects events={shot.timeline?.visual_events ?? []} frame={frame} width={data.format.width} height={data.format.height} />
+      <ComicEffects events={[...(shot.timeline?.visual_events ?? []), ...(shot.animation?.effects ?? [])]} frame={frame} width={data.format.width} height={data.format.height} />
       {caption && (
         <div style={{
           position: 'absolute', zIndex: 1000, bottom: '7%', left: '6%', right: '6%', textAlign: 'center',
