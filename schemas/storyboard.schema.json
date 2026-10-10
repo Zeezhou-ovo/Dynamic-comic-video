@@ -109,6 +109,10 @@
                 "text": {"type": "string", "minLength": 1},
                 "audio": {"type":"string","pattern":"^(?!/)(?!.*\\.\\.)(?!.*:)(?!.*\\\\).+\\.wav$"},
                 "timing_source": {"enum":["estimated","audio"]},
+                "mouth_shape_frames": {
+                  "type": "array",
+                  "items": {"enum": ["closed", "small", "open", "wide", "round"]}
+                },
                 "start_frame": {"type": "integer", "minimum": 0},
                 "end_frame": {"type": "integer", "minimum": 1}
               },
