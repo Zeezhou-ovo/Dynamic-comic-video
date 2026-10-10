@@ -259,8 +259,9 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
   const characterStates = evaluateShotCharacters(shot, frame);
   const caption = selectSubtitleCue(shot.dialogue, frame, data.presentation?.subtitle?.hold_frames ?? 0);
   const timeline = shot.timeline ?? {};
-  const visualEvents = timeline.visual_events ?? [];
-  const shake = shakeOffset(frame, visualEvents);
+  const visualEvents = [...(timeline.visual_events ?? []), ...(shot.animation?.effects ?? [])];
+  const v2Effects = evaluateEffects(frame, shot.animation?.effects ?? []);
+  const shake = shakeOffset(frame, timeline.visual_events ?? []) + v2Effects.screenShakeX;
 
   return (
     <AbsoluteFill style={{ overflow: 'hidden' }}>
@@ -274,8 +275,15 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
         );
         const acting = layer.acting;
         const performanceState = layer.character_id ? characterStates.get(layer.character_id) : undefined;
-        const local = evaluateCharacterPart(frame, acting, performanceState);
-        let pose = resolveCharacterLayerAsset(layer, performanceState, frame);
+        const poseTrack = layer.character_id
+          ? shot.animation?.characters?.find(item => item.character_id === layer.character_id)?.pose_clips ?? []
+          : [];
+        const poseState = evaluatePoseTrack(frame, poseTrack);
+        const v2State = poseState?.pose
+          ? {...performanceState, states: {...(performanceState?.states ?? {}), pose: `pose:${poseState.pose}`}}
+          : performanceState;
+        const local = evaluateCharacterPart(frame, acting, v2State);
+        let pose = resolveCharacterLayerAsset(layer, v2State, frame);
         pose = expressionAsset(frame, layer.layer_id, timeline.expression_events ?? []) ?? pose;
         if (acting?.speech) {
           if (performanceState) {
@@ -287,7 +295,16 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
         const prop = propTransform(frame, drivingPropMotion(layer, shot.layers));
         const region = layer.region;
         const depthTransform = evaluateLayerTransform(camera, layer.depth ?? 'character', data.format);
-        const root = performanceState?.root;
+        const baseRoot = performanceState?.root;
+        const root = baseRoot || poseState ? {
+          x: (baseRoot?.x ?? 0) + (poseState?.root.x ?? 0),
+          y: (baseRoot?.y ?? 0) + (poseState?.root.y ?? 0),
+          scale: baseRoot?.scale ?? 1,
+          rotation: (baseRoot?.rotation ?? 0) + (poseState?.root.rotation ?? 0),
+          opacity: baseRoot?.opacity ?? 1,
+          scaleX: poseState?.root.scaleX ?? 1,
+          scaleY: poseState?.root.scaleY ?? 1,
+        } : undefined;
 
         return (
           <AbsoluteFill
@@ -298,7 +315,7 @@ const Shot = ({ shot }: { shot: ShotPlan }) => {
             <AbsoluteFill
               style={{
                 transformOrigin: root ? `${performanceState?.rootPivot[0] * 100}% ${performanceState?.rootPivot[1] * 100}%` : '50% 50%',
-                transform: root ? `translate(${root.x}px, ${root.y}px) rotate(${root.rotation}deg) scale(${root.scale})` : undefined,
+                transform: root ? `translate(${root.x}px, ${root.y}px) rotate(${root.rotation}deg) scale(${root.scale * root.scaleX}, ${root.scale * root.scaleY})` : undefined,
                 opacity: root?.opacity,
               }}
             >
