@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from make_camera_parallax_fixture import build
+from make_character_performance_fixture import build
 from pipeline import local, read, save, validate
 from production import render_payload
 
