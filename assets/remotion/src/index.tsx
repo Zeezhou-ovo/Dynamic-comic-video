@@ -178,7 +178,8 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
   const v2Shake = v2Effects.screenShakeX;
 
   return (
-    <AbsoluteFill style={{ overflow: 'hidden', transform: v2Shake ? `translate(${v2Shake}px, 0px)` : undefined }}>
+    <AbsoluteFill style={{ overflow: 'hidden' }}>
+      <AbsoluteFill style={{ transform: v2Shake ? `translate(${v2Shake}px, 0px)` : undefined }}>
       {sceneGraph.nodes.map(node => {
         const depth = node.depth as Depth;
         const depthTransform = evaluateLayerTransform(camera, depth, data.format);
@@ -236,6 +237,7 @@ const SceneShot = ({ shot }: { shot: ShotPlan }) => {
           </AbsoluteFill>
         );
       })}
+      </AbsoluteFill>
       <ComicEffects events={[...(shot.timeline?.visual_events ?? []), ...(shot.animation?.effects ?? [])]} frame={frame} width={data.format.width} height={data.format.height} />
       {caption && (
         <div style={{
