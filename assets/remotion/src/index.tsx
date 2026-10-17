@@ -84,10 +84,12 @@ type DialogueCue = {
   emphasis?: 'normal' | 'important' | 'reveal' | 'punchline' | 'awkward' | 'surprise';
   beat_id?: string;
 };
+type PerformanceMode = 'limited-animation' | 'fixed-camera-micro' | 'sequential-comic' | 'cutout-comedy';
 type ShotPlan = {
   shot_id: string;
   start_frame: number;
   duration_frames: number;
+  performance?: { mode?: PerformanceMode; intent?: string; static_reason?: string; reviewed?: boolean };
   shot_intent?: string;
   camera_intent?: string;
   framing?: 'wide' | 'medium' | 'close_up';
@@ -103,7 +105,7 @@ type ShotPlan = {
     root_pivot?: [number, number];
     root_easing?: 'linear' | 'easeIn' | 'easeOut' | 'easeInOut';
     root_keys?: { frame: number; x: number; y: number; scale: number; rotation: number; opacity: number }[];
-    events: { event_id: string; preset: 'idle' | 'talk' | 'nod' | 'shake_head' | 'point' | 'raise_hand' | 'blink' | 'small_bounce'; start_frame: number; peak_frame: number; settle_frame: number; end_frame: number; part?: string; amplitude?: number; easing?: string }[];
+    events: { event_id: string; preset: 'idle' | 'talk' | 'nod' | 'shake_head' | 'point' | 'raise_hand' | 'blink' | 'small_bounce' | 'head_forward' | 'lean_back' | 'body_shake' | 'double_take'; start_frame: number; peak_frame: number; settle_frame: number; end_frame: number; part?: string; amplitude?: number; easing?: string }[];
     capabilities: { parts: string[]; poses: string[]; expressions: string[] };
   }[];
   layers: Layer[];
@@ -136,6 +138,7 @@ function evaluateShotCharacters(shot: ShotPlan, frame: number) {
       characterId: performance.character_id,
       performance,
       capabilities: performance.capabilities,
+      performanceMode: shot.performance?.mode,
       absoluteFrame: shot.start_frame + frame,
       localFrame: frame,
       startFrame: shot.start_frame,
