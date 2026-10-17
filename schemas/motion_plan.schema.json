@@ -30,7 +30,7 @@
           "performance": {
             "type": "object",
             "properties": {
-              "mode": {"enum": ["limited-animation", "fixed-camera-micro", "sequential-comic"]},
+              "mode": {"enum": ["limited-animation", "fixed-camera-micro", "sequential-comic", "cutout-comedy"]},
               "intent": {"type": "string", "minLength": 1},
               "static_reason": {"type": "string", "minLength": 1},
               "reviewed": {"type": "boolean"}
@@ -354,7 +354,7 @@
       "type": "object",
       "properties": {
         "event_id": {"type": "string", "minLength": 1},
-        "preset": {"enum": ["idle", "talk", "nod", "shake_head", "point", "raise_hand", "blink", "small_bounce"]},
+        "preset": {"enum": ["idle", "talk", "nod", "shake_head", "point", "raise_hand", "blink", "small_bounce", "head_forward", "lean_back", "body_shake", "double_take"]},
         "start_frame": {"type": "integer", "minimum": 0},
         "peak_frame": {"type": "integer", "minimum": 0},
         "settle_frame": {"type": "integer", "minimum": 0},
