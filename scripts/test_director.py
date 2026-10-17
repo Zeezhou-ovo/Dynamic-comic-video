@@ -64,6 +64,18 @@ class DirectorTests(unittest.TestCase):
         confused = map_reaction('confused', character, source, board, 22, performance_mode='cutout-comedy')
         self.assertEqual(confused['events'][0]['preset'], 'double_take')
 
+
+    def test_cutout_head_action_falls_back_to_body_when_head_part_is_missing(self):
+        plan, data = self._load(self.comedy)
+        source = next(item for item in data['motion_plan']['shots'] if item['shot_id'] == 'shot_004')
+        source['performance']['mode'] = 'cutout-comedy'
+        board = next(item for item in data['storyboard']['shots'] if item['id'] == 'shot_004')
+        character = next(item for item in data['characters']['characters'] if item['id'] == 'bo')
+        character['capabilities']['parts'] = [part for part in character['capabilities']['parts'] if part != 'head']
+        mapped = map_reaction('confused', character, source, board, 22, performance_mode='cutout-comedy')
+        self.assertEqual(mapped['events'][0]['preset'], 'double_take')
+        self.assertEqual(mapped['events'][0]['part'], 'body')
+
     def test_compiled_director_timeline_is_authoritative_and_contiguous(self):
         plan, data = self._load(self.comedy)
         rendered = compile_director_plan(plan, data)
