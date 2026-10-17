@@ -190,6 +190,7 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
             raise ValueError('director_plan references unknown source shot '+source_id)
         source_board = board_by_id[source_id]
         source_motion = motion_by_id[source_id]
+        source_mode = (source_motion.get('performance') or {}).get('mode')
         beats = entry['beats']
         default_visible = [item['character_id'] for item in source_board['characters']]
         if phase4:
@@ -217,7 +218,9 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
         requested_camera = entry['camera_intent']
         reaction_beat = next((beat for beat in beats if beat['kind'] == 'reaction'), None)
         if reaction_beat and requested_camera == 'static':
-            requested_camera = rules()['reactions'][reaction_beat['reaction']]['camera']
+            reaction_camera_rule = (rules().get('cutout_comedy', {}).get('reactions', {}).get(reaction_beat['reaction'])
+                                    if source_mode == 'cutout-comedy' else None) or rules()['reactions'][reaction_beat['reaction']]
+            requested_camera = reaction_camera_rule['camera']
         resolved = resolve_shot_intent(shot_intent, requested_camera, entry['emphasis'])
         if entry['emphasis'] == 'punchline' and entry['camera_intent'] == 'static':
             resolved = resolve_shot_intent(entry['shot_intent'], 'subtle_push', entry['emphasis'])
@@ -282,7 +285,6 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                 target = beat['reaction_target']
                 if target not in visible or target not in character_ids:
                     raise ValueError('reaction_target is not visible in source shot '+source_id)
-                source_mode = (source_motion.get('performance') or {}).get('mode')
                 reaction_rule = (rules().get('cutout_comedy', {}).get('reactions', {}).get(beat['reaction'])
                                  if source_mode == 'cutout-comedy' else None) or rules()['reactions'][beat['reaction']]
                 hold = beat['reaction_hold'] or reaction_rule['hold_frames']
@@ -348,7 +350,6 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
             character = _manifest_for(chars, character_id)
             character_intents = [beat.get('performance_intent', beat.get('intent')) for beat in beats
                                  if beat['kind'] == 'dialogue' and beat.get('speaker') == character_id]
-            source_mode = (source_motion.get('performance') or {}).get('mode')
             performance_config = dict(rules()['performance_intents'])
             if source_mode == 'cutout-comedy':
                 performance_config.update(rules().get('cutout_comedy', {}).get('performance_intents', {}))
