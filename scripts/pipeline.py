@@ -252,11 +252,12 @@ def validate(project, assets=False, shot_id=None):
         cursor+=item['duration_frames']
         if not shot: continue
         if item['duration_frames']!=shot['duration_frames']: errors.append('Duration mismatch '+sid)
-        sequential=(item.get('performance') or {}).get('mode')=='sequential-comic'
-        if motion['version'] in ('0.3','0.4') and (item.get('performance') or {}).get('mode') not in ('sequential-comic','fixed-camera-micro'):
+        performance_mode=(item.get('performance') or {}).get('mode')
+        sequential=performance_mode in ('sequential-comic','cutout-comedy')
+        if motion['version'] in ('0.3','0.4') and performance_mode not in ('sequential-comic','fixed-camera-micro','cutout-comedy'):
             errors.append('motion_plan '+motion['version']+' requires a fixed comic performance mode '+sid)
         if sequential and ('dialogue' not in shot or shot.get('transition')!='cut'):
-            errors.append('Sequential comic requires dialogue (empty for silent shots) and cut transition '+sid)
+            errors.append('Sequential/cutout comic requires dialogue (empty for silent shots) and cut transition '+sid)
         caption_end=0
         for cue in shot.get('dialogue',[]):
             if cue['start_frame']<caption_end or not cue['start_frame']<cue['end_frame']<=shot['duration_frames']:
