@@ -38,6 +38,14 @@ def _manifest_for(characters, character_id):
     return next(item for item in characters if item['id'] == character_id)
 
 
+def _event_part(preset, capabilities):
+    """Resolve a preset's preferred rendered part with safe cutout fallbacks."""
+    if preset in ('head_forward', 'double_take'):
+        parts = set(capabilities.get('parts', []))
+        return 'head' if 'head' in parts else ('body' if 'body' in parts else None)
+    return rules()['event_part'].get(preset)
+
+
 def _event(event_id, preset, start, duration, part=None):
     # Leave the last frame available for deterministic settle and respect the
     # Phase 2 event envelope's ordered prepare / peak / settle / end phases.
@@ -82,7 +90,7 @@ def map_reaction(kind, character, source_motion, source_board, duration, start_f
     if preset and preset in ('point', 'raise_hand') and not ({'arm', 'left_arm', 'right_arm'} & set(capabilities.get('parts', []))):
         preset = None
     events = [_event(f'reaction_{kind}', preset, start_frame, duration,
-                     rules()['event_part'].get(preset))] if preset and duration > start_frame else []
+                     _event_part(preset, capabilities))] if preset and duration > start_frame else []
     amplitude = {'subtle': .55, 'medium': .75, 'strong': 1.0}[strength]
     for event in events:
         event['amplitude'] = amplitude
@@ -379,7 +387,7 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                         performer['events'].append(_event(
                             f'{cue["beat_id"]}_{gesture}', gesture,
                             cue['start_frame'], duration_frames,
-                            rules()['event_part'].get(gesture)))
+                            _event_part(gesture, character.get('capabilities', {}))))
             if policy:
                 for event in performer['events']:
                     event['amplitude'] = event.get('amplitude', 1) * policy['performance']['event_strength']
