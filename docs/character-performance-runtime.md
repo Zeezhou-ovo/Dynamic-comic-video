@@ -38,7 +38,9 @@ Parts are the intersection of this manifest and the storyboard/rendered layers. 
 }
 ```
 
-Event frames are local to the shot. Supported presets: `idle`, `talk`, `nod`, `shake_head`, `point`, `raise_hand`, `blink`, and `small_bounce`. Events use a prepare-to-peak hold-to-settle envelope. Character-level `pose` and `expression` names map to `pose:<name>` and `expression:<name>` keys on the appropriate part layer.
+Event frames are local to the shot. Supported presets: `idle`, `talk`, `nod`, `shake_head`, `point`, `raise_hand`, `blink`, `small_bounce`, `head_forward`, `lean_back`, `body_shake`, and `double_take`. Events use a prepare-to-peak hold-to-settle envelope. Character-level `pose` and `expression` names map to `pose:<name>` and `expression:<name>` keys on the appropriate part layer.
+
+When a shot uses `performance.mode: "cutout-comedy"`, implicit idle/listener breathing and speaker body bob are disabled; mouths and explicitly authored events still run. This makes a hold genuinely static until a declared event changes it.
 
 Layer-level `acting.keys` remain supported for 0.3/0.4 plans. They interpolate a part's local `x`, `y`, `rotation`, `scale`, and `opacity`, then combine with the matching generated performance motion.
 
