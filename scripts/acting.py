@@ -9,8 +9,9 @@ def check_acting(shot, production, assets, roles):
     errors=[]; active=any(e.get('pose_asset') for e in timeline.get('expression_events',[])) or any(l.get('prop_motion') for l in shot['layers'])
     sid=shot['shot_id']; perf=shot.get('performance')
     if not perf: errors.append('Missing performance plan '+sid)
-    micro=(perf or {}).get('mode')=='fixed-camera-micro'
-    fixed=micro or (perf or {}).get('mode')=='sequential-comic'
+    mode=(perf or {}).get('mode')
+    micro=mode=='fixed-camera-micro'
+    fixed=mode in ('fixed-camera-micro','sequential-comic','cutout-comedy')
     for layer in shot['layers']:
         if fixed and any(layer[t]!={'x':0,'y':0,'scale':1} for t in ('from','to')):
             errors.append('Fixed-camera mode requires identity layer framing '+sid+'/'+layer['layer_id'])
@@ -69,6 +70,7 @@ def check_acting(shot, production, assets, roles):
 PRESET_PARTS = {
     'idle': ('body',), 'talk': ('body', 'mouth'), 'nod': ('head',),
     'shake_head': ('head',), 'blink': ('eyes',), 'small_bounce': ('body',),
+    'lean_back': ('body',), 'body_shake': ('body',),
 }
 
 
@@ -143,7 +145,15 @@ def check_character_performance(motion_shot, board_shot, characters, plan_versio
                 errors.append('Invalid character event phases '+sid+'/'+cid+'/'+event['event_id'])
             preset = event['preset']
             required = PRESET_PARTS.get(preset, ())
-            if preset in ('point', 'raise_hand'):
+            if preset in ('head_forward', 'double_take'):
+                target = event.get('part')
+                if target and target not in ('head', 'body'):
+                    errors.append(preset+' preset part must be head or body '+sid+'/'+cid+'/'+target)
+                elif target and not has_part(target):
+                    errors.append(preset+' preset requires rendered '+target+' part '+sid+'/'+cid+'/'+target)
+                elif not target and not (has_part('head') or has_part('body')):
+                    errors.append(preset+' preset requires a rendered head or body part '+sid+'/'+cid)
+            elif preset in ('point', 'raise_hand'):
                 target = event.get('part')
                 if target and target not in ('right_arm', 'left_arm', 'arm'):
                     errors.append(preset+' preset part must be an arm '+sid+'/'+cid+'/'+target)
