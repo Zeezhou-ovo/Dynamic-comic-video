@@ -127,8 +127,6 @@ def build(project: Path) -> Path:
                 "start_frame": start,
                 "end_frame": end,
             }
-            if index == 3:
-                cue["emphasis"] = "punchline"
             board_shot["dialogue"] = [cue]
             listener = "bo" if speaker == "lin" else "lin"
             board_shot["direction"]["reaction_hold_frames"] = max(0, duration - end)
