@@ -52,9 +52,13 @@ def _event(event_id, preset, start, duration, part=None):
 
 
 def map_reaction(kind, character, source_motion, source_board, duration, start_frame=0,
-                 strength='medium'):
+                 strength='medium', performance_mode=None):
     """Resolve reaction semantics using config and only declared/available assets."""
-    config = rules()['reactions'][kind]
+    all_rules = rules()
+    if performance_mode == 'cutout-comedy':
+        config = all_rules.get('cutout_comedy', {}).get('reactions', {}).get(kind, all_rules['reactions'][kind])
+    else:
+        config = all_rules['reactions'][kind]
     capabilities = character.get('capabilities', {})
     expression = next((name for name in config['expression_candidates']
                        if name in capabilities.get('expressions', [])), None)
@@ -70,6 +74,10 @@ def map_reaction(kind, character, source_motion, source_board, duration, start_f
     if preset and preset in ('nod', 'shake_head') and 'head' not in capabilities.get('parts', []):
         preset = None
     if preset == 'small_bounce' and 'body' not in capabilities.get('parts', []):
+        preset = None
+    if preset in ('lean_back', 'body_shake') and 'body' not in capabilities.get('parts', []):
+        preset = None
+    if preset in ('head_forward', 'double_take') and not ({'head', 'body'} & set(capabilities.get('parts', []))):
         preset = None
     if preset and preset in ('point', 'raise_hand') and not ({'arm', 'left_arm', 'right_arm'} & set(capabilities.get('parts', []))):
         preset = None
@@ -274,7 +282,10 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
                 target = beat['reaction_target']
                 if target not in visible or target not in character_ids:
                     raise ValueError('reaction_target is not visible in source shot '+source_id)
-                hold = beat['reaction_hold'] or rules()['reactions'][beat['reaction']]['hold_frames']
+                source_mode = (source_motion.get('performance') or {}).get('mode')
+                reaction_rule = (rules().get('cutout_comedy', {}).get('reactions', {}).get(beat['reaction'])
+                                 if source_mode == 'cutout-comedy' else None) or rules()['reactions'][beat['reaction']]
+                hold = beat['reaction_hold'] or reaction_rule['hold_frames']
                 reaction_specs.append((target, beat['reaction'], local_cursor, hold,
                                        beat['beat_id'], beat.get('reaction_strength', 'medium')))
                 local_cursor += hold + pause_after
@@ -337,7 +348,10 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
             character = _manifest_for(chars, character_id)
             character_intents = [beat.get('performance_intent', beat.get('intent')) for beat in beats
                                  if beat['kind'] == 'dialogue' and beat.get('speaker') == character_id]
-            performance_config = rules()['performance_intents']
+            source_mode = (source_motion.get('performance') or {}).get('mode')
+            performance_config = dict(rules()['performance_intents'])
+            if source_mode == 'cutout-comedy':
+                performance_config.update(rules().get('cutout_comedy', {}).get('performance_intents', {}))
             mapped_actions = [performance_config[intent] for intent in character_intents if intent in performance_config]
             action_role = next((action['speaker'] for action in mapped_actions if action['speaker'] != 'idle'), 'idle')
             role = ('speaker' if action_role == 'talk' else 'idle') if character_id in speakers else ('listener' if character_id in listeners else 'idle')
@@ -348,7 +362,7 @@ def compile_director_plan(plan, data, project=None, scene_manifest=None, charact
             if target_reaction:
                 _, reaction_kind, offset, hold, beat_id, strength = target_reaction
                 mapped = map_reaction(reaction_kind, character, source_motion, source_board,
-                                      duration_frames, offset, strength)
+                                      duration_frames, offset, strength, source_mode)
                 performer['expression'] = mapped['expression']
                 performer['events'].extend(mapped['events'])
             else:
