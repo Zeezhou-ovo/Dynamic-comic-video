@@ -102,3 +102,77 @@ test('character root/part transforms execute alongside camera and parallax trans
   assert.equal(state.root.x, 5);
   assert.equal(arm.scale, 1);
 });
+
+
+test('cutout-comedy listener stays still without explicit motion', () => {
+  for (const frame of [0, 4, 8, 12, 20]) {
+    const context = createCharacterPerformanceContext({
+      characterId: 'lin',
+      performance: { ...performer, role: 'listener', root_keys: [], events: [] },
+      capabilities,
+      performanceMode: 'cutout-comedy',
+      absoluteFrame: 100 + frame, localFrame: frame, startFrame: 100, durationFrames: 21, fps: 24,
+    });
+    const state = evaluateCharacterPerformance(context);
+    assert.deepEqual(state.root, { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 });
+    assert.deepEqual(evaluateCharacterPart(frame, { part: 'body', keys: [] }, state),
+      { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1 });
+  }
+});
+
+test('cutout-comedy speaker moves mouth without body bob', () => {
+  const context = createCharacterPerformanceContext({
+    characterId: 'lin',
+    performance: { ...performer, role: 'speaker', root_keys: [], events: [] },
+    capabilities,
+    performanceMode: 'cutout-comedy',
+    absoluteFrame: 104, localFrame: 4, startFrame: 100, durationFrames: 21, fps: 24,
+    dialogue: [{ speaker: 'lin', start_frame: 2, end_frame: 10, mouth_open_frames: [2, 4] }],
+  });
+  const state = evaluateCharacterPerformance(context);
+  assert.equal(state.activeTalk, true);
+  assert.equal(state.states.mouth, 'open');
+  assert.deepEqual(evaluateCharacterPart(4, { part: 'body', keys: [] }, state),
+    { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1 });
+});
+
+test('sequential-comic keeps existing procedural listener motion', () => {
+  const scales = [1, 5, 9, 13, 17].map(frame => {
+    const context = createCharacterPerformanceContext({
+      characterId: 'lin',
+      performance: { ...performer, role: 'listener', root_keys: [], events: [] },
+      capabilities,
+      performanceMode: 'sequential-comic',
+      absoluteFrame: 100 + frame, localFrame: frame, startFrame: 100, durationFrames: 21, fps: 24,
+    });
+    return evaluateCharacterPart(frame, { part: 'body', keys: [] }, evaluateCharacterPerformance(context)).scale;
+  });
+  assert.ok(scales.some(scale => Math.abs(scale - 1) > 1e-9));
+});
+
+test('cutout comedy presets settle back to neutral', () => {
+  for (const preset of ['head_forward', 'lean_back', 'body_shake', 'double_take']) {
+    const event = { event_id: preset, preset, start_frame: 2, peak_frame: 5, settle_frame: 8, end_frame: 12, amplitude: 1 };
+    const active = evaluateCharacterPerformance(createCharacterPerformanceContext({
+      characterId: 'lin',
+      performance: { ...performer, root_keys: [], events: [event] },
+      capabilities,
+      performanceMode: 'cutout-comedy',
+      absoluteFrame: 105, localFrame: 5, startFrame: 100, durationFrames: 21, fps: 24,
+    }));
+    const settled = evaluateCharacterPerformance(createCharacterPerformanceContext({
+      characterId: 'lin',
+      performance: { ...performer, root_keys: [], events: [event] },
+      capabilities,
+      performanceMode: 'cutout-comedy',
+      absoluteFrame: 113, localFrame: 13, startFrame: 100, durationFrames: 21, fps: 24,
+    }));
+    const activeChanged = active.root.x !== 0 || active.root.y !== 0 || active.root.rotation !== 0 ||
+      Object.values(active.parts).some(part => part.x !== 0 || part.y !== 0 || part.rotation !== 0 || part.scale !== 1);
+    assert.equal(activeChanged, true, preset + ' should visibly change the character');
+    assert.deepEqual(settled.root, { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 });
+    for (const part of Object.values(settled.parts)) {
+      assert.deepEqual(part, { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1 });
+    }
+  }
+});
