@@ -209,7 +209,11 @@
     "point": "right_arm",
     "raise_hand": "right_arm",
     "small_bounce": "body",
-    "talk": "mouth"
+    "talk": "mouth",
+    "head_forward": "head",
+    "lean_back": "body",
+    "body_shake": "body",
+    "double_take": "head"
   },
   "cutout_comedy": {
     "reactions": {
