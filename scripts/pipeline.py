@@ -139,8 +139,53 @@ def validate_camera_plan(motion_shot, version, errors, width, height):
                     or translate_y + height * zoom < height - 1):
                 errors.append('Camera/Parallax may reveal a background canvas edge '+sid)
 
+def validate_animation_system(animation, data, errors):
+    """Cross-check optional V2 animation data against storyboard and character capabilities."""
+    if not animation:
+        return
+    shot_map={shot['id']:shot for shot in data['storyboard']['shots']}
+    character_map={char['id']:char for char in data['characters']['characters']}
+    seen=set()
+    for shot in animation.get('shots',[]):
+        sid=shot['shot_id']
+        if sid in seen:
+            errors.append('Duplicate animation shot '+sid)
+            continue
+        seen.add(sid)
+        board=shot_map.get(sid)
+        if not board:
+            errors.append('Unknown animation shot '+sid)
+            continue
+        duration=board['duration_frames']
+        visible={item['character_id'] for item in board['characters']}
+        for performer in shot.get('characters',[]):
+            cid=performer['character_id']
+            if cid not in character_map:
+                errors.append('Unknown animation character '+sid+'/'+cid)
+                continue
+            if cid not in visible:
+                errors.append('Animation character is not visible in shot '+sid+'/'+cid)
+            capabilities=character_map[cid].get('capabilities',{})
+            known_poses=set(capabilities.get('poses',[]))
+            for clip in performer.get('pose_clips',[]):
+                frames=[clip.get('start_frame',0),clip.get('anticipation_end_frame',clip.get('start_frame',0)),
+                        clip.get('action_end_frame',clip.get('anticipation_end_frame',clip.get('start_frame',0))),
+                        clip.get('hold_end_frame',clip.get('action_end_frame',clip.get('start_frame',0))),
+                        clip['end_frame']]
+                if frames != sorted(frames) or frames[0] < 0 or frames[-1] > duration:
+                    errors.append('Invalid pose clip frame order/range '+sid+'/'+cid+'/'+clip['clip_id'])
+                for pose_key in ('base_pose','action_pose'):
+                    if known_poses and clip[pose_key] not in known_poses:
+                        errors.append('Unknown pose capability '+sid+'/'+cid+'/'+clip[pose_key])
+        for event in shot.get('effects',[]):
+            if not 0 <= event['start_frame'] < event['end_frame'] <= duration:
+                errors.append('Invalid animation effect range '+sid+'/'+event['event_id'])
+
 def validate(project, assets=False, shot_id=None):
     data = {n:read(project/(n+'.json')) for n in NAMES}
+    animation_path=project/'animation_system.json'
+    if animation_path.is_file():
+        data['animation_system']=read(animation_path)
     errors, warnings = [], []
     scene_path = project/'scene_manifest.json'
     character_assets_path = project/'character_assets.json'
@@ -176,6 +221,9 @@ def validate(project, assets=False, shot_id=None):
             Draft202012Validator.check_schema(schema)
             for e in Draft202012Validator(schema).iter_errors(manifest):
                 errors.append(f'{name}:{list(e.path)}: {e.message}')
+    if errors:
+        return data, errors, warnings
+    validate_animation_system(data.get('animation_system'), data, errors)
     if errors:
         return data, errors, warnings
     if scene_manifest is not None:

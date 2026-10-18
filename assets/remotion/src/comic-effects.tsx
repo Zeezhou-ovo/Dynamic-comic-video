@@ -24,6 +24,22 @@ export const ComicEffects = ({ events, frame, width, height }: { events: VisualE
       if (e.effect_type === 'flash' || e.effect_type === 'background_tint') {
         return <AbsoluteFill key={e.event_id} style={{ background: e.color ?? '#fff3c3', opacity: e.effect_type === 'flash' ? Math.max(0, 1 - age / Math.max(1, length)) * 0.24 * (e.intensity ?? 1) : 0.1 * (e.intensity ?? 1) }} />;
       }
+      if (e.effect_type === 'radial_burst') {
+        const burstColor = e.color ?? '#f5c84c';
+        const burstSize = Math.max(1, size);
+        const mask = 'radial-gradient(circle, black 0%, black 56%, transparent 100%)';
+        return <AbsoluteFill key={e.event_id} style={{
+          left: x * width - burstSize,
+          top: y * height - burstSize,
+          width: burstSize * 2,
+          height: burstSize * 2,
+          borderRadius: '50%',
+          opacity,
+          background: `repeating-conic-gradient(from 0deg, ${burstColor} 0deg 10deg, transparent 10deg 20deg)`,
+          maskImage: mask,
+          WebkitMaskImage: mask,
+        }} />;
+      }
       if (['question', 'exclamation', 'ellipsis'].includes(e.effect_type)) {
         return <div key={e.event_id} style={{ ...common, textAlign: 'center', fontFamily: 'sans-serif', fontSize: size * 0.88, fontWeight: 900, color: stroke, WebkitTextStroke: '1px #fff5d8' }}>{e.effect_type === 'question' ? '?' : e.effect_type === 'exclamation' ? '!' : '…'}</div>;
       }

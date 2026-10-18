@@ -72,13 +72,47 @@ test('pose, expression, blink and point resolve through the mapped part state as
     events: [{ event_id: 'blink', preset: 'blink', start_frame: 2, peak_frame: 4, settle_frame: 5, end_frame: 7 },
       { event_id: 'point', preset: 'point', part: 'right_arm', start_frame: 2, peak_frame: 4, settle_frame: 9, end_frame: 12 }],
   }));
-  assert.equal(state.states.eyes, 'blink');
+  assert.equal(state.states.eyes, 'closed');
   assert.equal(state.states.expression, 'expression:happy');
   assert.equal(state.states.pose, 'pose:point');
   assert.equal(state.parts.right_arm.rotation, -42);
-  assert.equal(resolveCharacterLayerAsset({ acting: { part: 'eyes' }, state_assets: { blink: 'eyes-blink.png' } }, state, 5), 'eyes-blink.png');
+  assert.equal(resolveCharacterLayerAsset({ acting: { part: 'eyes' }, state_assets: { closed: 'eyes-closed.png' } }, state, 5), 'eyes-closed.png');
   assert.equal(resolveCharacterLayerAsset({ acting: { part: 'mouth' }, state_assets: { 'expression:happy': 'mouth-happy.png' } }, state, 5), 'mouth-happy.png');
   assert.equal(resolveCharacterLayerAsset({ acting: { part: 'right_arm' }, state_assets: { 'pose:point': 'arm-point.png' } }, state, 5), 'arm-point.png');
+});
+
+test('mouth shape frames select closed, small, open and wide assets deterministically', () => {
+  const shapes = ['closed', 'small', 'open', 'wide'];
+  const dialogue = [{ speaker: 'lin', start_frame: 1, end_frame: 5, mouth_shape_frames: shapes }];
+  const assets = Object.fromEntries(shapes.map(shape => [shape, `mouth-${shape}.png`]));
+  for (let offset = 0; offset < shapes.length; offset += 1) {
+    const frame = offset + 1;
+    const context = createCharacterPerformanceContext({
+      characterId: 'lin', performance: { ...performer, role: 'speaker' }, capabilities,
+      absoluteFrame: 100 + frame, localFrame: frame, startFrame: 100, durationFrames: 21, fps: 24, dialogue,
+    });
+    const state = evaluateCharacterPerformance(context);
+    assert.equal(state.states.mouth, shapes[offset]);
+    assert.equal(resolveCharacterLayerAsset({ acting: { part: 'mouth' }, state_assets: assets }, state, frame), assets[shapes[offset]]);
+  }
+});
+
+test('blink transitions through half and closed eyes and preserves legacy blink asset mapping', () => {
+  const event = { event_id: 'blink', preset: 'blink', start_frame: 2, peak_frame: 4, settle_frame: 5, end_frame: 7 };
+  const eyes = { acting: { part: 'eyes' }, state_assets: {
+    open: 'eyes-open.png', half: 'eyes-half.png', closed: 'eyes-closed.png',
+  } };
+  assert.equal(evaluateCharacterPerformance(contextAt(1)).states.eyes, 'open');
+  assert.equal(evaluateCharacterPerformance(contextAt(3, { events: [event] })).states.eyes, 'half');
+  assert.equal(evaluateCharacterPerformance(contextAt(5, { events: [event] })).states.eyes, 'closed');
+  assert.equal(evaluateCharacterPerformance(contextAt(6, { events: [event] })).states.eyes, 'half');
+  assert.equal(resolveCharacterLayerAsset(eyes, evaluateCharacterPerformance(contextAt(3, { events: [event] })), 3), 'eyes-half.png');
+  assert.equal(resolveCharacterLayerAsset(eyes, evaluateCharacterPerformance(contextAt(5, { events: [event] })), 5), 'eyes-closed.png');
+  assert.equal(resolveCharacterLayerAsset(
+    { acting: { part: 'eyes' }, state_assets: { blink: 'legacy-eyes-blink.png' } },
+    evaluateCharacterPerformance(contextAt(5, { events: [event] })),
+    5,
+  ), 'legacy-eyes-blink.png');
 });
 
 test('secondary motion phase and absolute-frame output are stable across seek order', () => {

@@ -2,6 +2,17 @@ import { EASING } from './camera-controller.mjs';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const lerp = (a, b, t) => a + (b - a) * t;
+const MOUTH_SHAPES = new Set(['closed', 'small', 'open', 'round', 'wide']);
+const MOUTH_OPENNESS = Object.freeze({ closed: 0, small: 0.35, open: 1, round: 0.72, wide: 1 });
+
+function mouthShapeAtFrame(cue, frame) {
+  const cueFrame = frame - cue.start_frame;
+  const authoredShape = cue.mouth_shape_frames?.[cueFrame];
+  if (MOUTH_SHAPES.has(authoredShape)) return authoredShape;
+  const openFrames = cue.mouth_open_frames ?? [];
+  if (openFrames.length) return openFrames.includes(cueFrame) ? 'open' : 'closed';
+  return cueFrame % 9 < 5 ? 'open' : 'closed';
+}
 
 const identityRoot = () => ({ x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 });
 
@@ -113,6 +124,7 @@ export function evaluateCharacterPerformance(context) {
   const root = sampleTrack(frame, context.rootKeys, identityRoot(), context.rootEasing);
   const parts = {};
   const states = {};
+  if (context.capabilities.parts.includes('eyes')) states.eyes = 'open';
   const phase = (hashSeed(context.characterId) / 0xffffffff) * Math.PI * 2;
   let mouthState = 'closed';
   let activeTalk = false;
@@ -123,10 +135,7 @@ export function evaluateCharacterPerformance(context) {
 
   const activeCue = context.dialogue.find(cue => cue.speaker === context.characterId && frame >= cue.start_frame && frame < cue.end_frame);
   if (activeCue) {
-    const openFrames = activeCue.mouth_open_frames ?? [];
-    mouthState = openFrames.length
-      ? (openFrames.includes(frame - activeCue.start_frame) ? 'open' : 'closed')
-      : ((frame - activeCue.start_frame) % 9 < 5 ? 'open' : 'closed');
+    mouthState = mouthShapeAtFrame(activeCue, frame);
     activeTalk = true;
     addPart(parts, 'body', { y: Math.sin((Math.PI * 2 * frame) / 12 + phase) * 0.5 });
   }
@@ -164,7 +173,8 @@ export function evaluateCharacterPerformance(context) {
         break;
       }
       case 'blink':
-        if (frame >= event.peak_frame && frame <= event.settle_frame) states.eyes = 'blink';
+        if (frame >= event.peak_frame && frame <= event.settle_frame) states.eyes = 'closed';
+        else if (frame >= event.start_frame && frame < event.end_frame) states.eyes = 'half';
         break;
       case 'small_bounce':
         root.y -= (event.amplitude ?? 8) * envelope;
@@ -191,7 +201,7 @@ export function evaluateCharacterPerformance(context) {
     rootPivot: context.rootPivot,
     parts: Object.freeze(Object.fromEntries(Object.entries(parts).map(([key, value]) => [key, Object.freeze(value)]))),
     states: Object.freeze(states),
-    mouth: Object.freeze({ state: mouthState, openness: mouthState === 'open' ? 1 : 0 }),
+    mouth: Object.freeze({ state: mouthState, openness: MOUTH_OPENNESS[mouthState] ?? 0 }),
     activeTalk,
   });
 }
@@ -217,11 +227,14 @@ export function resolveCharacterLayerAsset(layer, performanceState, localFrame) 
   const stateAssets = layer.state_assets ?? {};
   const part = layer.acting?.part;
   const states = performanceState?.states ?? {};
+  const eyeState = states.eyes;
   for (const state of [
     part === 'mouth' && states.mouth,
-    part === 'eyes' && states.eyes,
+    part === 'eyes' && eyeState && eyeState !== 'open' && eyeState,
+    part === 'eyes' && eyeState === 'closed' && 'blink',
     states.expression,
     states.pose,
+    part === 'eyes' && eyeState === 'open' && 'open',
   ]) {
     if (state && stateAssets[state]) return stateAssets[state];
   }

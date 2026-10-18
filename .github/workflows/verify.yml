@@ -24,8 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Run deterministic camera checks
-        run: node --test scripts/test_camera_runtime.mjs scripts/test_character_runtime.mjs scripts/test_performance_runtime.mjs
+      - name: Run deterministic runtime checks
+        run: node --test scripts/test_camera_runtime.mjs scripts/test_character_runtime.mjs scripts/test_performance_runtime.mjs scripts/test_v2_animation_runtime.mjs
       - name: Compile example prompts
         run: python scripts/pipeline.py compile examples/library
       - name: Validate example contracts
@@ -79,6 +79,19 @@ jobs:
       - name: Render Character Performance MP4
         working-directory: character-performance-renderer
         run: npm run render
+      - name: Build V2 limited-animation fixture
+        run: python scripts/make_v2_animation_fixture.py v2-animation-fixture
+      - name: Validate and prepare V2 renderer
+        run: |
+          python scripts/pipeline.py validate v2-animation-fixture --assets
+          python scripts/pipeline.py prepare v2-animation-fixture --renderer v2-animation-renderer
+      - name: Install V2 renderer dependencies
+        working-directory: v2-animation-renderer
+        run: npm ci
+      - name: Render V2 limited-animation MP4
+        working-directory: v2-animation-renderer
+        run: npm run render
+
       - name: Build comedy and knowledge director fixtures
         run: |
           python scripts/make_director_fixtures.py comedy phase3-comedy-fixture
@@ -120,6 +133,11 @@ jobs:
         with:
           name: character-performance-video-fixture
           path: character-performance-renderer/out/video.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v2-limited-animation-video-fixture
+          path: v2-animation-renderer/out/video.mp4
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:

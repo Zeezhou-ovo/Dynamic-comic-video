@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dynamic-comic-video:animation_system:0.1",
+  "title": "animation_system",
+  "type": "object",
+  "properties": {
+    "version": {"const": "0.1"},
+    "project_id": {"type": "string", "minLength": 1},
+    "shots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "shot_id": {"type": "string", "minLength": 1},
+          "characters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "character_id": {"type": "string", "minLength": 1},
+                "pose_clips": {
+                  "type": "array",
+                  "items": {"$ref": "#/$defs/pose_clip"}
+                }
+              },
+              "required": ["character_id", "pose_clips"],
+              "additionalProperties": false
+            }
+          },
+          "effects": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/effect_event"}
+          }
+        },
+        "required": ["shot_id"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "project_id", "shots"],
+  "additionalProperties": false,
+  "$defs": {
+    "pose_clip": {
+      "type": "object",
+      "properties": {
+        "clip_id": {"type": "string", "minLength": 1},
+        "start_frame": {"type": "integer", "minimum": 0},
+        "anticipation_end_frame": {"type": "integer", "minimum": 0},
+        "action_end_frame": {"type": "integer", "minimum": 0},
+        "hold_end_frame": {"type": "integer", "minimum": 0},
+        "end_frame": {"type": "integer", "minimum": 1},
+        "base_pose": {"type": "string", "minLength": 1},
+        "action_pose": {"type": "string", "minLength": 1},
+        "smear": {"type": "boolean"},
+        "rotation_deg": {"type": "number", "minimum": -45, "maximum": 45},
+        "translate": {
+          "type": "object",
+          "properties": {
+            "x": {"type": "number"},
+            "y": {"type": "number"}
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
+        },
+        "squash_stretch": {
+          "type": "object",
+          "properties": {
+            "x": {"type": "number", "minimum": -0.5, "maximum": 0.5},
+            "y": {"type": "number", "minimum": -0.5, "maximum": 0.5}
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["clip_id", "start_frame", "end_frame", "base_pose", "action_pose"],
+      "additionalProperties": false
+    },
+    "effect_event": {
+      "type": "object",
+      "properties": {
+        "event_id": {"type": "string", "minLength": 1},
+        "effect_type": {
+          "enum": ["screen_shake", "flash", "speed_lines", "focus_lines", "shock_lines", "radial_burst", "background_tint"]
+        },
+        "start_frame": {"type": "integer", "minimum": 0},
+        "end_frame": {"type": "integer", "minimum": 1},
+        "intensity": {"type": "number", "minimum": 0, "maximum": 2},
+        "fade_frames": {"type": "integer", "minimum": 1},
+        "color": {"type": "string"},
+        "position": {
+          "type": "array",
+          "prefixItems": [
+            {"type": "number", "minimum": 0, "maximum": 1},
+            {"type": "number", "minimum": 0, "maximum": 1}
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "size": {"type": "number", "minimum": 0.01, "maximum": 2},
+        "angle": {"type": "number"},
+        "strength": {"type": "number", "minimum": 0, "maximum": 2}
+      },
+      "required": ["event_id", "effect_type", "start_frame", "end_frame"],
+      "additionalProperties": false
+    }
+  }
+}
