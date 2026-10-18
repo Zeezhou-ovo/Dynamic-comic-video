@@ -44,5 +44,24 @@
     "surprise": {"camera": "stronger_push", "default_pause_frames": 8}
   },
   "reveal": {"default_hold_frames": 14, "max_cut_delay_frames": 4},
-  "event_part": {"nod": "head", "shake_head": "head", "blink": "eyes", "point": "right_arm", "raise_hand": "right_arm", "small_bounce": "body", "talk": "mouth"}
+  "event_part": {"nod": "head", "shake_head": "head", "blink": "eyes", "point": "right_arm", "raise_hand": "right_arm", "small_bounce": "body", "talk": "mouth", "head_forward": "head", "lean_back": "body", "body_shake": "body", "double_take": "head"},
+  "cutout_comedy": {
+    "reactions": {
+      "neutral": {"expression_candidates": ["neutral"], "event": null, "camera": "static", "shot_intent": "two_shot", "hold_frames": 0},
+      "interested": {"expression_candidates": ["interested", "happy"], "event": "nod", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 8},
+      "confused": {"expression_candidates": ["confused", "surprised"], "event": "double_take", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 12},
+      "surprised": {"expression_candidates": ["surprised"], "event": "lean_back", "camera": "subtle_push", "shot_intent": "listener_reaction", "hold_frames": 12},
+      "speechless": {"expression_candidates": ["speechless", "surprised"], "event": null, "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 18},
+      "awkward": {"expression_candidates": ["awkward", "confused"], "event": null, "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 16},
+      "annoyed": {"expression_candidates": ["annoyed", "confused"], "event": "shake_head", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 10},
+      "amused": {"expression_candidates": ["amused", "happy"], "event": "nod", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 10},
+      "laugh": {"expression_candidates": ["laugh", "happy"], "event": "small_bounce", "camera": "static", "shot_intent": "listener_reaction", "hold_frames": 16}
+    },
+    "performance_intents": {
+      "deadpan": {"speaker": "talk", "listener": "idle"},
+      "challenge": {"speaker": "talk", "listener": "idle", "gesture": "head_forward"},
+      "accuse": {"speaker": "talk", "listener": "idle", "gesture": "point"},
+      "outburst": {"speaker": "talk", "listener": "idle", "gesture": "body_shake"}
+    }
+  }
 }

@@ -79,6 +79,14 @@ jobs:
       - name: Render Character Performance MP4
         working-directory: character-performance-renderer
         run: npm run render
+      - name: Build and validate cutout-comedy demo
+        run: |
+          python scripts/make_cutout_comedy_demo.py cutout-comedy-demo
+          python scripts/pipeline.py validate cutout-comedy-demo --assets
+          python scripts/pipeline.py prepare cutout-comedy-demo --renderer character-performance-renderer
+      - name: Render cutout-comedy demo MP4
+        working-directory: character-performance-renderer
+        run: npx remotion render src/index.tsx MangaMotion out/cutout-comedy-demo.mp4 --codec=h264
       - name: Build comedy and knowledge director fixtures
         run: |
           python scripts/make_director_fixtures.py comedy phase3-comedy-fixture
@@ -120,6 +128,11 @@ jobs:
         with:
           name: character-performance-video-fixture
           path: character-performance-renderer/out/video.mp4
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cutout-comedy-demo
+          path: character-performance-renderer/out/cutout-comedy-demo.mp4
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:

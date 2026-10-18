@@ -252,11 +252,12 @@ def validate(project, assets=False, shot_id=None):
         cursor+=item['duration_frames']
         if not shot: continue
         if item['duration_frames']!=shot['duration_frames']: errors.append('Duration mismatch '+sid)
-        sequential=(item.get('performance') or {}).get('mode')=='sequential-comic'
-        if motion['version'] in ('0.3','0.4') and (item.get('performance') or {}).get('mode') not in ('sequential-comic','fixed-camera-micro'):
+        performance_mode=(item.get('performance') or {}).get('mode')
+        sequential=performance_mode in ('sequential-comic','cutout-comedy')
+        if motion['version'] in ('0.3','0.4') and performance_mode not in ('sequential-comic','fixed-camera-micro','cutout-comedy'):
             errors.append('motion_plan '+motion['version']+' requires a fixed comic performance mode '+sid)
         if sequential and ('dialogue' not in shot or shot.get('transition')!='cut'):
-            errors.append('Sequential comic requires dialogue (empty for silent shots) and cut transition '+sid)
+            errors.append('Sequential/cutout comic requires dialogue (empty for silent shots) and cut transition '+sid)
         caption_end=0
         for cue in shot.get('dialogue',[]):
             if cue['start_frame']<caption_end or not cue['start_frame']<cue['end_frame']<=shot['duration_frames']:
@@ -395,8 +396,20 @@ def compile_prompts(project,data,shot_id=None):
             'scene_space':space,
             'direction':shot.get('direction'),
             'sequential_comic_constraints':('One panel expresses one line, action or reaction. Fixed camera and composition. Animate character mouths, eyes, expressions, head, hands or simple limbs; use a new hard-cut panel for complex actions and new angles. Comic exaggeration, symbols and text effects are allowed for punchlines. Preserve character identity across panels. Subtitles follow supplied dialogue intervals. No camera motion or whole-image stretch as acting.' if (plan.get('performance') or {}).get('mode')=='sequential-comic' else None),
+            'cutout_comedy_constraints':({
+                'motion':'Static first. Use abrupt readable pose/expression swaps and short explicit actions; do not add ambient breathing, floating or sway.',
+                'reaction':'Give listeners readable reactions and intentional holds. Speechless/awkward beats may remain completely still after an expression swap.',
+                'assets':'Prefer aligned reusable pose and expression assets for large changes. Do not stretch one drawing into a new body pose.',
+                'camera':'Default to fixed composition and hard cuts. Reserve stronger push or screen shake for clear emphasis.'
+            } if (plan.get('performance') or {}).get('mode')=='cutout-comedy' else None),
             'micro_performance_constraints':({'primary':'Exactly one complete blink per original comic shot; small mouth opening only during timed speech; extremely slight head turn; almost imperceptible chest/shoulder breathing; minimal hair movement. Preserve original pose and expression design.','secondary':'Remain still except optional occasional blinking. No secondary head, breathing or sway tracks.','stability':'No camera movement, whole-image stretch, large limb action, position changes, facial drift, deformed hands/feet or twisted bodies. Preserve original 2D linework.','review':'Visually count one primary blink and verify secondary stillness and anatomical stability; these are not automatically pixel-validated.'} if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro' else None),
-            'instructions':('Preserve the original master composition and pose. Fixed camera: no zoom, pan, rotation, scale or parallax. Animate only subtle local blinking, speech-timed mouth shapes, breathing and small head/hair/clothing motion. Keep background, identity and linework stable; no stretching or deformation. Mouth motion requires supplied dialogue timings and aligned local assets; automatic lip sync is not implemented.' if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro' else 'Design anticipation, action, reaction and hold. Generate fresh pose drawings or separate joints from this shot master; fill exposed areas. Keep identity and contact points consistent. Never substitute a lineup crop or camera zoom for acting.')})
+            'instructions':(
+                'Preserve the original master composition and pose. Fixed camera: no zoom, pan, rotation, scale or parallax. Animate only subtle local blinking, speech-timed mouth shapes, breathing and small head/hair/clothing motion. Keep background, identity and linework stable; no stretching or deformation. Mouth motion requires supplied dialogue timings and aligned local assets; automatic lip sync is not implemented.'
+                if (plan.get('performance') or {}).get('mode')=='fixed-camera-micro'
+                else 'Design static-first cutout comedy acting: one clear action or reaction at a time, abrupt readable pose/expression changes, listener reactions, and deliberate holds. Generate aligned pose/expression assets for large changes; do not add ambient breathing or floating, and do not substitute zoom for acting.'
+                if (plan.get('performance') or {}).get('mode')=='cutout-comedy'
+                else 'Design anticipation, action, reaction and hold. Generate fresh pose drawings or separate joints from this shot master; fill exposed areas. Keep identity and contact points consistent. Never substitute a lineup crop or camera zoom for acting.'
+            )})
         save(project/'prompts'/(shot['id']+'.json'),{
             'prompt_version':'0.1','project_id':brief['project_id'],'shot_id':shot['id'],'prompt_role':'master',
             'task':'fresh_master_composition','output':shot['master'],'canvas':brief['format'],

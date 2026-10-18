@@ -72,6 +72,7 @@ export function createCharacterPerformanceContext({
   characterId,
   performance,
   capabilities,
+  performanceMode,
   absoluteFrame,
   localFrame,
   startFrame,
@@ -91,6 +92,7 @@ export function createCharacterPerformanceContext({
     durationFrames,
     progress: durationFrames <= 1 ? 1 : localFrame / (durationFrames - 1),
     fps,
+    performanceMode: performanceMode ?? 'sequential-comic',
     role: performance.role,
     pose: performance.pose ?? null,
     expression: performance.expression ?? null,
@@ -116,8 +118,9 @@ export function evaluateCharacterPerformance(context) {
   const phase = (hashSeed(context.characterId) / 0xffffffff) * Math.PI * 2;
   let mouthState = 'closed';
   let activeTalk = false;
+  const proceduralMotionEnabled = context.performanceMode !== 'cutout-comedy';
 
-  if (context.role === 'idle' || context.role === 'listener') {
+  if (proceduralMotionEnabled && (context.role === 'idle' || context.role === 'listener')) {
     addPart(parts, 'body', { scale: 1 + 0.004 * Math.sin((Math.PI * 2 * frame) / (context.fps * 4) + phase) });
   }
 
@@ -128,7 +131,9 @@ export function evaluateCharacterPerformance(context) {
       ? (openFrames.includes(frame - activeCue.start_frame) ? 'open' : 'closed')
       : ((frame - activeCue.start_frame) % 9 < 5 ? 'open' : 'closed');
     activeTalk = true;
-    addPart(parts, 'body', { y: Math.sin((Math.PI * 2 * frame) / 12 + phase) * 0.5 });
+    if (proceduralMotionEnabled) {
+      addPart(parts, 'body', { y: Math.sin((Math.PI * 2 * frame) / 12 + phase) * 0.5 });
+    }
   }
 
   for (const event of context.events) {
@@ -137,7 +142,7 @@ export function evaluateCharacterPerformance(context) {
     const amount = event.amplitude ?? 1;
     switch (event.preset) {
       case 'idle':
-        if (context.role !== 'idle' && context.role !== 'listener') {
+        if (proceduralMotionEnabled && context.role !== 'idle' && context.role !== 'listener') {
           addPart(parts, 'body', { scale: 1 + 0.004 * Math.sin((Math.PI * 2 * frame) / (context.fps * 4) + phase) });
         }
         break;
@@ -145,7 +150,9 @@ export function evaluateCharacterPerformance(context) {
         activeTalk = true;
         const localTalkFrame = frame - event.start_frame;
         if (!activeCue) mouthState = localTalkFrame % 9 < 5 ? 'open' : 'closed';
-        addPart(parts, 'body', { y: Math.sin((Math.PI * 2 * frame) / 12 + phase) * 0.65 * envelope });
+        if (proceduralMotionEnabled) {
+          addPart(parts, 'body', { y: Math.sin((Math.PI * 2 * frame) / 12 + phase) * 0.65 * envelope });
+        }
         break;
       }
       case 'nod':
@@ -170,6 +177,46 @@ export function evaluateCharacterPerformance(context) {
         root.y -= (event.amplitude ?? 8) * envelope;
         root.scale *= 1 + 0.012 * envelope;
         break;
+      case 'head_forward': {
+        const target = event.part ?? (context.capabilities.parts.includes('head') ? 'head' : 'body');
+        addPart(parts, target, {
+          y: amount * 1.5 * envelope,
+          rotation: amount * -2 * envelope,
+          scale: 1 + amount * 0.035 * envelope,
+        });
+        break;
+      }
+      case 'lean_back':
+        root.y += amount * 2 * envelope;
+        root.rotation -= amount * 5 * envelope;
+        root.scale *= 1 - amount * 0.025 * envelope;
+        break;
+      case 'body_shake': {
+        const progress = (frame - event.start_frame) / Math.max(1, event.end_frame - event.start_frame);
+        root.x += Math.sin(progress * Math.PI * 8) * amount * 6 * envelope;
+        break;
+      }
+      case 'double_take': {
+        const target = event.part ?? (context.capabilities.parts.includes('head') ? 'head' : 'body');
+        const progress = clamp((frame - event.start_frame) / Math.max(1, event.end_frame - event.start_frame), 0, 1);
+        let x = 0;
+        let rotation = 0;
+        if (progress < 0.35) {
+          const p = progress / 0.35;
+          x = -3 * amount * p;
+          rotation = -2 * amount * p;
+        } else if (progress < 0.5) {
+          const p = (progress - 0.35) / 0.15;
+          x = lerp(-3, 7, p) * amount;
+          rotation = lerp(-2, 4, p) * amount;
+        } else if (progress < 0.72) {
+          const p = (progress - 0.5) / 0.22;
+          x = lerp(7, 0, p) * amount;
+          rotation = lerp(4, 0, p) * amount;
+        }
+        addPart(parts, target, { x, rotation });
+        break;
+      }
       default:
         break;
     }

@@ -225,7 +225,8 @@ def scan(project, autofix=False):
     previous_tags = []
     action_counts = {}
     sequential = motion.get("version") == "0.3" or any(
-        (item.get("performance") or {}).get("mode") == "sequential-comic" for item in motion.get("shots", [])
+        (item.get("performance") or {}).get("mode") in ("sequential-comic", "cutout-comedy")
+        for item in motion.get("shots", [])
     )
 
     for shot in board["shots"]:
@@ -313,7 +314,7 @@ def scan(project, autofix=False):
                 actions += max(0, len(acting["poses"]) - 2)
             if acting.get("speech") and not dialogue:
                 issue(report, "Major", "mouth_sync", sid, "Mouth speech layer exists without dialogue timing")
-            if motion_shot.get("performance", {}).get("mode") in ("sequential-comic", "fixed-camera-micro"):
+            if motion_shot.get("performance", {}).get("mode") in ("sequential-comic", "fixed-camera-micro", "cutout-comedy"):
                 for key in ("from", "to"):
                     transform = layer.get(key, {})
                     if transform.get("x", 0) or transform.get("y", 0) or transform.get("scale", 1) != 1:
