@@ -42,6 +42,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 - 先完整 master，再以它为唯一对齐基准提取或重建图层；保持画布、坐标、透视、尺度与光向，补全被遮挡背景。缺层就记录缺项，不降级成整图推拉。
 - 默认 `performance.mode: sequential-comic`，镜内固定机位；motion_plan 0.4 未提供 Camera 或 `camera.type: static` 时画面保持原构图。只有逐镜显式设置可执行 Camera 时才移动整场景；有多个 depth layer 时 Camera 驱动 Parallax。局部动作需要事件原因和准备→动作→停顿/回稳；静止也是有效表演。大型姿势变化优先拆镜，禁止周期浮动、摇摆和机械呼吸。
 - 实际配音先于最终字幕、嘴型、动作触发与 CUT 定时。没有音频时可以草拟时间，但不能报告为已同步；无对白作品不强加配音或嘴型。
+- 对适用的个人沙雕漫画风格档案，嘴部素材按硬规则处理：禁止用图像生成/编辑模型、手绘、矢量或程序绘图生成、补画、重绘、扩张、变形或替换嘴部；只允许从用户提供并确认的该角色素材中提取原嘴像素，做局部裁切、对齐和透明图层合成。缺少该角色的张嘴素材时保留原嘴静止，不借用其他角色素材、不拉伸或画椭圆补嘴，并说明限制。此规则优先于通用嘴型生成流程。
 - 使用 `director_plan` 时把它作为实际播放的权威时间轴：按故事意图分配 beat、speaker/listener、reaction 与 pauses；允许多句对白留在同一镜头，也允许没有对白的 reaction shot。停顿进入帧时长，意图只通过 resolver 映射到已有 Camera/Character Runtime，不能在 renderer 中增写导演 if/else。匹配到本地对白 WAV 时以实测时长排 cue，再验证没有音频/字幕漂移。
 - 默认新生图档位为 `comic-economy`，用户已有选择优先。知识卡、总结卡、CTA、特效和背景音乐只按创作需求启用。
 
@@ -53,7 +54,7 @@ description: Create and revise sequential motion-comic videos from stories, scri
 2. 完成当前阶段的数据后，依次运行 `python scripts/pipeline.py validate <project>` 和 `python scripts/pipeline.py compile <project>`。compile 只整理导演决策，不替代剧情设计或图像生成。
 3. 正式角色参考图存在并核对后，将 `characters[].reference.status` 设为 `ready`；使用正式素材时将 `motion_plan.asset_mode` 设为 `production`。逐镜人工核对 master 对齐、背景补全和运动边界后，填写 `motion_plan.shots[].review.master_alignment`、`background_completed`、`motion_bounds_checked` 与 `notes`。fixture 只用于管线测试，不得标成正式素材。
 4. 素材就绪后运行 `python scripts/pipeline.py validate <project> --assets`，查看 `repetition_warnings`、重复角色图层错误和图像接触表。核对相邻人物姿势标签、连续三镜的景别/角度/构图标签及实际画面。标签重复会产生 warning，合理复用时在该镜头写入 `repetition_exception`；完全相同的人物 PNG 会触发资产校验错误，不能用 exception 绕过，应提供正确分层。标签或文件哈希的差异也不能证明画面真实不同。
-5. Critical/Major 问题修复后才预览。使用 `python scripts/preview.py <project> --renderer <external-renderer>`；单镜头可追加 `--shot <shot_id>`，输出默认为 `preview_<shot_id>.mp4`。预览会校验素材、运行质量闸门安全修正、再次校验、编译、prepare 并渲染；仅首次安装该 renderer 的依赖时追加 `--npm-install`。每次预览会把首/中/末帧放入 `<project>/visual-review/` 并写入 `visual_review.json`。使用 `style_preset: "simple-comic"` 时，预览前先运行 `scripts/generate_simple_comic_motion_assets.py <project>` 生成眨眼和嘴型变体，再追加 `--simple-comic`；没有变体时只能称为静态预览，未经对齐审核的通用嘴型不得覆盖 master。
+5. Critical/Major 问题修复后才预览。使用 `python scripts/preview.py <project> --renderer <external-renderer>`；单镜头可追加 `--shot <shot_id>`，输出默认为 `preview_<shot_id>.mp4`。预览会校验素材、运行质量闸门安全修正、再次校验、编译、prepare 并渲染；仅首次安装该 renderer 的依赖时追加 `--npm-install`。每次预览会把首/中/末帧放入 `<project>/visual-review/` 并写入 `visual_review.json`。使用 `style_preset: "simple-comic"` 时可追加 `--simple-comic`；需要眨眼变体时可运行 `scripts/generate_simple_comic_motion_assets.py <project>`。嘴部始终遵守适用的个人风格档案硬规则：只可使用用户提供并确认的原始嘴部素材；缺少张嘴素材时保持静止。生成脚本写出的原嘴拷贝不能冒充张嘴素材，未经确认的通用嘴型不得覆盖 master。
 6. 打开 `visual_review.json` 中的图片，查看逐镜接触表、关键帧及中间帧、切点两侧，检查身份、接缝、接触、遮挡、字幕和节奏。按叙事需要保留反应时间；实际查看后运行 `python scripts/project_state.py review <project> --approve`，发现问题则用 `--reject --note`。清单绑定当前源文件和媒体指纹，修改输入后必须重新预览和复核。
 7. 多镜头返工用 `python scripts/project_state.py revision add <project> --text "..." --shot <shot_id>` 记录，处理后标为 `resolved`。只重做变化镜头时可用 `scripts/preview.py <project> --renderer <external-renderer> --incremental`；它只更新指纹变化或缺失缓存的镜头，不替代最终全片预览。
 8. 视觉复核批准且返工台账清空后运行 `python scripts/deliver.py <project>`。交付闸门用本地 `ffprobe` 检查 MP4 可播放性、尺寸、帧率和时长；报告为 `FAIL` 时按 `blocking_issues` 修复。
