@@ -11,6 +11,8 @@ description: Create and revise sequential motion-comic videos from stories, scri
 
 先读取 [总控与恢复规则](references/v10-control-system.md)，判断本次是新建、继续还是局部修改。只加载当前阶段对应的文档，不一次读完全部 references。用户只请求分镜、提示词或局部修改时，到该交付物完成为止，不自动扩展为整片制作。
 
+本机用户延续其沙雕漫画系列、说“按之前标准/继续”，或未指定不同风格时，读取[维护者已确认的沙雕漫画默认](references/user-style-profile.md)。此档只适用于该用户的同类项目；本次明确指示优先，不套用于无关项目或其他用户。
+
 | 当前任务 | 读取 | 本阶段结果 |
 | --- | --- | --- |
 | 新建项目或关键信息缺失 | [制作向导](references/production-wizard.md)、[内容目录](references/content-intake.md)；面向真实观众时再读[内容策划](references/content-strategy.md) | 独立项目目录、最小 brief 与明确假设；面向真实观众时补齐内容策略 |
